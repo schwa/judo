@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		45FF28942DEA17A900947A9B /* Everything in Frameworks */ = {isa = PBXBuildFile; productRef = 45FF28932DEA17A900947A9B /* Everything */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		45FF28832DEA173E00947A9B /* Judo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Judo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				45FF28942DEA17A900947A9B /* Everything in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = Judo;
 			packageProductDependencies = (
+				45FF28932DEA17A900947A9B /* Everything */,
 			);
 			productName = Judo;
 			productReference = 45FF28832DEA173E00947A9B /* Judo.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = 45FF287A2DEA173E00947A9B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				45FF28922DEA17A900947A9B /* XCRemoteSwiftPackageReference "Everything" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 45FF28842DEA173E00947A9B /* Products */;
 			projectDirPath = "";
@@ -321,6 +330,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		45FF28922DEA17A900947A9B /* XCRemoteSwiftPackageReference "Everything" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/schwa/Everything";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		45FF28932DEA17A900947A9B /* Everything */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 45FF28922DEA17A900947A9B /* XCRemoteSwiftPackageReference "Everything" */;
+			productName = Everything;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 45FF287B2DEA173E00947A9B /* Project object */;
 }
