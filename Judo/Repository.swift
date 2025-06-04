@@ -45,13 +45,15 @@ class Repository {
             let header = "[\n".data(using: .utf8)!
             let footer = "\n]".data(using: .utf8)!
             let jsonData = header + data + footer
-//            let jsonString = String(data: jsonData, encoding: .utf8)!
-//            print(jsonString)
+            let jsonString = String(data: jsonData, encoding: .utf8)!
+            print(jsonString)
+
 
             let decoder = JSONDecoder()
             decoder.allowsJSON5 = true
             decoder.dateDecodingStrategy = .iso8601
             let commits = try decoder.decode([CommitRecord].self, from: jsonData)
+
             let end = CFAbsoluteTimeGetCurrent()
             print("... fetched \(commits.count) commits in \(end - start) seconds")
             return commits
@@ -229,8 +231,8 @@ struct CommitRecord: Identifiable, Decodable {
         ++ "\t'git_head': " ++ git_head ++ ",\\n"
         ++ "\t'conflict': " ++ conflict ++ ",\\n"
         ++ "\t'immutable': " ++ immutable ++ ",\\n"
-        ++ "\t'parents': [" ++ parents.map(|c| "'" ++ c.commit_id() ++ "'").join("|") ++ "],\\n"
-        ++ "\t'bookmarks': [" ++ bookmarks.map(|c| "'" ++ c ++ "'").join("|") ++ "],\\n"
+        ++ "\t'parents': [" ++ parents.map(|c| "'" ++ c.commit_id() ++ "'").join(",") ++ "],\\n"
+        ++ "\t'bookmarks': [" ++ bookmarks.map(|c| "'" ++ c ++ "'").join(",") ++ "],\\n"
         ++ "},\\n"
         """
         .replacingOccurrences(of: "'", with: "\\\"")
