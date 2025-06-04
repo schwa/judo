@@ -11,30 +11,43 @@ struct ContentView: View {
     var body: some View {
         //        TemplateDemoView()
         List(repository.commits, id: \.commit_id) { commit in
-            VStack(alignment: .leading) {
-                HStack {
-                    ChangeIDView(changeID: commit.change_id).monospaced()
-                    if let email = commit.author.email {
-
-                        Text(email)
-                    }
-                    Text(commit.author.timestamp, style: .relative)
-                        .foregroundStyle(.cyan)
-                    if commit.bookmarks.isEmpty == false {
-                        Text("\(commit.bookmarks.joined(separator: ", "))")
-                            .foregroundStyle(.purple)
-                    }
-                    if commit.root {
-                        Text("root()").italic()
-                            .foregroundStyle(.green)
-                    }
-                    Text(commit.commit_id)
-                }
-                if commit.description.isEmpty {
-                    Text("(no description set").italic()
+            HStack {
+                if commit.immutable {
+                    Image(systemName: "diamond.fill")
                 }
                 else {
-                    Text(commit.description.trimmingCharacters(in: .whitespacesAndNewlines))
+                    Image(systemName: "circle")
+
+                }
+
+                VStack(alignment: .leading) {
+                    HStack {
+                        ChangeIDView(changeID: commit.change_id).monospaced()
+                        if let email = commit.author.email {
+                            Text(email)
+                        }
+                        Text(commit.author.timestamp, style: .relative)
+                            .foregroundStyle(.cyan)
+                        if commit.bookmarks.isEmpty == false {
+                            Text("\(commit.bookmarks.joined(separator: ", "))")
+                                .foregroundStyle(.purple)
+                        }
+                        if commit.root {
+                            Text("root()").italic()
+                                .foregroundStyle(.green)
+                        }
+                        Text(commit.commit_id)
+                    }
+                    if commit.empty && commit.root == false {
+                        Text("(empty)").italic().foregroundStyle(.green)
+                    }
+
+                    if commit.description.isEmpty && commit.root == false  {
+                        Text("(no description set").italic()
+                    }
+                    else {
+                        Text(commit.description.trimmingCharacters(in: .whitespacesAndNewlines))
+                    }
                 }
             }
 
@@ -197,9 +210,10 @@ struct CommitRecord: Identifiable, Decodable {
     var commit_id: String
     var author: Signature
     var description: String
-    var parents: [String]
     var root: Bool
     var empty: Bool
+    var immutable: Bool
+    var parents: [String]
     var bookmarks: [String]
 
     static let template = Template(name: "judo_commit_record", content: """
@@ -210,6 +224,7 @@ struct CommitRecord: Identifiable, Decodable {
         ++ "\t'description': " ++ description.escape_json() ++ ",\\n"
         ++ "\t'root': " ++ root ++ ",\\n"
         ++ "\t'empty': " ++ empty ++ ",\\n"
+        ++ "\t'immutable': " ++ immutable ++ ",\\n"
         ++ "\t'parents': [" ++ parents.map(|c| "'" ++ c.commit_id() ++ "'").join("|") ++ "],\\n"
         ++ "\t'bookmarks': [" ++ bookmarks.map(|c| "'" ++ c ++ "'").join("|") ++ "],\\n"
         ++ "},\\n"
