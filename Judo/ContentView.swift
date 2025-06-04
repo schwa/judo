@@ -1,11 +1,12 @@
 import SwiftUI
 import Everything
 import Collections
+import SwiftTerm
 
 struct ContentView: View {
 
     @State
-    var repository = Repository(path: "/Users/schwa/Projects/Ultraviolence")
+    var repository = Repository(path: "/tmp/fake-repo")
 
     @State
     var head: ChangeID?
@@ -19,6 +20,9 @@ struct ContentView: View {
     @State
     var commits: OrderedDictionary<ChangeID, CommitRecord> = [:]
 
+    @State
+    var isRawViewPresented: Bool = false
+
     var body: some View {
         VStack {
             RevsetEditorView(revisionQuery: $revisionQuery) { text in
@@ -28,7 +32,12 @@ struct ContentView: View {
                 }
             }
             .padding()
-            RevisionTimelineView(selection: $selection, commits: $commits)
+            if !isRawViewPresented {
+                RevisionTimelineViewNEW(selection: $selection, commits: $commits)
+            }
+            else {
+                RawTimelineView(revisionQuery: revisionQuery)
+            }
         }
         .navigationDocument(repository.path.url)
         .navigationSubtitle("\(repository.path.description)")
@@ -73,6 +82,10 @@ struct ContentView: View {
                     print("Error selecting directory: \(error)")
                 }
             }
+        }
+
+        Toggle(isOn: $isRawViewPresented) {
+            Text("Raw")
         }
     }
 
@@ -363,5 +376,95 @@ struct RevisionTimelineView: View {
             }
         }
 
+    }
+}
+
+struct RevisionTimelineViewNEW: View {
+
+    @State
+    var repository = Repository(path: "/Users/schwa/Projects/Ultraviolence")
+
+    @State
+    var head: ChangeID?
+
+    @Binding
+    var selection: Set<ChangeID>
+
+    @Binding
+    var commits: OrderedDictionary<ChangeID, CommitRecord>
+
+    var body: some View {
+
+
+        let rows = buildGraphRows(from: Array(commits.values), allCommits: self.commits)
+        let columnCount = rows.map { row -> Int in
+            switch row {
+            case let .commit(_, _, lanes):
+                return lanes.count
+            case let .elision(_, _):
+                return 0
+            }
+        }.max() ?? 0
+
+
+        List(Array(rows.enumerated()), id: \.offset) { index, row in
+            HStack {
+                Group {
+                    switch row {
+                    case let .commit(commit, _, lanes):
+                        LanesView(row: row, columnCount: columnCount)
+//                        CommitGraphRowView(row: row, columnCount: columnCount)
+                    case let .elision(parents, lanes):
+                        Text("...")
+                    }
+                }
+                .frame(width: 12 * CGFloat(columnCount))
+
+                switch row {
+                case let .commit(commit, _, _):
+                    CommitRowView(commit: commit)
+                case let .elision(parents, _):
+                    Spacer()
+                }
+
+            }
+
+
+        }
+
+    }
+}
+
+extension Dictionary {
+    init(_ orderedDictionary: OrderedDictionary<Key, Value>) {
+        self.init(uniqueKeysWithValues: Array(orderedDictionary))
+    }
+}
+
+struct RawTimelineView: View {
+    @Environment(Repository.self)
+    var repository
+
+    var revisionQuery: String
+
+    var body: some View {
+        ViewAdaptor<LocalProcessTerminalView> {
+            return LocalProcessTerminalView(frame: .zero)
+        }
+        update: { view in
+            var env = Terminal.getEnvironmentVariables(termName: "xterm-256color")
+            FSPath.currentDirectory = repository.path
+            env.append("PWD=\(repository.path.path)")
+            var args = ["log"]
+            if revisionQuery.isEmpty == false {
+                args.append(contentsOf: ["-r", revisionQuery])
+            }
+
+
+
+            view.startProcess(executable: repository.binaryPath.path, args: args, environment: env)
+        }
+        .padding()
+        .background(Color.black)
     }
 }

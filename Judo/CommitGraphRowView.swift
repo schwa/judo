@@ -1,15 +1,18 @@
 import SwiftUI
+import Collections
 
 struct CommitGraphRowView: View {
     let row: GraphRow
+    let columnCount: Int
 
     var body: some View {
-        Grid {
+        Grid(alignment: .leading) {
             GridRow {
-                ForEach(0..<lanes.count, id: \.self) { index in
-                    Text(symbol(at: index))
-                        .font(.system(.body, design: .monospaced))
-                        .frame(width: 12, alignment: .center)
+                ForEach(0..<columnCount, id: \.self) { index in
+                        Text(symbol(at: index))
+                            .font(.system(.body, design: .monospaced))
+                    .frame(width: 12, alignment: .center)
+                    .border(Color.red)
                 }
             }
         }
@@ -28,10 +31,10 @@ struct CommitGraphRowView: View {
         case let .commit(commit, column, _):
             if index == column {
                 return "•"
-            } else if lanes[index] != nil {
+            } else if lanes.indices.contains(index), lanes[index] != nil {
                 return "|"
             } else {
-                return " "
+                return ""
             }
 
         case .elision(_, _):
@@ -40,78 +43,104 @@ struct CommitGraphRowView: View {
     }
 }
 
-func partialTopologicalSort(commits: [ChangeID: CommitRecord]) -> [CommitRecord] {
-    var visited = Set<ChangeID>()
-    var result: [CommitRecord] = []
-    func visit(_ id: ChangeID) {
-        guard !visited.contains(id), let commit = commits[id] else { return }
-        visited.insert(id)
-        for parent in commit.parents {
-            if commits[parent] != nil {
-                visit(parent)
-            }
-        }
-        result.append(commit)
-    }
-    for commit in commits.values {
-        visit(commit.id)
-    }
-    return result.reversed()
-}
-
 enum GraphRow {
     case commit(commit: CommitRecord, column: Int, lanes: [ChangeID?])
     case elision(parents: [ChangeID], lanes: [ChangeID?])
 }
 
-func buildGraphRows(from sortedCommits: [CommitRecord], allCommits: [ChangeID: CommitRecord]) -> [GraphRow] {
+func buildGraphRows(from sortedCommits: [CommitRecord], allCommits: OrderedDictionary<ChangeID, CommitRecord>) -> [GraphRow] {
     var rows: [GraphRow] = []
     var lanes: [ChangeID?] = []
 
     for commit in sortedCommits {
-        // Find or assign column for this commit
+        // Determine column for this commit
         let column: Int
         if let idx = lanes.firstIndex(where: { $0 == commit.id }) {
             column = idx
         } else {
-            column = lanes.count
-            lanes.append(commit.id)
-        }
+            // 🚫 Don't allow reuse if the commit is totally unrelated to current active commits
+            let active = Set(lanes.compactMap { $0 })
+            let conflicts = commit.parents.contains(where: { active.contains($0) })
 
-        // Emit the commit row
-        rows.append(.commit(commit: commit, column: column, lanes: lanes))
-
-        // Replace the current commit with its parents (or remove if no parents)
-        lanes[column] = nil // will be replaced or removed
-
-        var phantomParents: [ChangeID] = []
-
-        for parent in commit.parents {
-            if allCommits[parent] != nil {
-                // Parent is known: add to lanes if not already there
-                if !lanes.contains(parent) {
-                    if let emptySlot = lanes.firstIndex(of: nil) {
-                        lanes[emptySlot] = parent
-                    } else {
-                        lanes.append(parent)
-                    }
-                }
+            if let reusable = lanes.firstIndex(of: nil), !conflicts {
+                column = reusable
+                lanes[column] = commit.id
             } else {
-                // Parent is missing: phantom
-                phantomParents.append(parent)
+                column = lanes.count
+                lanes.append(commit.id)
             }
         }
 
-        // Emit elision row if there are phantom parents
-        if !phantomParents.isEmpty {
-            rows.append(.elision(parents: phantomParents, lanes: lanes))
-        }
+        // Emit row
+        rows.append(.commit(commit: commit, column: column, lanes: lanes))
 
-        // If the commit has no parents and isn’t referenced again, clean up
-        if commit.parents.isEmpty || !lanes.contains(commit.id) {
-            lanes[column] = nil
+        // Clear this commit’s slot
+        lanes[column] = nil
+
+        for parent in commit.parents {
+            if !lanes.contains(parent), allCommits[parent] != nil {
+                if let empty = lanes.firstIndex(of: nil) {
+                    lanes[empty] = parent
+                } else {
+                    lanes.append(parent)
+                }
+            }
         }
     }
 
     return rows
+}
+
+struct LanesView: View {
+
+    static let laneWidth: CGFloat = 12
+
+    let row: GraphRow
+    let columnCount: Int
+
+    var body: some View {
+        Canvas { context, size in
+            for index in 0..<columnCount {
+
+                let hasNode: Bool
+                switch row {
+                case let .commit(_, column, _):
+                    if index == column {
+                        hasNode = true
+                    } else if lanes.indices.contains(index), lanes[index] != nil {
+                        hasNode = false
+                    } else {
+                        continue
+                    }
+                case .elision(_, _):
+                    hasNode = false
+                }
+
+
+                let x = CGFloat(index) * Self.laneWidth + (Self.laneWidth / 2)
+                let path = Path { path in
+                    path.move(to: CGPoint(x: x, y: 0))
+                    path.addLine(to: CGPoint(x: x, y: size.height / 2))
+                }
+                context.stroke(path, with: .color(.orange), lineWidth: 2)
+
+                if hasNode {
+                    let path = Path { path in
+                        path.addEllipse(in: CGRect(x: x - 4, y: size.height / 4 - 4, width: 8, height: 8))
+                    }
+                    context.fill(path, with: .color(.orange))
+                }
+
+            }
+        }
+        .frame(width: CGFloat(columnCount) * Self.laneWidth)
+    }
+
+    private var lanes: [ChangeID?] {
+        switch row {
+        case .commit(_, _, let lanes), .elision(_, let lanes):
+            return lanes
+        }
+    }
+
 }
