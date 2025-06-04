@@ -1,58 +1,214 @@
-import Observation
 import SwiftUI
 import Everything
-import TOMLKit
 
 struct ContentView: View {
 
     @State
-    var repository = Repository()
+    var repository = Repository(path: "/Users/schwa/Projects/Ultraviolence")
+
+    @State
+    var head: ChangeID?
+
+    @State
+    var selection: Set<CommitID> = []
+
+    @State
+    var revisionQuery: String = ""
+
+    @State
+    var commits: [CommitRecord] = []
+
+    let revsetShortcuts: [(String, String)] = [
+        ("default", ""),
+        ("all", "all()"),
+        ("visible_heads", "visible_heads()"),
+        ("latest 10", "latest(all(), 10)"),
+        ("merges", "merges()"),
+        ("empty", "empty()"),
+        ("empty description", "description(exact:\"\")"),
+        ("WIP description", "description(\"WIP\")"),
+        ("mine", "mine()"),
+        ("not mine", "~mine()"),
+        ("conflicts", "conflicts()"),
+        ("immutable", "immutable()"),
+        ("tagged", "tags()"),
+        ("remote_bookmarks", "remote_bookmarks()"),
+
+    ]
 
     var body: some View {
-        //        TemplateDemoView()
-        List(repository.commits, id: \.commit_id) { commit in
+        VStack {
             HStack {
-                if commit.immutable {
-                    Image(systemName: "diamond.fill")
-                }
-                else {
-                    Image(systemName: "circle")
-
-                }
-
                 VStack(alignment: .leading) {
-                    HStack {
-                        ChangeIDView(changeID: commit.change_id).monospaced()
-                        if let email = commit.author.email {
-                            Text(email)
-                        }
-                        Text(commit.author.timestamp, style: .relative)
-                            .foregroundStyle(.cyan)
-                        if commit.bookmarks.isEmpty == false {
-                            Text("\(commit.bookmarks.joined(separator: ", "))")
-                                .foregroundStyle(.purple)
-                        }
-                        if commit.root {
-                            Text("root()").italic()
-                                .foregroundStyle(.green)
-                        }
-                        Text(commit.commit_id)
-                    }
-                    if commit.empty && commit.root == false {
-                        Text("(empty)").italic().foregroundStyle(.green)
-                    }
 
-                    if commit.description.isEmpty && commit.root == false  {
-                        Text("(no description set").italic()
+                    HStack {
+                        TextField("revset", text: $revisionQuery).monospaced()
+                            .onSubmit {
+                                Task {
+                                    try await refresh()
+                                }
+
+                            }
+                        Button("Refresh") {
+                            Task {
+                                try await refresh()
+                            }
+                        }
+                    }
+                    HStack {
+                        ForEach(revsetShortcuts, id: \.0) { name, query in
+                            Button(name) {
+                                revisionQuery = query
+                                Task {
+                                    try await refresh()
+                                }
+                            }
+                            .buttonStyle(.link)
+                            .font(.caption)
+                        }
+                    }
+                }
+
+            }
+            .padding()
+
+            List(commits, id: \.commit_id, selection: $selection) { commit in
+                HStack {
+                    if commit.immutable {
+                        Image(systemName: "diamond.fill")
                     }
                     else {
-                        Text(commit.description.trimmingCharacters(in: .whitespacesAndNewlines))
+                        if commit.change_id == head {
+                            Text("@")
+                        }
+                        else {
+                            Image(systemName: "circle")
+                        }
+                    }
+                    VStack(alignment: .leading) {
+                        HStack {
+                            ChangeIDView(changeID: commit.change_id).monospaced()
+                            if let email = commit.author.email {
+                                Text(email)
+                            }
+                            Text(commit.author.timestamp, style: .relative)
+                                .foregroundStyle(.cyan)
+                            if commit.bookmarks.isEmpty == false {
+                                Text("\(commit.bookmarks.joined(separator: ", "))")
+                                    .foregroundStyle(.purple)
+                            }
+                            if commit.git_head {
+                                Text("git_head()").italic()
+                                    .foregroundStyle(.green)
+                            }
+                            if commit.root {
+                                Text("root()").italic()
+                                    .foregroundStyle(.green)
+                            }
+                            CommitIDView(commitID: commit.commit_id)
+                            if commit.conflict {
+                                Text("conflict()").italic()
+                                    .foregroundStyle(.red)
+                            }
+                        }
+                        .font(.subheadline)
+                        if commit.empty && commit.root == false {
+                            Text("(empty)").italic().foregroundStyle(.green)
+                        }
+
+                        Group {
+                            if commit.description.isEmpty && commit.root == false  {
+                                Text("(no description set").italic()
+                            }
+                            else {
+                                let description = commit.description.trimmingCharacters(in: .whitespacesAndNewlines)
+                                Text(verbatim: description).lineLimit(1)
+                            }
+                        }
+                        .font(.body)
+                    }
+                    Spacer()
+                    VStack {
+                        Text("\(commit.parents.count)")
+                        Text(commit.parents.count == 1 ? "parent" : "parents")
+                            .font(.caption)
+                    }
+                    .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .navigationDocument(repository.path.url)
+        .navigationSubtitle("\(repository.path.description)")
+        .toolbar {
+            ValueView(value: false) { value in
+                Button("Open…") {
+                    value.wrappedValue = true
+                }
+                .fileImporter(isPresented: value, allowedContentTypes: [.directory], allowsMultipleSelection: false) { result in
+                    do {
+                        let urls = try result.get()
+                        guard let url = urls.first else { return }
+                        repository.path = FSPath(url)
+                        Task {
+                            try await refresh()
+                        }
+                    }
+                    catch {
+                        print("Error selecting directory: \(error)")
                     }
                 }
+
             }
 
         }
+        .task {
+            head = repository.head
+            do {
+                try await refresh()
+            }
+            catch {
+                print("Error refreshing repository: \(error)")
+            }
+        }
+    }
 
+    func refresh() async throws {
+        do {
+            commits = try await repository.scan(revset: revisionQuery)
+        }
+        catch {
+            print("Error scanning repository: \(error)")
+        }
+
+    }
+}
+
+struct ChangeIDView: View {
+    var changeID: ChangeID
+
+    var body: some View {
+        if let shortest = changeID.shortest {
+            Text(shortest)
+                .foregroundStyle(Color(nsColor: NSColor.magenta))
+            + Text(changeID.rawValue.trimmingPrefix(shortest).prefix(7))
+                .foregroundStyle(.secondary)
+        }
+        else {
+            Text(changeID.rawValue.prefix(8))
+                .foregroundStyle(.secondary)
+        }
+
+    }
+}
+
+struct CommitIDView: View {
+    var commitID: CommitID
+
+    var body: some View {
+        Text(commitID.shortest)
+            .foregroundStyle(.blue)
+        + Text(commitID.rawValue.trimmingPrefix(commitID.shortest).prefix(7))
+            .foregroundStyle(.secondary)
     }
 }
 
@@ -60,222 +216,4 @@ struct ContentView: View {
     ContentView()
 }
 
-@Observable
-class Repository {
-    //    var path: FSPath = "/Users/schwa/Projects/Ultraviolence"
-    var path: FSPath = "/Users/schwa/Desktop/judo"
 
-    var binaryPath: FSPath = "/opt/homebrew/bin/jj"
-
-    var commits: [CommitRecord] = []
-
-    init() {
-        Task {
-
-            let temporaryConfig = JujutsuConfig(templateAliases: [
-                CommitRecord.template.key: CommitRecord.template.content,
-                Signature.template.key: Signature.template.content,
-            ])
-            // write to temp directory
-            //            let tempDirectory = FileManager.default.temporaryDirectory
-            let tempDirectory = URL(fileURLWithPath: "/tmp")
-            let tempConfigPath = tempDirectory.appending(path: "judo.toml")
-            print(tempConfigPath)
-
-            let d = try TOMLEncoder().encode(temporaryConfig).write(toFile: tempConfigPath.path, atomically: true, encoding: .utf8)
-
-            let arguments = ["log", "--no-graph",
-                             "-r", "all()",
-                             "--template", CommitRecord.template.name,
-                             "--config-file", tempConfigPath.path,
-                             //                "--limit", "1"
-            ]
-            print("jj \(arguments.joined(separator: " "))")
-            do {
-                print("Fetching...")
-
-
-
-                let process = SimpleAsyncProcess(executableURL: binaryPath.url, arguments: arguments, currentDirectoryURL: path.url)
-                let data = try await process.run()
-
-                let header = "[\n".data(using: .utf8)!
-                let footer = "\n]".data(using: .utf8)!
-                let jsonData = header + data + footer
-                let jsonString = String(data: jsonData, encoding: .utf8)!
-                print(jsonString)
-
-                let decoder = JSONDecoder()
-                decoder.allowsJSON5 = true
-                decoder.dateDecodingStrategy = .iso8601
-
-
-
-                self.commits = try decoder.decode([CommitRecord].self, from: jsonData)
-                print("Done")
-                //                print(try! output.standardOutput!.readString())
-            }
-            catch {
-                print("Error: \(error)")
-            }
-        }
-
-    }
-}
-
-extension Process.Output {
-    func readString() throws -> String {
-        String(data: try read(), encoding: .utf8)!
-    }
-}
-
-struct ChangeID: Hashable, Decodable {
-    let rawValue: String
-    let shortest: String
-
-    init(from decoder: any Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        let string = try container.decode(String.self)
-
-        let regex = #/^\[(?<shortest>[a-z0-9]+)\]?(?<remaining>[a-z0-9]+)$/#
-        guard let match = try regex.firstMatch(in: string) else {
-            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid ChangeID format")
-        }
-
-        let shortest = match.output.shortest
-        let remaining = match.output.remaining
-
-        self.shortest = String(shortest)
-        self.rawValue = String(remaining)
-    }
-}
-
-struct CommitID: Hashable {
-    let rawValue: String
-    let shortest: String
-}
-
-struct ChangeIDView: View {
-    var changeID: ChangeID
-
-    var body: some View {
-        Text(changeID.rawValue)
-    }
-}
-
-struct JujutsuConfig: Codable {
-
-    enum CodingKeys: String, CodingKey {
-        case templates
-        case templateAliases = "template-aliases"
-    }
-
-    var templates: [String: String] = [:]
-    var templateAliases: [String: String] = [:]
-}
-
-// https://jj-vcs.github.io/jj/latest/templates/
-
-struct Template {
-    var name: String
-    var parameters: [String] = []
-    var content: String
-
-    var key: String {
-        return name + (parameters.isEmpty ? "" : "(\(parameters.joined(separator: ",")))")
-    }
-}
-
-struct Signature: Decodable {
-    var name: String
-    var email: String?
-    var timestamp: Date
-
-    static let template = Template(name: "JUDO_SIGNATURE", parameters: ["p"], content: """
-        "{"
-        ++ "'name': " ++ p.name().escape_json()
-        ++ ", " ++ "'email': '" ++ p.email().local() ++ "@" ++ p.email().domain() ++ "'"
-        ++ ", 'timestamp': '" ++ p.timestamp().format("%Y-%m-%dT%H:%M:%S%z")
-        ++ "'}"
-        """.replacingOccurrences(of: "'", with: "\\\"")
-    )
-}
-
-
-struct CommitRecord: Identifiable, Decodable {
-
-    var id: String { commit_id }
-
-    var change_id: ChangeID
-    var commit_id: String
-    var author: Signature
-    var description: String
-    var root: Bool
-    var empty: Bool
-    var immutable: Bool
-    var parents: [String]
-    var bookmarks: [String]
-
-    static let template = Template(name: "judo_commit_record", content: """
-        "{\\n"
-        ++ "\t'change_id': " ++ "'[" ++ change_id.shortest() ++ "]" ++ change_id ++ "'" ++ ",\\n"
-        ++ "\t'commit_id': " ++ "'[" ++ commit_id.shortest() ++ "]" ++ commit_id ++ "'" ++ ",\\n"
-        ++ "\t'author': " ++ JUDO_SIGNATURE(author) ++ ",\\n"
-        ++ "\t'description': " ++ description.escape_json() ++ ",\\n"
-        ++ "\t'root': " ++ root ++ ",\\n"
-        ++ "\t'empty': " ++ empty ++ ",\\n"
-        ++ "\t'immutable': " ++ immutable ++ ",\\n"
-        ++ "\t'parents': [" ++ parents.map(|c| "'" ++ c.commit_id() ++ "'").join("|") ++ "],\\n"
-        ++ "\t'bookmarks': [" ++ bookmarks.map(|c| "'" ++ c ++ "'").join("|") ++ "],\\n"
-        ++ "},\\n"
-        """
-        .replacingOccurrences(of: "'", with: "\\\"")
-    )
-}
-
-struct TemplateDemoView: View {
-    @State
-    var template: String = ""
-
-    @State
-    var revset: String = ""
-
-    @State
-    var output: String = ""
-
-    var body: some View {
-        VStack {
-            TextField("Template", text: $template)
-            TextField("Revset", text: $revset)
-            Button("Run") {
-                run()
-            }
-            ScrollView {
-                Text(output).frame(maxWidth: .infinity).monospaced()
-            }
-
-        }
-    }
-
-    func run() {
-        Task {
-
-            var arguments: [String] = ["log"]
-
-            if !revset.isEmpty {
-                arguments.append(contentsOf: ["-r", revset])
-            }
-            if !template.isEmpty {
-                arguments.append(contentsOf: ["--template", template])
-            }
-
-            let process = SimpleAsyncProcess(executableURL: URL(fileURLWithPath: "/opt/homebrew/bin/jj"), arguments: arguments, currentDirectoryURL: URL(fileURLWithPath: "/Users/schwa/Projects/Ultraviolence"))
-            do {
-                let data = try await process.run()
-                output = String(data: data, encoding: .utf8) ?? "Failed to decode output"
-            } catch {
-                output = "Error: \(error)"
-            }
-        }
-    }
-}

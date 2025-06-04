@@ -58,4 +58,34 @@ struct SimpleAsyncProcess {
 
         return stdout
     }
+
+
+}
+
+extension SimpleAsyncProcess {
+    func runSync() throws -> Data {
+        let process = Process()
+        process.executableURL = executableURL
+        process.arguments = arguments
+        process.currentDirectoryURL = currentDirectoryURL
+
+        let stdoutPipe = Pipe()
+        let stderrPipe = Pipe()
+
+        process.standardOutput = stdoutPipe
+        process.standardError = stderrPipe
+
+        try process.run()
+        process.waitUntilExit()
+
+        let stdout = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
+        let stderr = stderrPipe.fileHandleForReading.readDataToEndOfFile()
+
+        if process.terminationStatus != 0 {
+            let errStr = String(data: stderr, encoding: .utf8) ?? "<non-UTF8 stderr>"
+            throw Error(exitCode: process.terminationStatus, stderr: errStr)
+        }
+
+        return stdout
+    }
 }
