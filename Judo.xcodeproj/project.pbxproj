@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		45214F512DF08DF400634736 /* TOMLKit in Frameworks */ = {isa = PBXBuildFile; productRef = 45214F502DF08DF400634736 /* TOMLKit */; };
 		45FF28942DEA17A900947A9B /* Everything in Frameworks */ = {isa = PBXBuildFile; productRef = 45FF28932DEA17A900947A9B /* Everything */; };
 /* End PBXBuildFile section */
 
@@ -28,6 +29,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				45FF28942DEA17A900947A9B /* Everything in Frameworks */,
+				45214F512DF08DF400634736 /* TOMLKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,6 +73,7 @@
 			name = Judo;
 			packageProductDependencies = (
 				45FF28932DEA17A900947A9B /* Everything */,
+				45214F502DF08DF400634736 /* TOMLKit */,
 			);
 			productName = Judo;
 			productReference = 45FF28832DEA173E00947A9B /* Judo.app */;
@@ -102,6 +105,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				45FF28922DEA17A900947A9B /* XCRemoteSwiftPackageReference "Everything" */,
+				45214F4F2DF08DF400634736 /* XCRemoteSwiftPackageReference "TOMLKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 45FF28842DEA173E00947A9B /* Products */;
@@ -332,6 +336,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		45214F4F2DF08DF400634736 /* XCRemoteSwiftPackageReference "TOMLKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/LebJe/TOMLKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.6.0;
+			};
+		};
 		45FF28922DEA17A900947A9B /* XCRemoteSwiftPackageReference "Everything" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/schwa/Everything";
@@ -343,6 +355,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		45214F502DF08DF400634736 /* TOMLKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 45214F4F2DF08DF400634736 /* XCRemoteSwiftPackageReference "TOMLKit" */;
+			productName = TOMLKit;
+		};
 		45FF28932DEA17A900947A9B /* Everything */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 45FF28922DEA17A900947A9B /* XCRemoteSwiftPackageReference "Everything" */;
