@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		45214F512DF08DF400634736 /* TOMLKit in Frameworks */ = {isa = PBXBuildFile; productRef = 45214F502DF08DF400634736 /* TOMLKit */; };
+		456748A92DF0CD650017D5D6 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 456748A82DF0CD650017D5D6 /* Collections */; };
 		45FF28942DEA17A900947A9B /* Everything in Frameworks */ = {isa = PBXBuildFile; productRef = 45FF28932DEA17A900947A9B /* Everything */; };
 /* End PBXBuildFile section */
 
@@ -28,6 +29,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				456748A92DF0CD650017D5D6 /* Collections in Frameworks */,
 				45FF28942DEA17A900947A9B /* Everything in Frameworks */,
 				45214F512DF08DF400634736 /* TOMLKit in Frameworks */,
 			);
@@ -74,6 +76,7 @@
 			packageProductDependencies = (
 				45FF28932DEA17A900947A9B /* Everything */,
 				45214F502DF08DF400634736 /* TOMLKit */,
+				456748A82DF0CD650017D5D6 /* Collections */,
 			);
 			productName = Judo;
 			productReference = 45FF28832DEA173E00947A9B /* Judo.app */;
@@ -106,6 +109,7 @@
 			packageReferences = (
 				45FF28922DEA17A900947A9B /* XCRemoteSwiftPackageReference "Everything" */,
 				45214F4F2DF08DF400634736 /* XCRemoteSwiftPackageReference "TOMLKit" */,
+				456748A72DF0CD650017D5D6 /* XCRemoteSwiftPackageReference "swift-collections" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 45FF28842DEA173E00947A9B /* Products */;
@@ -344,6 +348,14 @@
 				minimumVersion = 0.6.0;
 			};
 		};
+		456748A72DF0CD650017D5D6 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
 		45FF28922DEA17A900947A9B /* XCRemoteSwiftPackageReference "Everything" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/schwa/Everything";
@@ -359,6 +371,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 45214F4F2DF08DF400634736 /* XCRemoteSwiftPackageReference "TOMLKit" */;
 			productName = TOMLKit;
+		};
+		456748A82DF0CD650017D5D6 /* Collections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 456748A72DF0CD650017D5D6 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = Collections;
 		};
 		45FF28932DEA17A900947A9B /* Everything */ = {
 			isa = XCSwiftPackageProductDependency;

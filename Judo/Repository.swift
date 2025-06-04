@@ -2,6 +2,7 @@ import Observation
 import Everything
 import TOMLKit
 import Foundation
+import Collections
 
 @Observable
 class Repository {
@@ -12,7 +13,7 @@ class Repository {
         self.path = path
     }
 
-    func scan(revset: String) async throws -> [CommitRecord] {
+    func scan(revset: String) async throws -> OrderedDictionary<ChangeID, CommitRecord> {
         let temporaryConfig = JujutsuConfig(templateAliases: [
             CommitRecord.template.key: CommitRecord.template.content,
             Signature.template.key: Signature.template.content,
@@ -45,8 +46,8 @@ class Repository {
             let header = "[\n".data(using: .utf8)!
             let footer = "\n]".data(using: .utf8)!
             let jsonData = header + data + footer
-            let jsonString = String(data: jsonData, encoding: .utf8)!
-            print(jsonString)
+//            let jsonString = String(data: jsonData, encoding: .utf8)!
+//            print(jsonString)
 
 
             let decoder = JSONDecoder()
@@ -55,12 +56,12 @@ class Repository {
             let commits = try decoder.decode([CommitRecord].self, from: jsonData)
 
             let end = CFAbsoluteTimeGetCurrent()
-            print("... fetched \(commits.count) commits in \(end - start) seconds")
-            return commits
+            print("... fetched \(commits.count) (\(data.count) bytes) commits in \(end - start) seconds")
+            return OrderedDictionary(uniqueKeys: commits.map(\.id), values: commits)
         }
         catch {
             print("Error: \(error)")
-            return []
+            return [:]
         }
     }
 
@@ -110,7 +111,7 @@ struct ChangeID: Hashable, Decodable {
         let container = try decoder.singleValueContainer()
         let string = try container.decode(String.self)
 
-        let regex = #/^\[(?<shortest>[a-z0-9]+)\]?(?<remaining>[a-z0-9]+)$/#
+        let regex = #/^(\[(?<shortest>[a-z0-9]+)\])?(?<remaining>[a-z0-9]+)$/#
         guard let match = try regex.firstMatch(in: string) else {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid ChangeID format")
         }
@@ -118,7 +119,7 @@ struct ChangeID: Hashable, Decodable {
         let shortest = match.output.shortest
         let remaining = match.output.remaining
 
-        self.shortest = String(shortest)
+        self.shortest = shortest.map(String.init)
         self.rawValue = String(remaining)
     }
 
@@ -217,7 +218,7 @@ struct CommitRecord: Identifiable, Decodable {
     var immutable: Bool
     var git_head: Bool
     var conflict: Bool
-    var parents: [String]
+    var parents: [ChangeID]
     var bookmarks: [String]
 
     static let template = Template(name: "judo_commit_record", content: """
@@ -231,7 +232,7 @@ struct CommitRecord: Identifiable, Decodable {
         ++ "\t'git_head': " ++ git_head ++ ",\\n"
         ++ "\t'conflict': " ++ conflict ++ ",\\n"
         ++ "\t'immutable': " ++ immutable ++ ",\\n"
-        ++ "\t'parents': [" ++ parents.map(|c| "'" ++ c.commit_id() ++ "'").join(",") ++ "],\\n"
+        ++ "\t'parents': [" ++ parents.map(|c| "'" ++ c.change_id() ++ "'").join(",") ++ "],\\n"
         ++ "\t'bookmarks': [" ++ bookmarks.map(|c| "'" ++ c ++ "'").join(",") ++ "],\\n"
         ++ "},\\n"
         """
