@@ -1,8 +1,8 @@
-import Observation
-import Everything
-import TOMLKit
-import Foundation
 import Collections
+import Everything
+import Foundation
+import Observation
+import TOMLKit
 
 @Observable
 class Repository {
@@ -18,7 +18,7 @@ class Repository {
             CommitRecord.template.key: CommitRecord.template.content,
             Signature.template.key: Signature.template.content,
             ChangeID.template.key: ChangeID.template.content,
-            CommitID.template.key: CommitID.template.content,
+            CommitID.template.key: CommitID.template.content
         ])
         // let tempDirectory = FileManager.default.temporaryDirectory
         let tempDirectory = URL(fileURLWithPath: "/tmp")
@@ -28,13 +28,12 @@ class Repository {
 
         var arguments = ["log", "--no-graph",
                          "--template", CommitRecord.template.name,
-                         "--config-file", tempConfigPath.path,
+                         "--config-file", tempConfigPath.path
                          //                "--limit", "1"
         ]
         if !revset.isEmpty {
             arguments.append(contentsOf: ["-r", revset])
         }
-
 
         print("jj \(arguments.joined(separator: " "))")
         do {
@@ -46,9 +45,8 @@ class Repository {
             let header = "[\n".data(using: .utf8)!
             let footer = "\n]".data(using: .utf8)!
             let jsonData = header + data + footer
-//            let jsonString = String(data: jsonData, encoding: .utf8)!
-//            print(jsonString)
-
+            //            let jsonString = String(data: jsonData, encoding: .utf8)!
+            //            print(jsonString)
 
             let decoder = JSONDecoder()
             decoder.allowsJSON5 = true
@@ -58,8 +56,7 @@ class Repository {
             let end = CFAbsoluteTimeGetCurrent()
             print("... fetched \(commits.count) (\(data.count) bytes) commits in \(end - start) seconds")
             return OrderedDictionary(uniqueKeys: commits.map(\.id), values: commits)
-        }
-        catch {
+        } catch {
             print("Error: \(error)")
             return [:]
         }
@@ -69,7 +66,7 @@ class Repository {
         do {
             let arguments = ["log", "--no-graph",
                              "-r", "@",
-                             "--template", "change_id",
+                             "--template", "change_id"
             ]
 
             print("Fetching...")
@@ -80,8 +77,7 @@ class Repository {
             }
 
             return ChangeID(rawValue: string)
-        }
-        catch {
+        } catch {
             print(error)
             return nil
         }
@@ -99,7 +95,7 @@ struct ChangeID: Hashable, Decodable {
         self.shortest = shortest
     }
 
-    static func == (lhs: ChangeID, rhs: ChangeID) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.rawValue == rhs.rawValue
     }
 
@@ -136,7 +132,7 @@ struct CommitID: Hashable, Decodable {
     // TODO: This is ephemeral and can change as repositories are updated.
     let shortest: String
 
-    static func == (lhs: CommitID, rhs: CommitID) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.rawValue == rhs.rawValue
     }
 
@@ -167,7 +163,6 @@ struct CommitID: Hashable, Decodable {
 }
 
 struct JujutsuConfig: Codable {
-
     enum CodingKeys: String, CodingKey {
         case templates
         case templateAliases = "template-aliases"
@@ -185,7 +180,7 @@ struct Template {
     var content: String
 
     var key: String {
-        return name + (parameters.isEmpty ? "" : "(\(parameters.joined(separator: ",")))")
+        name + (parameters.isEmpty ? "" : "(\(parameters.joined(separator: ",")))")
     }
 }
 
@@ -204,9 +199,7 @@ struct Signature: Decodable {
     )
 }
 
-
 struct CommitRecord: Identifiable, Decodable {
-
     var id: ChangeID { change_id }
 
     var change_id: ChangeID
@@ -236,7 +229,6 @@ struct CommitRecord: Identifiable, Decodable {
         ++ "\t'bookmarks': [" ++ bookmarks.map(|c| "'" ++ c ++ "'").join(",") ++ "],\\n"
         ++ "},\\n"
         """
-        .replacingOccurrences(of: "'", with: "\\\"")
+                                    .replacingOccurrences(of: "'", with: "\\\"")
     )
 }
-

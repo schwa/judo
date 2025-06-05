@@ -1,5 +1,5 @@
-import SwiftUI
 import Collections
+import SwiftUI
 
 struct CommitGraphRowView: View {
     let row: GraphRow
@@ -9,10 +9,10 @@ struct CommitGraphRowView: View {
         Grid(alignment: .leading) {
             GridRow {
                 ForEach(0..<columnCount, id: \.self) { index in
-                        Text(symbol(at: index))
-                            .font(.system(.body, design: .monospaced))
-                    .frame(width: 12, alignment: .center)
-                    .border(Color.red)
+                    Text(symbol(at: index))
+                        .font(.system(.body, design: .monospaced))
+                        .frame(width: 12, alignment: .center)
+                        .border(Color.red)
                 }
             }
         }
@@ -31,13 +31,13 @@ struct CommitGraphRowView: View {
         case let .commit(commit, column, _):
             if index == column {
                 return "•"
-            } else if lanes.indices.contains(index), lanes[index] != nil {
-                return "|"
-            } else {
-                return ""
             }
+            if lanes.indices.contains(index), lanes[index] != nil {
+                return "|"
+            }
+            return ""
 
-        case .elision(_, _):
+        case .elision:
             return lanes[index] != nil ? "|" : " "
         }
     }
@@ -59,8 +59,8 @@ func buildGraphRows(from sortedCommits: [CommitRecord], allCommits: OrderedDicti
             column = idx
         } else {
             // 🚫 Don't allow reuse if the commit is totally unrelated to current active commits
-            let active = Set(lanes.compactMap { $0 })
-            let conflicts = commit.parents.contains(where: { active.contains($0) })
+            let active = Set(lanes.compactMap(\.self))
+            let conflicts = commit.parents.contains { active.contains($0) }
 
             if let reusable = lanes.firstIndex(of: nil), !conflicts {
                 column = reusable
@@ -92,7 +92,6 @@ func buildGraphRows(from sortedCommits: [CommitRecord], allCommits: OrderedDicti
 }
 
 struct LanesView: View {
-
     static let laneWidth: CGFloat = 12
 
     let row: GraphRow
@@ -101,7 +100,6 @@ struct LanesView: View {
     var body: some View {
         Canvas { context, size in
             for index in 0..<columnCount {
-
                 let hasNode: Bool
                 switch row {
                 case let .commit(_, column, _):
@@ -112,10 +110,10 @@ struct LanesView: View {
                     } else {
                         continue
                     }
-                case .elision(_, _):
+
+                case .elision:
                     hasNode = false
                 }
-
 
                 let x = CGFloat(index) * Self.laneWidth + (Self.laneWidth / 2)
                 let path = Path { path in
@@ -130,7 +128,6 @@ struct LanesView: View {
                     }
                     context.fill(path, with: .color(.orange))
                 }
-
             }
         }
         .frame(width: CGFloat(columnCount) * Self.laneWidth)
@@ -142,5 +139,4 @@ struct LanesView: View {
             return lanes
         }
     }
-
 }

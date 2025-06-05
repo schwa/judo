@@ -2,13 +2,13 @@ import SwiftUI
 
 struct TemplateDemoView: View {
     @State
-    var template: String = ""
+    private var template: String = ""
 
     @State
-    var revset: String = ""
+    private var revset: String = ""
 
     @State
-    var output: String = ""
+    private var output: String = ""
 
     var body: some View {
         VStack {
@@ -20,13 +20,11 @@ struct TemplateDemoView: View {
             ScrollView {
                 Text(output).frame(maxWidth: .infinity).monospaced()
             }
-
         }
     }
 
     func run() {
         Task {
-
             var arguments: [String] = ["log"]
 
             if !revset.isEmpty {

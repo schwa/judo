@@ -1,32 +1,31 @@
-import SwiftUI
-import Everything
 import Collections
+import Everything
 import SwiftTerm
+import SwiftUI
 
 struct ContentView: View {
+    @State
+    private var repository = Repository(path: "/tmp/fake-repo")
 
     @State
-    var repository = Repository(path: "/tmp/fake-repo")
+    private var head: ChangeID?
 
     @State
-    var head: ChangeID?
+    private var selection: Set<ChangeID> = []
 
     @State
-    var selection: Set<ChangeID> = []
+    private var revisionQuery: String = ""
 
     @State
-    var revisionQuery: String = ""
+    private var commits: OrderedDictionary<ChangeID, CommitRecord> = [:]
 
     @State
-    var commits: OrderedDictionary<ChangeID, CommitRecord> = [:]
-
-    @State
-    var isRawViewPresented: Bool = false
+    private var isRawViewPresented: Bool = false
 
     var body: some View {
         VStack {
             RevsetEditorView(revisionQuery: $revisionQuery) { text in
-                self.revisionQuery = text
+                revisionQuery = text
                 Task {
                     await refresh()
                 }
@@ -34,8 +33,7 @@ struct ContentView: View {
             .padding()
             if !isRawViewPresented {
                 RevisionTimelineViewNEW(selection: $selection, commits: $commits)
-            }
-            else {
+            } else {
                 RawTimelineView(revisionQuery: revisionQuery)
             }
         }
@@ -57,8 +55,7 @@ struct ContentView: View {
     func refresh() async {
         do {
             commits = try await repository.scan(revset: revisionQuery)
-        }
-        catch {
+        } catch {
             print("Error scanning repository: \(error)")
         }
     }
@@ -77,8 +74,7 @@ struct ContentView: View {
                     Task {
                         try await refresh()
                     }
-                }
-                catch {
+                } catch {
                     print("Error selecting directory: \(error)")
                 }
             }
@@ -100,13 +96,9 @@ struct ContentView: View {
             .compactMap { commits[$0] } // Filter commits based on selection
 
         if !selectedCommits.isEmpty {
-
-
             InspectorView(commits: commits, selectedCommits: selectedCommits)
-        }
-        else {
-            ContentUnavailableView(label: { Text("(no commits selected)") })
-
+        } else {
+            ContentUnavailableView { Text("(no commits selected)") }
         }
     }
 }
@@ -118,14 +110,12 @@ struct ChangeIDView: View {
         if let shortest = changeID.shortest {
             Text(shortest)
                 .foregroundStyle(Color(nsColor: NSColor.magenta))
-            + Text(changeID.rawValue.trimmingPrefix(shortest).prefix(7))
+                + Text(changeID.rawValue.trimmingPrefix(shortest).prefix(7))
                 .foregroundStyle(.secondary)
-        }
-        else {
+        } else {
             Text(changeID.rawValue.prefix(8))
                 .foregroundStyle(.secondary)
         }
-
     }
 }
 
@@ -135,7 +125,7 @@ struct CommitIDView: View {
     var body: some View {
         Text(commitID.shortest)
             .foregroundStyle(.blue)
-        + Text(commitID.rawValue.trimmingPrefix(commitID.shortest).prefix(7))
+            + Text(commitID.rawValue.trimmingPrefix(commitID.shortest).prefix(7))
             .foregroundStyle(.secondary)
     }
 }
@@ -144,14 +134,12 @@ struct CommitIDView: View {
     ContentView()
 }
 
-
-
 struct InspectorView: View {
     @Environment(Repository.self)
     var repository
 
     @State
-    var commitIndex: Int = 0
+    private var commitIndex: Int = 0
 
     var commits: OrderedDictionary<ChangeID, CommitRecord>
 
@@ -162,7 +150,6 @@ struct InspectorView: View {
             Text("Commit \(commitIndex + 1) of \(selectedCommits.count)")
             if let commit = selectedCommits.first {
                 CommitDetailView(commits: commits, commit: commit)
-
             }
         }
     }
@@ -207,10 +194,9 @@ struct CommitRowView: View {
             }
 
             Group {
-                if commit.description.isEmpty && commit.root == false  {
+                if commit.description.isEmpty && commit.root == false {
                     Text("(no description set").italic()
-                }
-                else {
+                } else {
                     let description = commit.description.trimmingCharacters(in: .whitespacesAndNewlines)
                     Text(verbatim: description).lineLimit(1)
                 }
@@ -224,23 +210,19 @@ struct CommitRowView: View {
                 .font(.caption)
         }
         .foregroundStyle(.secondary)
-
     }
-
 }
 
 struct CommitDetailView: View {
-
     @Environment(Repository.self)
     var repository
 
     var commits: OrderedDictionary<ChangeID, CommitRecord>
 
-
     var commit: CommitRecord
 
     @State
-    var description: String = ""
+    private var description: String = ""
 
     var body: some View {
         Form {
@@ -264,14 +246,12 @@ struct CommitDetailView: View {
                             let process = SimpleAsyncProcess(executableURL: repository.binaryPath.url, arguments: arguments, currentDirectoryURL: repository.path.url)
                             _ = try await process.run()
                             print("Commit described successfully.")
-                        }
-                        catch {
+                        } catch {
                             print("Error describing commit: \(error)")
                         }
                     }
                 }
             }
-
 
             LabeledContent("Parent") {
                 ForEach(commit.parents, id: \.self) { parent in
@@ -283,12 +263,10 @@ struct CommitDetailView: View {
                     }
                 }
             }
-
         }
         .onChange(of: commit.description) {
             description = commit.description
         }
-
     }
 }
 
@@ -307,7 +285,7 @@ struct RevsetEditorView: View {
         ("conflicts", "conflicts()"),
         ("immutable", "immutable()"),
         ("tagged", "tags()"),
-        ("remote_bookmarks", "remote_bookmarks()"),
+        ("remote_bookmarks", "remote_bookmarks()")
     ]
 
     @Binding
@@ -338,19 +316,16 @@ struct RevsetEditorView: View {
                     }
                 }
             }
-
         }
-
     }
 }
 
 struct RevisionTimelineView: View {
+    @State
+    private var repository = Repository(path: "/Users/schwa/Projects/Ultraviolence")
 
     @State
-    var repository = Repository(path: "/Users/schwa/Projects/Ultraviolence")
-
-    @State
-    var head: ChangeID?
+    private var head: ChangeID?
 
     @Binding
     var selection: Set<ChangeID>
@@ -363,29 +338,25 @@ struct RevisionTimelineView: View {
             HStack {
                 if commit.immutable {
                     Image(systemName: "diamond.fill")
-                }
-                else {
+                } else {
                     if commit.change_id == head {
                         Text("@")
-                    }
-                    else {
+                    } else {
                         Image(systemName: "circle")
                     }
                 }
                 CommitRowView(commit: commit)
             }
         }
-
     }
 }
 
 struct RevisionTimelineViewNEW: View {
+    @State
+    private var repository = Repository(path: "/Users/schwa/Projects/Ultraviolence")
 
     @State
-    var repository = Repository(path: "/Users/schwa/Projects/Ultraviolence")
-
-    @State
-    var head: ChangeID?
+    private var head: ChangeID?
 
     @Binding
     var selection: Set<ChangeID>
@@ -394,26 +365,24 @@ struct RevisionTimelineViewNEW: View {
     var commits: OrderedDictionary<ChangeID, CommitRecord>
 
     var body: some View {
-
-
         let rows = buildGraphRows(from: Array(commits.values), allCommits: self.commits)
         let columnCount = rows.map { row -> Int in
             switch row {
             case let .commit(_, _, lanes):
                 return lanes.count
+
             case let .elision(_, _):
                 return 0
             }
         }.max() ?? 0
 
-
-        List(Array(rows.enumerated()), id: \.offset) { index, row in
+        List(Array(rows.enumerated()), id: \.offset) { _, row in
             HStack {
                 Group {
                     switch row {
                     case let .commit(commit, _, lanes):
                         LanesView(row: row, columnCount: columnCount)
-//                        CommitGraphRowView(row: row, columnCount: columnCount)
+                    //                        CommitGraphRowView(row: row, columnCount: columnCount)
                     case let .elision(parents, lanes):
                         Text("...")
                     }
@@ -423,15 +392,12 @@ struct RevisionTimelineViewNEW: View {
                 switch row {
                 case let .commit(commit, _, _):
                     CommitRowView(commit: commit)
+
                 case let .elision(parents, _):
                     Spacer()
                 }
-
             }
-
-
         }
-
     }
 }
 
@@ -449,7 +415,7 @@ struct RawTimelineView: View {
 
     var body: some View {
         ViewAdaptor<LocalProcessTerminalView> {
-            return LocalProcessTerminalView(frame: .zero)
+            LocalProcessTerminalView(frame: .zero)
         }
         update: { view in
             var env = Terminal.getEnvironmentVariables(termName: "xterm-256color")
@@ -459,8 +425,6 @@ struct RawTimelineView: View {
             if revisionQuery.isEmpty == false {
                 args.append(contentsOf: ["-r", revisionQuery])
             }
-
-
 
             view.startProcess(executable: repository.binaryPath.path, args: args, environment: env)
         }

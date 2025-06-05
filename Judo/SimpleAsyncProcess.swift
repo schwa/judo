@@ -58,8 +58,6 @@ struct SimpleAsyncProcess {
 
         return stdout
     }
-
-
 }
 
 extension SimpleAsyncProcess {
