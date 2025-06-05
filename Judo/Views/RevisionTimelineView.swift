@@ -3,9 +3,6 @@ import Collections
 
 struct RevisionTimelineView: View {
     @State
-    private var repository = Repository(path: "/Users/schwa/Projects/Ultraviolence")
-
-    @State
     private var head: ChangeID?
 
     @Binding
@@ -32,10 +29,9 @@ struct RevisionTimelineView: View {
     }
 }
 
-struct RevisionTimelineViewNEW: View {
-    @State
-    private var repository = Repository(path: "/Users/schwa/Projects/Ultraviolence")
+// MARK: -
 
+struct RevisionTimelineViewNEW: View {
     @State
     private var head: ChangeID?
 
@@ -51,8 +47,7 @@ struct RevisionTimelineViewNEW: View {
             switch row {
             case let .commit(_, _, lanes):
                 return lanes.count
-
-            case let .elision(_, _):
+            case .elision:
                 return 0
             }
         }.max() ?? 0
@@ -61,10 +56,10 @@ struct RevisionTimelineViewNEW: View {
             HStack {
                 Group {
                     switch row {
-                    case let .commit(commit, _, lanes):
+                    case .commit:
                         LanesView(row: row, columnCount: columnCount)
                     //                        CommitGraphRowView(row: row, columnCount: columnCount)
-                    case let .elision(parents, lanes):
+                    case .elision:
                         Text("...")
                     }
                 }
@@ -73,8 +68,7 @@ struct RevisionTimelineViewNEW: View {
                 switch row {
                 case let .commit(commit, _, _):
                     CommitRowView(commit: commit)
-
-                case let .elision(parents, _):
+                case .elision:
                     Spacer()
                 }
             }

@@ -5,7 +5,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State
-    private var repository = Repository(path: "/tmp/fake-repo")
+    private var repository = Repository(path: "")
 
     @State
     private var head: ChangeID?
@@ -72,7 +72,7 @@ struct ContentView: View {
                     guard let url = urls.first else { return }
                     repository.path = FSPath(url)
                     Task {
-                        try await refresh()
+                        await refresh()
                     }
                 } catch {
                     print("Error selecting directory: \(error)")
@@ -105,39 +105,6 @@ struct ContentView: View {
 
 // MARK: -
 
-struct ChangeIDView: View {
-    var changeID: ChangeID
-
-    var body: some View {
-        if let shortest = changeID.shortest {
-            Text(shortest)
-                .foregroundStyle(Color(nsColor: NSColor.magenta))
-                + Text(changeID.rawValue.trimmingPrefix(shortest).prefix(7))
-                .foregroundStyle(.secondary)
-        } else {
-            Text(changeID.rawValue.prefix(8))
-                .foregroundStyle(.secondary)
-        }
-    }
-}
-
-struct CommitIDView: View {
-    var commitID: CommitID
-
-    var body: some View {
-        Text(commitID.shortest)
-            .foregroundStyle(.blue)
-            + Text(commitID.rawValue.trimmingPrefix(commitID.shortest).prefix(7))
-            .foregroundStyle(.secondary)
-    }
-}
-
 #Preview {
     ContentView()
 }
-
-
-
-
-
-
