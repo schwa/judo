@@ -45,7 +45,7 @@ struct SplashView: View {
                 .buttonStyle(.borderless)
 
                 Menu("Recent Repositories") {
-                    ForEach(appModel.recentRepositories, id: \.self) { path in
+                    ForEach(appModel.recentRepositories.reversed(), id: \.self) { path in
                         Button(path.displayName) {
                             openRepository(path)
                         }
@@ -58,7 +58,7 @@ struct SplashView: View {
                 Link("Github", destination: URL(string: "https://github.com/schwa/judo")!)
             }
             .frame(width: 240)
-            List(appModel.recentRepositories, id: \.self, selection: $selectedRepository) { path in
+            List(appModel.recentRepositories.reversed(), id: \.self, selection: $selectedRepository) { path in
                 HStack {
                     Image(nsImage: path.icon)
                     VStack(alignment: .leading) {
