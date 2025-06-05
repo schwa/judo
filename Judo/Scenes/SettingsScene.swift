@@ -40,7 +40,7 @@ struct SettingsView: View {
                 Button("Generate Demo Repo") {
                     Task {
                         let scriptURL = Bundle.main.url(forResource: "generate-demo-repo", withExtension: "sh")!
-                        let data = try await SimpleAsyncProcess(executableURL: scriptURL, useShell: true).run()
+                        _ = try await SimpleAsyncProcess(executableURL: scriptURL, useShell: true).run()
 //                        print(String(data: data, encoding: .utf8) ?? "No output")
                         openWindow(value: FSPath("/tmp/fake-repo"))
                     }

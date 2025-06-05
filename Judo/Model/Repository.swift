@@ -11,6 +11,7 @@ class Repository {
     var binaryPath: FSPath {
         appModel.binaryPath
     }
+    var currentLog: RepositoryLog
 
     var canUndo: Bool {
         return true
@@ -19,9 +20,10 @@ class Repository {
     init(appModel: AppModel, path: FSPath) {
         self.appModel = appModel
         self.path = path
+        self.currentLog = RepositoryLog()
     }
 
-    func log(revset: String) async throws -> RepositoryLog {
+    func log(revset: String) async throws {
         let temporaryConfig = JujutsuConfig(templateAliases: [
             CommitRecord.template.key: CommitRecord.template.content,
             Signature.template.key: Signature.template.content,
@@ -44,7 +46,7 @@ class Repository {
         }
 
 //        print("jj \(arguments.joined(separator: " "))")
-        let start = CFAbsoluteTimeGetCurrent()
+//        let start = CFAbsoluteTimeGetCurrent()
 //            print("Fetching...")
         let process = SimpleAsyncProcess(executableURL: binaryPath.url, arguments: arguments, currentDirectoryURL: path.url)
         let data = try await process.run()
@@ -60,11 +62,11 @@ class Repository {
         decoder.dateDecodingStrategy = .iso8601
         let commits = try decoder.decode([CommitRecord].self, from: jsonData)
 
-        let end = CFAbsoluteTimeGetCurrent()
+//        let end = CFAbsoluteTimeGetCurrent()
 //            print("... fetched \(commits.count) (\(data.count) bytes) commits in \(end - start) seconds")
         let orderedCommits = OrderedDictionary(uniqueKeys: commits.map(\.id), values: commits)
 
-        return RepositoryLog(repository: self, revset: revset, commits: orderedCommits)
+        self.currentLog = RepositoryLog(revset: revset, commits: orderedCommits)
     }
 
     var head: ChangeID? {
@@ -189,7 +191,7 @@ struct Template {
     }
 }
 
-struct Signature: Decodable {
+struct Signature: Decodable, Equatable {
     var name: String
     var email: String?
     var timestamp: Date
@@ -205,7 +207,7 @@ struct Signature: Decodable {
     )
 }
 
-struct CommitRecord: Identifiable, Decodable {
+struct CommitRecord: Identifiable, Decodable, Equatable {
     var id: ChangeID { change_id }
 
     var change_id: ChangeID

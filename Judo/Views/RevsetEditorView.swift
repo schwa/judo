@@ -19,7 +19,7 @@ struct RevsetEditorView: View {
     ]
 
     @Binding
-    var revisionQuery: String
+    var revset: String
 
     var submit: (String) -> Void
 
@@ -27,19 +27,19 @@ struct RevsetEditorView: View {
         HStack {
             VStack(alignment: .leading) {
                 HStack {
-                    TextField("revset", text: $revisionQuery).monospaced()
+                    TextField("revset", text: $revset).monospaced()
                         .onSubmit {
-                            submit(revisionQuery)
+                            submit(revset)
                         }
                     Button("Refresh") {
-                        submit(revisionQuery)
+                        submit(revset)
                     }
                 }
                 HStack {
                     ForEach(Self.revsetShortcuts, id: \.0) { name, query in
                         Button(name) {
-                            revisionQuery = query
-                            submit(revisionQuery)
+                            revset = query
+                            submit(revset)
                         }
                         .buttonStyle(.link)
                         .font(.caption)

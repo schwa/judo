@@ -20,17 +20,22 @@ struct RepositoryView: View {
     private var revisionQuery: String = ""
 
     @State
-    private var log: RepositoryLog?
-
-    @State
     private var isRawViewPresented: Bool = false
 
     @State
     private var status: Status = .waiting
 
+    init() {
+
+    }
+
     var body: some View {
+
+        @Bindable
+        var repository = self.repository
+
         VStack {
-            RevsetEditorView(revisionQuery: $revisionQuery) { text in
+            RevsetEditorView(revset: $revisionQuery) { text in
                 revisionQuery = text
                 Task {
                     await refresh()
@@ -39,10 +44,10 @@ struct RepositoryView: View {
             .padding()
             if !isRawViewPresented {
                 if appModel.isNewTimelineViewEnabled {
-                    RevisionTimelineViewNEW(selection: $selection, log: log)
+                    RepositoryLogViewNew(selection: $selection, log: repository.currentLog)
                 }
                 else {
-                    RevisionTimelineView(selection: $selection, log: log)
+                    RepositoryLogView(selection: $selection, log: $repository.currentLog)
                 }
             } else {
                 RawTimelineView(revisionQuery: revisionQuery)
@@ -64,7 +69,7 @@ struct RepositoryView: View {
     }
 
     var selectedCommits: [CommitRecord] {
-        guard let log = log else { return [] }
+        let log = repository.currentLog
         return selection
             .sorted { lhs, rhs in
                 let lhs = log.commits.index(forKey: lhs) ?? -1 // TODO: -1?
@@ -77,7 +82,7 @@ struct RepositoryView: View {
 
     func refresh() async {
         do {
-            log = try await repository.log(revset: revisionQuery)
+            try await repository.log(revset: revisionQuery)
         } catch {
             print("Error scanning repository: \(error)")
         }
@@ -159,8 +164,8 @@ struct RepositoryView: View {
 
     @ViewBuilder
     var inspector: some View {
-        if let log, !selectedCommits.isEmpty {
-            InspectorView(commits: log.commits, selectedCommits: selectedCommits)
+        if !selectedCommits.isEmpty {
+            InspectorView(commits: repository.currentLog.commits, selectedCommits: selectedCommits)
         } else {
             ContentUnavailableView { Text("(no commits selected)") }
         }

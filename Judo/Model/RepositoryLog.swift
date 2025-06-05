@@ -1,13 +1,13 @@
 import Collections
 
 struct RepositoryLog {
-    var repository: Repository
     var revset: String?
     var commits: OrderedDictionary<ChangeID, CommitRecord>
+    var head: ChangeID?
 
-    init(repository: Repository, revset: String?, commits: OrderedDictionary<ChangeID, CommitRecord>) {
-        self.repository = repository
+    init(revset: String? = nil, commits: OrderedDictionary<ChangeID, CommitRecord> = [:], head: ChangeID? = nil) {
         self.revset = revset
         self.commits = commits
+        self.head = head
     }
 }

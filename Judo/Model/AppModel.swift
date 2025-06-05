@@ -19,7 +19,7 @@ class AppModel {
         }
     }
 
-    var isNewTimelineViewEnabled = false
+    var isNewTimelineViewEnabled = true
 
     init() {
         UserDefaults.standard.register(defaults: [

@@ -34,7 +34,17 @@ extension Repository {
     func commitRecord(for: ChangeID) async throws -> CommitRecord {
         fatalError()
     }
+
+    func rebase(from: [ChangeID], to: ChangeID) async throws {
+        let jujutsu = Jujutsu(binaryPath: binaryPath)
+        let arguments = ["--revisions"] + from.map(\.rawValue)
+         + ["--insert-after", to.rawValue]
+        print(arguments)
+        let data = try await jujutsu.run(subcommand: "rebase", arguments: arguments, repository: self)
+        print(">", String(data: data, encoding: .utf8) ?? "No output")
+    }
 }
+
 
 //JJ: Enter a description for the combined commit.
 //JJ: Description from the destination commit:
