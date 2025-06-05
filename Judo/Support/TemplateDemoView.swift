@@ -2,6 +2,9 @@ import SwiftUI
 
 struct TemplateDemoView: View {
     @State
+    private var path: String = "/Users/schwa/Projects/Ultraviolence"
+
+    @State
     private var template: String = ""
 
     @State
@@ -12,11 +15,15 @@ struct TemplateDemoView: View {
 
     var body: some View {
         VStack {
-            TextField("Template", text: $template)
-            TextField("Revset", text: $revset)
-            Button("Run") {
-                run()
+            Form {
+                TextField("Path", text: $path)
+                TextField("Template", text: $template)
+                TextField("Revset", text: $revset)
+                Button("Run") {
+                    run()
+                }
             }
+            .padding()
             ScrollView {
                 Text(output).frame(maxWidth: .infinity).monospaced()
             }
@@ -34,7 +41,7 @@ struct TemplateDemoView: View {
                 arguments.append(contentsOf: ["--template", template])
             }
 
-            let process = SimpleAsyncProcess(executableURL: URL(fileURLWithPath: "/opt/homebrew/bin/jj"), arguments: arguments, currentDirectoryURL: URL(fileURLWithPath: "/Users/schwa/Projects/Ultraviolence"))
+            let process = SimpleAsyncProcess(executableURL: URL(fileURLWithPath: "/opt/homebrew/bin/jj"), arguments: arguments, currentDirectoryURL: URL(fileURLWithPath: path))
             do {
                 let data = try await process.run()
                 output = String(data: data, encoding: .utf8) ?? "Failed to decode output"

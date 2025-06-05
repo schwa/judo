@@ -1,17 +1,31 @@
-//
-//  JudoApp.swift
-//  Judo
-//
-//  Created by Jonathan Wight on 5/30/25.
-//
-
 import SwiftUI
 
 @main
 struct JudoApp: App {
+    @State
+    var appModel: AppModel = AppModel()
+
+    @Environment(\.openWindow)
+    var openWindow
+
     var body: some Scene {
-        WindowGroup {
-            ContentView()
+        Group {
+            WindowGroup {
+                ContentView()
+            }
+
+            WindowGroup(id: "template-demo") {
+                TemplateDemoView()
+            }
+            .commands {
+                CommandGroup(after: .singleWindowList) {
+                    Button("Template Demo") {
+                        openWindow(id: "template-demo")
+                    }
+                }
+            }
         }
+        .environment(appModel)
     }
 }
+
