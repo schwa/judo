@@ -1,0 +1,1 @@
+../../Scripts/generate-demo-repo.sh

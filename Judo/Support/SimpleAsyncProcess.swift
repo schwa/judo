@@ -9,11 +9,23 @@ struct SimpleAsyncProcess {
     var executableURL: URL
     var arguments: [String] = []
     var currentDirectoryURL: URL?
+    var useShell: Bool = false
 
     func run() async throws -> Data {
         let process = Process()
-        process.executableURL = executableURL
-        process.arguments = arguments
+
+        if !useShell {
+            process.executableURL = executableURL
+            process.arguments = arguments
+        }
+        else {
+            process.executableURL = URL(fileURLWithPath: currentShell)
+            let commandLine = ([executableURL.path] + arguments).map { arg in
+                "\"\(arg.replacingOccurrences(of: "\"", with: "\\\""))\""
+            }.joined(separator: " ")
+            process.arguments = ["-l", "-c", commandLine]
+        }
+
         process.currentDirectoryURL = currentDirectoryURL
 
         let stdoutPipe = Pipe()
@@ -57,6 +69,13 @@ struct SimpleAsyncProcess {
         }
 
         return stdout
+    }
+
+    var currentShell: String {
+        if let pw = getpwuid(getuid()), let shellCString = pw.pointee.pw_shell {
+            return String(cString: shellCString)
+        }
+        return "/bin/sh" // fallback
     }
 }
 

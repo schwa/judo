@@ -14,6 +14,7 @@ struct RepositoryScene: Scene {
                 RepositoryView()
                     .environment(repository)
                     .onChange(of: path, initial: true) {
+                        print("OPENING: \(path)")
                         appModel.recentRepositories.append(path)
                     }
             }
