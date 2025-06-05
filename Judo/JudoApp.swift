@@ -10,20 +10,10 @@ struct JudoApp: App {
 
     var body: some Scene {
         Group {
-            WindowGroup {
-                ContentView()
-            }
-
-            WindowGroup(id: "template-demo") {
-                TemplateDemoView()
-            }
-            .commands {
-                CommandGroup(after: .singleWindowList) {
-                    Button("Template Demo") {
-                        openWindow(id: "template-demo")
-                    }
-                }
-            }
+            SplashScene()
+            RepositoryScene()
+            TemplateDemoScene()
+            SettingsScene()
         }
         .environment(appModel)
     }

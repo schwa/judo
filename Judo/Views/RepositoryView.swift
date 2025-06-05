@@ -3,9 +3,12 @@ import Everything
 import SwiftTerm
 import SwiftUI
 
-struct ContentView: View {
-    @State
-    private var repository = Repository(path: "")
+struct RepositoryView: View {
+    @Environment(AppModel.self)
+    private var appModel
+
+    @Environment(Repository.self)
+    private var repository
 
     @State
     private var head: ChangeID?
@@ -32,7 +35,13 @@ struct ContentView: View {
             }
             .padding()
             if !isRawViewPresented {
-                RevisionTimelineViewNEW(selection: $selection, commits: $commits)
+                if appModel.isNewTimelineViewEnabled {
+                    RevisionTimelineViewNEW(selection: $selection, commits: $commits)
+                }
+                else {
+                    RevisionTimelineView(selection: $selection, commits: $commits)
+
+                }
             } else {
                 RawTimelineView(revisionQuery: revisionQuery)
             }
@@ -101,10 +110,4 @@ struct ContentView: View {
             ContentUnavailableView { Text("(no commits selected)") }
         }
     }
-}
-
-// MARK: -
-
-#Preview {
-    ContentView()
 }

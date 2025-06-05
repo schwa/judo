@@ -1,6 +1,29 @@
 import SwiftUI
 
+struct TemplateDemoScene: Scene {
+    @Environment(\.openWindow)
+    var openWindow
+
+    var body: some Scene {
+        Window(Text("Template Demo"), id: "template-demo") {
+            TemplateDemoView()
+        }
+        .commands {
+            CommandGroup(after: .singleWindowList) {
+                Button("Template Demo") {
+                    openWindow(id: "template-demo")
+                }
+            }
+        }
+    }
+}
+
+
 struct TemplateDemoView: View {
+
+    @Environment(AppModel.self)
+    private var appModel
+
     @State
     private var path: String = "/Users/schwa/Projects/Ultraviolence"
 
@@ -41,7 +64,7 @@ struct TemplateDemoView: View {
                 arguments.append(contentsOf: ["--template", template])
             }
 
-            let process = SimpleAsyncProcess(executableURL: URL(fileURLWithPath: "/opt/homebrew/bin/jj"), arguments: arguments, currentDirectoryURL: URL(fileURLWithPath: path))
+            let process = SimpleAsyncProcess(executableURL: appModel.binaryPath.url, arguments: arguments, currentDirectoryURL: URL(fileURLWithPath: path))
             do {
                 let data = try await process.run()
                 output = String(data: data, encoding: .utf8) ?? "Failed to decode output"

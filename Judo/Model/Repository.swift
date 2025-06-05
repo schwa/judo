@@ -6,10 +6,14 @@ import TOMLKit
 
 @Observable
 class Repository {
+    var appModel: AppModel
     var path: FSPath
-    var binaryPath: FSPath = "/opt/homebrew/bin/jj"
+    var binaryPath: FSPath {
+        appModel.binaryPath
+    }
 
-    init(path: FSPath) {
+    init(appModel: AppModel, path: FSPath) {
+        self.appModel = appModel
         self.path = path
     }
 
@@ -189,12 +193,13 @@ struct Signature: Decodable {
     var email: String?
     var timestamp: Date
 
+    // TODO: This can outout just "@" if email is empty
     static let template = Template(name: "JUDO_SIGNATURE", parameters: ["p"], content: """
         "{"
         ++ "'name': " ++ p.name().escape_json()
         ++ ", " ++ "'email': '" ++ p.email().local() ++ "@" ++ p.email().domain() ++ "'"
-        ++ ", 'timestamp': '" ++ p.timestamp().format("%Y-%m-%dT%H:%M:%S%z")
-        ++ "'}"
+        ++ ", 'timestamp': '" ++ p.timestamp().format("%Y-%m-%dT%H:%M:%S%z") ++ "'"
+        ++ "}"
         """.replacingOccurrences(of: "'", with: "\\\"")
     )
 }
@@ -214,6 +219,7 @@ struct CommitRecord: Identifiable, Decodable {
     var parents: [ChangeID]
     var bookmarks: [String]
 
+    // TODO: Make sure everything is escaped properly (esp. parents and bookmarks
     static let template = Template(name: "judo_commit_record", content: """
         "{\\n"
         ++ "\t'change_id': " ++ JUDO_CHANGE_ID(change_id) ++ ",\\n"
