@@ -2,11 +2,15 @@ import Collections
 import SwiftUI
 
 struct CommitDetailView: View {
+    @Environment(AppModel.self)
+    var appModel
+
     @Environment(Repository.self)
     var repository
 
     var commits: OrderedDictionary<ChangeID, CommitRecord>
 
+    // TODO: This is not getting reloaded when description changes??
     var commit: CommitRecord
 
     @State
@@ -25,17 +29,22 @@ struct CommitDetailView: View {
             }
             TextEditor(text: $description)
                 .disabled(commit.immutable)
-            if commit.description != description {
-                Button("Describe") {
-                    Task {
-                        do {
-                            let arguments = ["describe", "-r", commit.change_id.rawValue, "-m", description]
-                            print("Describing commit with arguments: \(arguments)")
-                            let process = SimpleAsyncProcess(executableURL: repository.binaryPath.url, arguments: arguments, currentDirectoryURL: repository.path.url)
-                            _ = try await process.run()
-                            print("Commit described successfully.")
-                        } catch {
-                            print("Error describing commit: \(error)")
+            HStack {
+                if !commit.immutable {
+                    Spacer()
+                    if commit.description != description {
+                        Button("Describe") {
+                            Task {
+                                do {
+                                    let arguments = ["describe", "-r", commit.change_id.rawValue, "-m", description]
+                                    print("Describing commit with arguments: \(arguments)")
+                                    let process = SimpleAsyncProcess(executableURL: repository.binaryPath.url, arguments: arguments, currentDirectoryURL: repository.path.url)
+                                    _ = try await process.run()
+                                    print("Commit described successfully.")
+                                } catch {
+                                    print("Error describing commit: \(error)")
+                                }
+                            }
                         }
                     }
                 }
