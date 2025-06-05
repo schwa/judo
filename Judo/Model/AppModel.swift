@@ -12,6 +12,7 @@ class AppModel {
         }
     }
 
+    // TODO: standardize paths.
     var recentRepositories: Collections.OrderedSet<FSPath> {
         didSet {
             UserDefaults.standard.set(recentRepositories.map { $0.path }, forKey: "judo.recentRepositories")
@@ -29,16 +30,5 @@ class AppModel {
         recentRepositories = OrderedSet(UserDefaults.standard.array(forKey: "judo.recentRepositories")!.map { path in
             return FSPath(path as! String)
         })
-
-
-
-
-//        recentRepositories = []
-
-
-//        FSPath(path: "/Users/schwa/Projects/judo"),
-//        FSPath(path: "/Users/schwa/Projects/Ultraviolence"),
-//        FSPath(path: "/tmp/fake-repo"),
-
     }
 }

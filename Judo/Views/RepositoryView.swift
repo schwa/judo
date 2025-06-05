@@ -61,6 +61,17 @@ struct RepositoryView: View {
         .environment(repository)
     }
 
+    var selectedCommits: [CommitRecord] {
+        selection
+            .sorted { lhs, rhs in
+                let lhs = commits.index(forKey: lhs) ?? -1 // TODO: -1?
+                let rhs = commits.index(forKey: rhs) ?? -1 // TODO: -1?
+                return lhs < rhs
+            }
+            .compactMap { commits[$0] } // Filter commits based on selection
+
+    }
+
     func refresh() async {
         do {
             commits = try await repository.scan(revset: revisionQuery)
@@ -92,9 +103,35 @@ struct RepositoryView: View {
         }
 
         ToolbarItem(placement: .primaryAction) {
-            Button("Squash") {
+            ValueView(value: false) { value in
+                let selectedCommits = self.selectedCommits
+                let targetCommit = selectedCommits.first
+                let sourceCommits = selectedCommits.dropFirst().map { $0 }
+                Button("Squash") {
+                    let descriptions = selectedCommits.compactMap { $0.description.isEmpty ? nil : $0.description }
+                    if descriptions.count <= 1 {
+                        Task {
+                            try! await repository.squash(commits: OrderedSet(sourceCommits.map(\.id)), destination: targetCommit!.id, description: descriptions.first ?? "")
+                            await refresh()
+                        }
+                    }
+                    else {
+                        value.wrappedValue = true
+                    }
+                }
+                .disabled(selection.count < 2)
+                .sheet(isPresented: value) {
+                    DescriptionEditor(targetCommit: targetCommit, sourceCommits: sourceCommits, isSquash: true) { description in
+
+                        Task {
+                            try! await repository.squash(commits: OrderedSet(sourceCommits.map(\.id)), destination: targetCommit!.id, description: description)
+                            await refresh()
+                        }
+
+
+                    }
+                }
             }
-            .disabled(true)
         }
 
         ToolbarItem(placement: .primaryAction) {
@@ -112,14 +149,6 @@ struct RepositoryView: View {
 
     @ViewBuilder
     var inspector: some View {
-        let selectedCommits = selection
-            .sorted { lhs, rhs in
-                let lhs = commits.index(forKey: lhs) ?? -1 // TODO: -1?
-                let rhs = commits.index(forKey: rhs) ?? -1 // TODO: -1?
-                return lhs < rhs
-            }
-            .compactMap { commits[$0] } // Filter commits based on selection
-
         if !selectedCommits.isEmpty {
             InspectorView(commits: commits, selectedCommits: selectedCommits)
         } else {

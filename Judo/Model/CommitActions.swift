@@ -18,7 +18,8 @@ extension Repository {
 
     func squash(commits: Collections.OrderedSet<ChangeID>, destination: ChangeID, description: String) async throws {
         let jujutsu = Jujutsu(binaryPath: binaryPath)
-        let arguments = ["--from"] + commits.map(\.rawValue) + ["--into", destination.rawValue] + ["--message", description]
+        let arguments = ["--from", commits.map(\.rawValue).joined(separator: " | "), "--into", destination.rawValue] + ["--message", description]
+        print(arguments)
         let data = try await jujutsu.run(subcommand: "squash", arguments: arguments, repository: self)
         print(String(data: data, encoding: .utf8) ?? "No output")
     }
@@ -35,3 +36,13 @@ extension Repository {
     }
 }
 
+//JJ: Enter a description for the combined commit.
+//JJ: Description from the destination commit:
+//Fake Commit B_2
+//JJ: Description from source commit:
+//Fake Commit B_3
+//JJ: This commit contains the following changes:
+//JJ: A file_2. txt
+//JJ: A file_3. txt
+//JJ:
+//JJ: Lines starting with "JJ:" (like this one) will be removed.

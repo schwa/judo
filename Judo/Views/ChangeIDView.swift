@@ -1,5 +1,42 @@
 import SwiftUI
 
+extension Color {
+    static let magenta = Color(nsColor: .magenta)
+}
+
+extension AttributedString {
+    func modifying(_ modifier: (inout AttributedString) -> Void) -> AttributedString {
+        var modified = self
+        modifier(&modified)
+        return modified
+    }
+}
+
+extension ChangeID {
+    var shortAttributedString: AttributedString {
+        if let shortest {
+            return AttributedString(shortest).modifying {
+                $0.foregroundColor = Color.blue
+            }
+            + AttributedString(rawValue.trimmingPrefix(shortest).prefix(7))
+        }
+        else {
+            return AttributedString(rawValue.prefix(8), attributes: .init([.foregroundColor: Color.secondary]))
+        }
+    }
+}
+
+extension CommitID {
+    var shortAttributedString: AttributedString {
+        return AttributedString(shortest) .modifying {
+            $0.foregroundColor = Color.blue
+        }
+
+        + AttributedString(rawValue.trimmingPrefix(shortest).prefix(7))
+    }
+}
+
+
 struct ChangeIDView: View {
     var changeID: ChangeID
 
