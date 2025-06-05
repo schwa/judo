@@ -25,12 +25,16 @@ struct RepositoryView: View {
     @State
     private var isRawViewPresented: Bool = false
 
+    @State
+    private var status: Status = .waiting
+
     var body: some View {
         VStack {
             RevsetEditorView(revisionQuery: $revisionQuery) { text in
                 revisionQuery = text
                 Task {
-                    await refresh()
+                    // TODO: Handle error.
+                    try? await refresh()
                 }
             }
             .padding()
@@ -82,22 +86,29 @@ struct RepositoryView: View {
 
     @ToolbarContentBuilder
     var toolbar: some ToolbarContent {
+
+        ToolbarItem(placement: .status) {
+            StatusView(status: $status)
+                .frame(width: 480)
+                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 6))
+        }
+
         ToolbarItem(placement: .primaryAction) {
             Button("Undo") {
-                Task {
+                with(action: Action(name: "Undo") {
                     try await repository.undo()
                     await refresh()
-                }
+                })
             }
             .disabled(!repository.canUndo)
         }
 
         ToolbarItem(placement: .primaryAction) {
             Button("Abandon") {
-                Task {
+                with(action: Action(name: "Abandon") {
                     try await repository.abandon(commits: OrderedSet(selection))
                     await refresh()
-                }
+                })
             }
             .disabled(selection.isEmpty)
         }
@@ -110,10 +121,10 @@ struct RepositoryView: View {
                 Button("Squash") {
                     let descriptions = selectedCommits.compactMap { $0.description.isEmpty ? nil : $0.description }
                     if descriptions.count <= 1 {
-                        Task {
-                            try! await repository.squash(commits: OrderedSet(sourceCommits.map(\.id)), destination: targetCommit!.id, description: descriptions.first ?? "")
+                        with(action: Action(name: "Squash") {
+                            try await repository.squash(commits: OrderedSet(sourceCommits.map(\.id)), destination: targetCommit!.id, description: descriptions.first ?? "")
                             await refresh()
-                        }
+                        })
                     }
                     else {
                         value.wrappedValue = true
@@ -123,10 +134,10 @@ struct RepositoryView: View {
                 .sheet(isPresented: value) {
                     DescriptionEditor(targetCommit: targetCommit, sourceCommits: sourceCommits, isSquash: true) { description in
 
-                        Task {
-                            try! await repository.squash(commits: OrderedSet(sourceCommits.map(\.id)), destination: targetCommit!.id, description: description)
+                        with(action: Action(name: "Squash") {
+                            try await repository.squash(commits: OrderedSet(sourceCommits.map(\.id)), destination: targetCommit!.id, description: description)
                             await refresh()
-                        }
+                        })
 
 
                     }
@@ -140,7 +151,7 @@ struct RepositoryView: View {
             .disabled(true)
         }
 
-        ToolbarItem(placement: .secondaryAction) {
+        ToolbarItem(placement: .primaryAction) {
             Toggle(isOn: $isRawViewPresented) {
                 Text("Raw")
             }
@@ -153,6 +164,18 @@ struct RepositoryView: View {
             InspectorView(commits: commits, selectedCommits: selectedCommits)
         } else {
             ContentUnavailableView { Text("(no commits selected)") }
+        }
+    }
+
+    func with(action: Action) {
+        Task {
+            do {
+                try await action.closure()
+                status = .success(action)
+            }
+            catch {
+                status = .failure(action, error)
+            }
         }
     }
 }

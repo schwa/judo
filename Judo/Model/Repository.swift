@@ -31,7 +31,7 @@ class Repository {
         // let tempDirectory = FileManager.default.temporaryDirectory
         let tempDirectory = URL(fileURLWithPath: "/tmp")
         let tempConfigPath = tempDirectory.appending(path: "judo.toml")
-        print(tempConfigPath)
+//        print(tempConfigPath)
         try TOMLEncoder().encode(temporaryConfig).write(toFile: tempConfigPath.path, atomically: true, encoding: .utf8)
 
         var arguments = ["log", "--no-graph",
@@ -43,10 +43,10 @@ class Repository {
             arguments.append(contentsOf: ["-r", revset])
         }
 
-        print("jj \(arguments.joined(separator: " "))")
+//        print("jj \(arguments.joined(separator: " "))")
         do {
             let start = CFAbsoluteTimeGetCurrent()
-            print("Fetching...")
+//            print("Fetching...")
             let process = SimpleAsyncProcess(executableURL: binaryPath.url, arguments: arguments, currentDirectoryURL: path.url)
             let data = try await process.run()
 
@@ -62,10 +62,10 @@ class Repository {
             let commits = try decoder.decode([CommitRecord].self, from: jsonData)
 
             let end = CFAbsoluteTimeGetCurrent()
-            print("... fetched \(commits.count) (\(data.count) bytes) commits in \(end - start) seconds")
+//            print("... fetched \(commits.count) (\(data.count) bytes) commits in \(end - start) seconds")
             return OrderedDictionary(uniqueKeys: commits.map(\.id), values: commits)
         } catch {
-            print("Error: \(error)")
+//            print("Error: \(error)")
             return [:]
         }
     }
@@ -77,7 +77,7 @@ class Repository {
                              "--template", "change_id"
             ]
 
-            print("Fetching...")
+//            print("Fetching...")
             let process = SimpleAsyncProcess(executableURL: binaryPath.url, arguments: arguments, currentDirectoryURL: path.url)
             let data = try process.runSync()
             guard let string = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) else {
