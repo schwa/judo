@@ -69,28 +69,44 @@ struct RepositoryView: View {
         }
     }
 
-    @ViewBuilder
-    var toolbar: some View {
-        ValueView(value: false) { value in
-            Button("Open…") {
-                value.wrappedValue = true
-            }
-            .fileImporter(isPresented: value, allowedContentTypes: [.directory], allowsMultipleSelection: false) { result in
-                do {
-                    let urls = try result.get()
-                    guard let url = urls.first else { return }
-                    repository.path = FSPath(url)
-                    Task {
-                        await refresh()
-                    }
-                } catch {
-                    print("Error selecting directory: \(error)")
+    @ToolbarContentBuilder
+    var toolbar: some ToolbarContent {
+        ToolbarItem(placement: .primaryAction) {
+            Button("Undo") {
+                Task {
+                    try await repository.undo()
+                    await refresh()
                 }
             }
+            .disabled(!repository.canUndo)
         }
 
-        Toggle(isOn: $isRawViewPresented) {
-            Text("Raw")
+        ToolbarItem(placement: .primaryAction) {
+            Button("Abandon") {
+                Task {
+                    try await repository.abandon(commits: OrderedSet(selection))
+                    await refresh()
+                }
+            }
+            .disabled(selection.isEmpty)
+        }
+
+        ToolbarItem(placement: .primaryAction) {
+            Button("Squash") {
+            }
+            .disabled(true)
+        }
+
+        ToolbarItem(placement: .primaryAction) {
+            Button("Describe") {
+            }
+            .disabled(true)
+        }
+
+        ToolbarItem(placement: .secondaryAction) {
+            Toggle(isOn: $isRawViewPresented) {
+                Text("Raw")
+            }
         }
     }
 

@@ -12,6 +12,10 @@ class Repository {
         appModel.binaryPath
     }
 
+    var canUndo: Bool {
+        return true
+    }
+
     init(appModel: AppModel, path: FSPath) {
         self.appModel = appModel
         self.path = path
