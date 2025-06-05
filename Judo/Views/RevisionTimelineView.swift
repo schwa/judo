@@ -8,11 +8,13 @@ struct RevisionTimelineView: View {
     @Binding
     var selection: Set<ChangeID>
 
-    @Binding
-    var commits: OrderedDictionary<ChangeID, CommitRecord>
+    var log: RepositoryLog?
 
     var body: some View {
-        List(commits.values, selection: $selection) { commit in
+
+        let commits: [CommitRecord] = log.map { Array($0.commits.values) } ?? []
+
+        List(commits, selection: $selection) { commit in
             HStack {
                 if commit.immutable {
                     Image(systemName: "diamond.fill")
@@ -38,11 +40,12 @@ struct RevisionTimelineViewNEW: View {
     @Binding
     var selection: Set<ChangeID>
 
-    @Binding
-    var commits: OrderedDictionary<ChangeID, CommitRecord>
+    var log: RepositoryLog?
 
     var body: some View {
-        let rows = buildGraphRows(from: Array(commits.values), allCommits: self.commits)
+        let commits: [CommitRecord] = log.map { Array($0.commits.values) } ?? []
+
+        let rows = buildGraphRows(from: commits, allCommits: log?.commits ?? [:])
         let columnCount = rows.map { row -> Int in
             switch row {
             case let .commit(_, _, lanes):

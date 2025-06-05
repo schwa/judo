@@ -21,7 +21,7 @@ class Repository {
         self.path = path
     }
 
-    func scan(revset: String) async throws -> OrderedDictionary<ChangeID, CommitRecord> {
+    func log(revset: String) async throws -> RepositoryLog {
         let temporaryConfig = JujutsuConfig(templateAliases: [
             CommitRecord.template.key: CommitRecord.template.content,
             Signature.template.key: Signature.template.content,
@@ -44,30 +44,27 @@ class Repository {
         }
 
 //        print("jj \(arguments.joined(separator: " "))")
-        do {
-            let start = CFAbsoluteTimeGetCurrent()
+        let start = CFAbsoluteTimeGetCurrent()
 //            print("Fetching...")
-            let process = SimpleAsyncProcess(executableURL: binaryPath.url, arguments: arguments, currentDirectoryURL: path.url)
-            let data = try await process.run()
+        let process = SimpleAsyncProcess(executableURL: binaryPath.url, arguments: arguments, currentDirectoryURL: path.url)
+        let data = try await process.run()
 
-            let header = "[\n".data(using: .utf8)!
-            let footer = "\n]".data(using: .utf8)!
-            let jsonData = header + data + footer
-            //            let jsonString = String(data: jsonData, encoding: .utf8)!
-            //            print(jsonString)
+        let header = "[\n".data(using: .utf8)!
+        let footer = "\n]".data(using: .utf8)!
+        let jsonData = header + data + footer
+        //            let jsonString = String(data: jsonData, encoding: .utf8)!
+        //            print(jsonString)
 
-            let decoder = JSONDecoder()
-            decoder.allowsJSON5 = true
-            decoder.dateDecodingStrategy = .iso8601
-            let commits = try decoder.decode([CommitRecord].self, from: jsonData)
+        let decoder = JSONDecoder()
+        decoder.allowsJSON5 = true
+        decoder.dateDecodingStrategy = .iso8601
+        let commits = try decoder.decode([CommitRecord].self, from: jsonData)
 
-            let end = CFAbsoluteTimeGetCurrent()
+        let end = CFAbsoluteTimeGetCurrent()
 //            print("... fetched \(commits.count) (\(data.count) bytes) commits in \(end - start) seconds")
-            return OrderedDictionary(uniqueKeys: commits.map(\.id), values: commits)
-        } catch {
-//            print("Error: \(error)")
-            return [:]
-        }
+        let orderedCommits = OrderedDictionary(uniqueKeys: commits.map(\.id), values: commits)
+
+        return RepositoryLog(repository: self, revset: revset, commits: orderedCommits)
     }
 
     var head: ChangeID? {

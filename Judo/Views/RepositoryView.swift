@@ -20,7 +20,7 @@ struct RepositoryView: View {
     private var revisionQuery: String = ""
 
     @State
-    private var commits: OrderedDictionary<ChangeID, CommitRecord> = [:]
+    private var log: RepositoryLog?
 
     @State
     private var isRawViewPresented: Bool = false
@@ -33,18 +33,16 @@ struct RepositoryView: View {
             RevsetEditorView(revisionQuery: $revisionQuery) { text in
                 revisionQuery = text
                 Task {
-                    // TODO: Handle error.
-                    try? await refresh()
+                    await refresh()
                 }
             }
             .padding()
             if !isRawViewPresented {
                 if appModel.isNewTimelineViewEnabled {
-                    RevisionTimelineViewNEW(selection: $selection, commits: $commits)
+                    RevisionTimelineViewNEW(selection: $selection, log: log)
                 }
                 else {
-                    RevisionTimelineView(selection: $selection, commits: $commits)
-
+                    RevisionTimelineView(selection: $selection, log: log)
                 }
             } else {
                 RawTimelineView(revisionQuery: revisionQuery)
@@ -66,19 +64,20 @@ struct RepositoryView: View {
     }
 
     var selectedCommits: [CommitRecord] {
-        selection
+        guard let log = log else { return [] }
+        return selection
             .sorted { lhs, rhs in
-                let lhs = commits.index(forKey: lhs) ?? -1 // TODO: -1?
-                let rhs = commits.index(forKey: rhs) ?? -1 // TODO: -1?
+                let lhs = log.commits.index(forKey: lhs) ?? -1 // TODO: -1?
+                let rhs = log.commits.index(forKey: rhs) ?? -1 // TODO: -1?
                 return lhs < rhs
             }
-            .compactMap { commits[$0] } // Filter commits based on selection
+            .compactMap { log.commits[$0] } // Filter commits based on selection
 
     }
 
     func refresh() async {
         do {
-            commits = try await repository.scan(revset: revisionQuery)
+            log = try await repository.log(revset: revisionQuery)
         } catch {
             print("Error scanning repository: \(error)")
         }
@@ -160,8 +159,8 @@ struct RepositoryView: View {
 
     @ViewBuilder
     var inspector: some View {
-        if !selectedCommits.isEmpty {
-            InspectorView(commits: commits, selectedCommits: selectedCommits)
+        if let log, !selectedCommits.isEmpty {
+            InspectorView(commits: log.commits, selectedCommits: selectedCommits)
         } else {
             ContentUnavailableView { Text("(no commits selected)") }
         }
