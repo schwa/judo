@@ -10,111 +10,200 @@ struct RepositoryLogViewNew: View {
 
     @State
     var rows: [GraphRow] = []
-    @State
-    var maxLanes: Int = 0
-
 
     var body: some View {
+        let laneCount = rows.reduce(0) { max($0, $1.nextLanes.count) }
         List(selection: $selection) {
-            ForEach(rows) { row in
-                rowView(row: row)
+            ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
+                HStack {
+                    LanesView(row: row, lastRow: index > 0 ? rows[index - 1] : nil, laneCount: laneCount)
+                    CommitRowView(commit: row.commit)
+                }
                 .tag(row.id)
             }
         }
         .onChange(of: log.commits) {
             rows = log.makeGraphRows()
         }
-        .onChange(of: rows) {
-            maxLanes = rows.map { $0.lanes.count }.max() ?? 0
-        }
-    }
-
-
-    @ViewBuilder
-    func rowView(row: GraphRow) -> some View {
-        HStack {
-            LanesView(lanes: row.lanes, maxLanes: maxLanes)
-            CommitRowView(commit: row.commit)
-        }
     }
 }
 
 struct LanesView: View {
-    var lanes: [Lane]
-    var maxLanes: Int
+    var row: GraphRow
+    var lastRow: GraphRow?
+    var laneCount: Int
+    var laneWidth: CGFloat = 12
 
     var body: some View {
-        HStack {
-            ForEach(0..<maxLanes, id: \.self) { index in
-                Group {
-                    let lane = lanes[safe: index] ?? .empty
-                    switch lane {
-                    case .empty:
-                        Color.clear.frame(height: 12)
-                    case .edge:
-                        Color.orange.frame(width: 2, height: 12)
-                    case .node:
-                        Circle().fill(.orange)
-                        .frame(height: 12)
+        Canvas { context, size in
+            let minY = 0.0
+            let midY = size.height / 2
+            let maxY = size.height
+            let activeLaneX = (CGFloat(row.activeLane.id) + 0.5) * laneWidth
 
-                    }
-
-                }
-                .frame(width: 12)
+            func laneIDToX(_ laneID: LaneID) -> CGFloat {
+                return (CGFloat(laneID.id) + 0.5) * laneWidth
             }
+
+            print("##################")
+            let lanes = (lastRow?.nextLanes ?? [:]).sorted { $0.key.id < $1.key.id }.map { (laneIDToX($0.key), $0.value) }
+            let nextLanes = row.nextLanes.sorted { $0.key.id < $1.key.id }.map { (laneIDToX($0.key), $0.value) }
+            print("lanes", lanes)
+            print("activeLane", row.commit.change_id.short(4), row.activeLane)
+            print("nextLanes", nextLanes)
+            // Top half
+            for (sourceX, currentChange) in lanes {
+                let destinationX: CGFloat
+                if currentChange == row.commit.change_id {
+                    destinationX = laneIDToX(row.activeLane)
+                }
+                else {
+                    destinationX = sourceX
+                }
+                context.stroke(Path.wire(from: CGPoint(x: sourceX, y: minY), to: CGPoint(x: destinationX, y: midY)), with: .color(.orange), lineWidth: 2)
+            }
+//            // Bottom half
+            // Top half
+            for (destinationX, nextChange) in nextLanes {
+                let sourceX: CGFloat
+                if nextChange == row.commit.change_id {
+                    sourceX = laneIDToX(row.activeLane)
+                }
+                else {
+                    sourceX = destinationX
+                }
+                context.stroke(Path.wire(from: CGPoint(x: sourceX, y: midY), to: CGPoint(x: destinationX, y: maxY)), with: .color(.purple), lineWidth: 2)
+            }
+//            for (change, destinationLane) in nextLanes.map({ ($1, $0.id) }) {
+//            }
+            context.fill(Path(ellipseIn: CGRect(x: activeLaneX - 4, y: midY - 4, width: 8, height: 8)), with: .color(.orange))
         }
+        .frame(width: CGFloat(laneCount) * laneWidth)
     }
 }
 
-enum Lane: Equatable {
-    case empty
-    case edge(change: ChangeID, parents: [ChangeID])
-    case node(change: ChangeID, parents: [ChangeID])
+
+struct LaneID: Hashable {
+    var id: Int
 }
 
-struct GraphRow: Identifiable, Equatable {
-    var id: ChangeID {
-        commit.change_id
+extension LaneID: CustomStringConvertible {
+    var description: String {
+        return "L\(id)"
     }
-    var lanes: [Lane]
-    var commit: CommitRecord
+}
+
+struct LaneSegment {
+    var fromLane: LaneID
+    var toLane: LaneID
+}
+
+struct GraphRow {
+    let commit: CommitRecord
+    let activeLane: LaneID
+    let nextLanes: [LaneID: ChangeID]
 }
 
 extension RepositoryLog {
     func makeGraphRows() -> [GraphRow] {
+        var nextLaneID = 0
+        func makeLaneID() -> LaneID {
+            defer {
+                nextLaneID += 1
+            }
+            return LaneID(id: nextLaneID)
+        }
+        //
+
         var rows: [GraphRow] = []
-        for commit in commits.values {
+        for (index, commit) in commits.values.enumerated() {
+            let isAtEnd = index == commits.count - 1
             let lastRow = rows.last
-            var lanes = lastRow?.lanes ?? .init()
-            lanes = lanes.map { lane in
-                switch lane {
-                case .empty:
-                    return .empty
-                case .edge(let commitID, let parents), .node(let commitID, let parents):
-                    if parents.contains(commit.change_id) {
-                        return .empty
-                    }
-                    else {
-                        return .edge(change: commitID, parents: parents)
+//            print("** \(commit.change_id.short(4)), [\(commit.parents.map { $0.short(4) })]")
+            if let lastRow {
+                var nextLanes = lastRow.nextLanes
+                let activeLane = nextLanes
+                    .sorted { $0.key.id < $1.key.id }
+                    .first(where: { $0.value == commit.change_id })?.key ?? makeLaneID()
+                if let first = commit.parents.first {
+                    nextLanes[activeLane] = first
+                    for parent in commit.parents.dropFirst() {
+                        nextLanes[makeLaneID()] = parent
                     }
                 }
-            }
-            if let index = lanes.firstIndex(where: { $0 == .empty }) {
-                lanes[index] = .node(change: commit.change_id, parents: commit.parents)
+                if isAtEnd {
+                    nextLanes.removeAll()
+                }
+                let row = GraphRow(commit: commit, activeLane: activeLane, nextLanes: nextLanes)
+                rows.append(row)
             }
             else {
-                lanes.append(.node(change: commit.change_id, parents: commit.parents))
+                // First commit, create a new row
+                let activeLane = makeLaneID()
+                var nextLanes: [LaneID: ChangeID] = [:]
+                // make next lanes - the first parent reuses laneID and the others get new ones
+                if let first = commit.parents.first {
+                    nextLanes[activeLane] = first
+                    for parent in commit.parents.dropFirst() {
+                        nextLanes[makeLaneID()] = parent
+                    }
+                }
+                let row = GraphRow(commit: commit, activeLane: activeLane, nextLanes: nextLanes)
+                rows.append(row)
             }
-            let row = GraphRow(lanes: lanes, commit: commit)
-            rows.append(row)
+//            print(">>", rows.last)
         }
         return rows
     }
 }
 
-extension Array {
-    subscript(safe index: Int) -> Element? {
-        guard index >= 0 && index < count else { return nil }
-        return self[index]
+extension GraphRow: CustomDebugStringConvertible {
+    var debugDescription: String {
+
+        return "GraphRow(commit: \(commit.change_id.short(4)), activeLane: \(activeLane), nextLanes: \(nextLanes))"
+
+    }
+}
+
+// MARK: -
+
+extension ChangeID {
+    func short(_ count: Int = 8) -> String {
+        return String(rawValue.prefix(count))
+    }
+}
+
+public extension String.StringInterpolation {
+    mutating func appendInterpolation(_ value: String, paddedTo length: Int, pad: Character = " ") {
+        let padCount = max(0, length - value.count)
+        let padded = value + String(repeating: pad, count: padCount)
+        appendLiteral(padded)
+    }
+}
+
+extension ChangeID: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        return short(4)
+    }
+}
+
+extension GraphRow: Identifiable {
+    var id: ChangeID { commit.change_id }
+}
+
+extension Path {
+    static func wire(from: CGPoint, to: CGPoint) -> Path {
+        Path { path in
+            path.move(to: from)
+
+            let midY = (from.y + to.y) / 2
+
+            // Control points for a smooth S curve
+            path.addCurve(
+                to: to,
+                control1: CGPoint(x: from.x, y: midY),
+                control2: CGPoint(x: to.x, y: midY)
+            )
+        }
     }
 }
