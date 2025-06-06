@@ -3,27 +3,28 @@ import Collections
 import Everything
 
 public extension Repository {
+
+    var jujutsu: Jujutsu {
+        appModel.jujutsu
+    }
+
     func new(selectedCommit: CommitRecord? = nil) async throws {
-        let jujutsu = Jujutsu(binaryPath: binaryPath)
         let data = try await jujutsu.run(subcommand: "new", arguments: [], repository: self)
         print(String(data: data, encoding: .utf8) ?? "No output")
     }
 
     func undo() async throws {
-        let jujutsu = Jujutsu(binaryPath: binaryPath)
         let data = try await jujutsu.run(subcommand: "undo", arguments: [], repository: self)
         print(String(data: data, encoding: .utf8) ?? "No output")
     }
 
     func abandon(commits: Collections.OrderedSet<ChangeID>) async throws {
-        let jujutsu = Jujutsu(binaryPath: binaryPath)
         let arguments = commits.map(\.rawValue)
         let data = try await jujutsu.run(subcommand: "abandon", arguments: arguments, repository: self)
         print(String(data: data, encoding: .utf8) ?? "No output")
     }
 
     func squash(commits: Collections.OrderedSet<ChangeID>, destination: ChangeID, description: String) async throws {
-        let jujutsu = Jujutsu(binaryPath: binaryPath)
         let arguments = ["--from", commits.map(\.rawValue).joined(separator: " | "), "--into", destination.rawValue] + ["--message", description]
         print(arguments)
         let data = try await jujutsu.run(subcommand: "squash", arguments: arguments, repository: self)
@@ -31,7 +32,6 @@ public extension Repository {
     }
 
     func describe(commits: Collections.OrderedSet<ChangeID>, description: String) async throws {
-        let jujutsu = Jujutsu(binaryPath: binaryPath)
         let arguments = ["--message", description] + commits.map(\.rawValue)
         let data = try await jujutsu.run(subcommand: "describe", arguments: arguments, repository: self)
         print(String(data: data, encoding: .utf8) ?? "No output")
@@ -42,7 +42,6 @@ public extension Repository {
     }
 
     func rebase(from: [ChangeID], to: ChangeID) async throws {
-        let jujutsu = Jujutsu(binaryPath: binaryPath)
         let arguments = ["--revisions"] + from.map(\.rawValue)
          + ["--insert-after", to.rawValue]
         print(arguments)

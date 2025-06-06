@@ -9,6 +9,7 @@ public class AppModel {
     public var binaryPath: FSPath {
         didSet {
             UserDefaults.standard.set(binaryPath.path, forKey: "judo.binaryPath")
+            jujutsu.binaryPath = binaryPath
         }
     }
 
@@ -21,14 +22,18 @@ public class AppModel {
 
     public var isNewTimelineViewEnabled = true
 
+    public var jujutsu: Jujutsu
+
     public init() {
         UserDefaults.standard.register(defaults: [
             "judo.binaryPath": "/opt/homebrew/bin/jj",
             "judo.recentRepositories": [],
         ])
-        binaryPath = FSPath(UserDefaults.standard.string(forKey: "judo.binaryPath")!)
+        let binaryPath = FSPath(UserDefaults.standard.string(forKey: "judo.binaryPath")!)
+        self.binaryPath = binaryPath
         recentRepositories = OrderedSet(UserDefaults.standard.array(forKey: "judo.recentRepositories")!.map { path in
             return FSPath(path as! String)
         })
+        jujutsu = Jujutsu(binaryPath: binaryPath)
     }
 }

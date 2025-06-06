@@ -24,21 +24,10 @@ public class Repository {
     }
 
     public func log(revset: String) async throws {
-        let temporaryConfig = JujutsuConfig(templateAliases: [
-            CommitRecord.template.key: CommitRecord.template.content,
-            Signature.template.key: Signature.template.content,
-            ChangeID.template.key: ChangeID.template.content,
-            CommitID.template.key: CommitID.template.content
-        ])
-        // let tempDirectory = FileManager.default.temporaryDirectory
-        let tempDirectory = URL(fileURLWithPath: "/tmp")
-        let tempConfigPath = tempDirectory.appending(path: "judo.toml")
-//        print(tempConfigPath)
-        try TOMLEncoder().encode(temporaryConfig).write(toFile: tempConfigPath.path, atomically: true, encoding: .utf8)
 
-        var arguments = ["log", "--no-graph",
+        var arguments = ["--no-graph",
                          "--template", CommitRecord.template.name,
-                         "--config-file", tempConfigPath.path
+                         "--config-file", appModel.jujutsu.tempConfigPath.path
                          //                "--limit", "1"
         ]
         if !revset.isEmpty {
@@ -48,8 +37,8 @@ public class Repository {
 //        print("jj \(arguments.joined(separator: " "))")
 //        let start = CFAbsoluteTimeGetCurrent()
 //            print("Fetching...")
-        let process = SimpleAsyncProcess(executableURL: binaryPath.url, arguments: arguments, currentDirectoryURL: path.url)
-        let data = try await process.run()
+
+        let data = try await appModel.jujutsu.run(subcommand: "log", arguments: arguments, repository: self)
 
         let header = "[\n".data(using: .utf8)!
         let footer = "\n]".data(using: .utf8)!
