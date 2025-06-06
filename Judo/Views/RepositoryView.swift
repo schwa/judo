@@ -98,6 +98,15 @@ struct RepositoryView: View {
         }
 
         ToolbarItem(placement: .primaryAction) {
+            Button("New") {
+                with(action: Action(name: "new") {
+                    try await repository.new(selectedCommit: selectedCommits.first)
+                    await refresh()
+                })
+            }
+        }
+
+        ToolbarItem(placement: .primaryAction) {
             Button("Undo") {
                 with(action: Action(name: "Undo") {
                     try await repository.undo()

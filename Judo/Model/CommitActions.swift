@@ -3,6 +3,12 @@ import Collections
 import Everything
 
 extension Repository {
+    func new(selectedCommit: CommitRecord? = nil) async throws {
+        let jujutsu = Jujutsu(binaryPath: binaryPath)
+        let data = try await jujutsu.run(subcommand: "new", arguments: [], repository: self)
+        print(String(data: data, encoding: .utf8) ?? "No output")
+    }
+
     func undo() async throws {
         let jujutsu = Jujutsu(binaryPath: binaryPath)
         let data = try await jujutsu.run(subcommand: "undo", arguments: [], repository: self)
