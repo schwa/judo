@@ -1,6 +1,7 @@
 import Everything
 import SwiftUI
 import SwiftTerm
+import JudoSupport
 
 struct RawTimelineView: View {
     @Environment(Repository.self)

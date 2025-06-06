@@ -1,4 +1,5 @@
 import SwiftUI
+import JudoSupport
 
 @main
 struct JudoApp: App {

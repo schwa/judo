@@ -1,5 +1,6 @@
 import SwiftUI
 import Everything
+import JudoSupport
 
 struct SplashScene: Scene {
     var body: some Scene {

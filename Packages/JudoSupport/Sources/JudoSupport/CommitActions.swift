@@ -2,7 +2,7 @@ import Foundation
 import Collections
 import Everything
 
-extension Repository {
+public extension Repository {
     func new(selectedCommit: CommitRecord? = nil) async throws {
         let jujutsu = Jujutsu(binaryPath: binaryPath)
         let data = try await jujutsu.run(subcommand: "new", arguments: [], repository: self)

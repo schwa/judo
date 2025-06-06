@@ -2,6 +2,7 @@ import Collections
 import Everything
 import SwiftTerm
 import SwiftUI
+import JudoSupport
 
 struct RepositoryView: View {
     @Environment(AppModel.self)

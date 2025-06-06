@@ -1,5 +1,6 @@
 import SwiftUI
 import Collections
+import JudoSupport
 
 struct RepositoryLogView: View {
 

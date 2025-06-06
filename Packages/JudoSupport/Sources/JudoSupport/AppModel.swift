@@ -4,24 +4,24 @@ import Foundation
 import Collections
 
 @Observable
-class AppModel {
+public class AppModel {
     // TODO: Cheap & cheesy persistence.
-    var binaryPath: FSPath {
+    public var binaryPath: FSPath {
         didSet {
             UserDefaults.standard.set(binaryPath.path, forKey: "judo.binaryPath")
         }
     }
 
     // TODO: standardize paths.
-    var recentRepositories: Collections.OrderedSet<FSPath> {
+    public var recentRepositories: Collections.OrderedSet<FSPath> {
         didSet {
             UserDefaults.standard.set(recentRepositories.map { $0.path }, forKey: "judo.recentRepositories")
         }
     }
 
-    var isNewTimelineViewEnabled = true
+    public var isNewTimelineViewEnabled = true
 
-    init() {
+    public init() {
         UserDefaults.standard.register(defaults: [
             "judo.binaryPath": "/opt/homebrew/bin/jj",
             "judo.recentRepositories": [],

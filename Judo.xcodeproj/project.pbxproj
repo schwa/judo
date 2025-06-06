@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		45214F512DF08DF400634736 /* TOMLKit in Frameworks */ = {isa = PBXBuildFile; productRef = 45214F502DF08DF400634736 /* TOMLKit */; };
+		45480B2C2DF34CE20032CB12 /* JudoSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 45480B2B2DF34CE20032CB12 /* JudoSupport */; };
 		456748A92DF0CD650017D5D6 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 456748A82DF0CD650017D5D6 /* Collections */; };
 		456748BD2DF14F7E0017D5D6 /* SwiftTerm in Frameworks */ = {isa = PBXBuildFile; productRef = 456748BC2DF14F7E0017D5D6 /* SwiftTerm */; };
 		45FF28942DEA17A900947A9B /* Everything in Frameworks */ = {isa = PBXBuildFile; productRef = 45FF28932DEA17A900947A9B /* Everything */; };
@@ -17,7 +18,25 @@
 		45FF28832DEA173E00947A9B /* Judo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Judo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		45480B292DF34CCA0032CB12 /* Exceptions for "Packages" folder in "Judo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				JudoSupport,
+			);
+			target = 45FF28822DEA173E00947A9B /* Judo */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		45480B282DF34CC90032CB12 /* Packages */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				45480B292DF34CCA0032CB12 /* Exceptions for "Packages" folder in "Judo" target */,
+			);
+			path = Packages;
+			sourceTree = "<group>";
+		};
 		45FF28852DEA173E00947A9B /* Judo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Judo;
@@ -33,6 +52,7 @@
 				456748A92DF0CD650017D5D6 /* Collections in Frameworks */,
 				45FF28942DEA17A900947A9B /* Everything in Frameworks */,
 				456748BD2DF14F7E0017D5D6 /* SwiftTerm in Frameworks */,
+				45480B2C2DF34CE20032CB12 /* JudoSupport in Frameworks */,
 				45214F512DF08DF400634736 /* TOMLKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -40,10 +60,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		45480B2A2DF34CE20032CB12 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		45FF287A2DEA173E00947A9B = {
 			isa = PBXGroup;
 			children = (
 				45FF28852DEA173E00947A9B /* Judo */,
+				45480B282DF34CC90032CB12 /* Packages */,
+				45480B2A2DF34CE20032CB12 /* Frameworks */,
 				45FF28842DEA173E00947A9B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -72,6 +101,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				45480B282DF34CC90032CB12 /* Packages */,
 				45FF28852DEA173E00947A9B /* Judo */,
 			);
 			name = Judo;
@@ -80,6 +110,7 @@
 				45214F502DF08DF400634736 /* TOMLKit */,
 				456748A82DF0CD650017D5D6 /* Collections */,
 				456748BC2DF14F7E0017D5D6 /* SwiftTerm */,
+				45480B2B2DF34CE20032CB12 /* JudoSupport */,
 			);
 			productName = Judo;
 			productReference = 45FF28832DEA173E00947A9B /* Judo.app */;
@@ -383,6 +414,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 45214F4F2DF08DF400634736 /* XCRemoteSwiftPackageReference "TOMLKit" */;
 			productName = TOMLKit;
+		};
+		45480B2B2DF34CE20032CB12 /* JudoSupport */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = JudoSupport;
 		};
 		456748A82DF0CD650017D5D6 /* Collections */ = {
 			isa = XCSwiftPackageProductDependency;

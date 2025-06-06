@@ -1,4 +1,5 @@
 import SwiftUI
+import JudoSupport
 
 struct CommitRowView: View {
     @Environment(Repository.self)

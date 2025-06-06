@@ -1,4 +1,5 @@
 import SwiftUI
+import JudoSupport
 
 struct TemplateDemoScene: Scene {
     @Environment(\.openWindow)

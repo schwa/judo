@@ -1,17 +1,24 @@
 import Foundation
 
-struct SimpleAsyncProcess {
-    struct Error: Swift.Error {
-        let exitCode: Int32
-        let stderr: String
+public struct SimpleAsyncProcess {
+    public struct Error: Swift.Error {
+        public let exitCode: Int32
+        public let stderr: String
     }
 
-    var executableURL: URL
-    var arguments: [String] = []
-    var currentDirectoryURL: URL?
-    var useShell: Bool = false
+    public var executableURL: URL
+    public var arguments: [String]
+    public var currentDirectoryURL: URL?
+    public var useShell: Bool = false
 
-    func run() async throws -> Data {
+    public init(executableURL: URL, arguments: [String] = [], currentDirectoryURL: URL? = nil, useShell: Bool = false) {
+        self.executableURL = executableURL
+        self.arguments = arguments
+        self.currentDirectoryURL = currentDirectoryURL
+        self.useShell = useShell
+    }
+
+    public func run() async throws -> Data {
         let process = Process()
 
         if !useShell {

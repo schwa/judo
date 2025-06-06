@@ -5,25 +5,25 @@ import Observation
 import TOMLKit
 
 @Observable
-class Repository {
-    var appModel: AppModel
-    var path: FSPath
-    var binaryPath: FSPath {
+public class Repository {
+    public var appModel: AppModel
+    public var path: FSPath
+    public var binaryPath: FSPath {
         appModel.binaryPath
     }
-    var currentLog: RepositoryLog
+    public var currentLog: RepositoryLog
 
-    var canUndo: Bool {
+    public var canUndo: Bool {
         return true
     }
 
-    init(appModel: AppModel, path: FSPath) {
+    public init(appModel: AppModel, path: FSPath) {
         self.appModel = appModel
         self.path = path
         self.currentLog = RepositoryLog()
     }
 
-    func log(revset: String) async throws {
+    public func log(revset: String) async throws {
         let temporaryConfig = JujutsuConfig(templateAliases: [
             CommitRecord.template.key: CommitRecord.template.content,
             Signature.template.key: Signature.template.content,
@@ -69,7 +69,7 @@ class Repository {
         self.currentLog = RepositoryLog(revset: revset, commits: orderedCommits)
     }
 
-    var head: ChangeID? {
+    public var head: ChangeID? {
         do {
             let arguments = ["log", "--no-graph",
                              "-r", "@",
@@ -91,26 +91,26 @@ class Repository {
     }
 }
 
-struct ChangeID: Hashable, Decodable {
-    let rawValue: String
+public struct ChangeID: Hashable, Decodable {
+    public let rawValue: String
 
     // TODO: This is ephemeral and can change as repositories are updated.
-    let shortest: String?
+    public let shortest: String?
 
-    init(rawValue: String, shortest: String? = nil) {
+    public init(rawValue: String, shortest: String? = nil) {
         self.rawValue = rawValue
         self.shortest = shortest
     }
 
-    static func == (lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.rawValue == rhs.rawValue
     }
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(rawValue)
     }
 
-    init(from decoder: any Decoder) throws {
+    public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         let string = try container.decode(String.self)
 
@@ -126,28 +126,28 @@ struct ChangeID: Hashable, Decodable {
         self.rawValue = String(remaining)
     }
 
-    static let template = Template(name: "JUDO_CHANGE_ID", parameters: ["p"], content: """
+    public static let template = Template(name: "JUDO_CHANGE_ID", parameters: ["p"], content: """
         "'[" ++ p.shortest() ++ "]" ++ p ++ "'"
         """.replacingOccurrences(of: "'", with: "\\\"")
     )
 }
 
 // TODO: merge with ChangeID
-struct CommitID: Hashable, Decodable {
-    let rawValue: String
+public struct CommitID: Hashable, Decodable {
+    public let rawValue: String
 
     // TODO: This is ephemeral and can change as repositories are updated.
-    let shortest: String
+    public let shortest: String
 
-    static func == (lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.rawValue == rhs.rawValue
     }
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(rawValue)
     }
 
-    init(from decoder: any Decoder) throws {
+    public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         let string = try container.decode(String.self)
 
@@ -163,41 +163,41 @@ struct CommitID: Hashable, Decodable {
         self.rawValue = String(remaining)
     }
 
-    static let template = Template(name: "JUDO_COMMIT_ID", parameters: ["p"], content: """
+    public static let template = Template(name: "JUDO_COMMIT_ID", parameters: ["p"], content: """
         "'[" ++ p.shortest() ++ "]" ++ p ++ "'"
         """.replacingOccurrences(of: "'", with: "\\\"")
     )
 }
 
-struct JujutsuConfig: Codable {
+public struct JujutsuConfig: Codable {
     enum CodingKeys: String, CodingKey {
         case templates
         case templateAliases = "template-aliases"
     }
 
-    var templates: [String: String] = [:]
-    var templateAliases: [String: String] = [:]
+    public var templates: [String: String] = [:]
+    public var templateAliases: [String: String] = [:]
 }
 
 // https://jj-vcs.github.io/jj/latest/templates/
 
-struct Template {
-    var name: String
-    var parameters: [String] = []
-    var content: String
+public struct Template: Sendable {
+    public var name: String
+    public var parameters: [String] = []
+    public var content: String
 
-    var key: String {
+    public var key: String {
         name + (parameters.isEmpty ? "" : "(\(parameters.joined(separator: ",")))")
     }
 }
 
-struct Signature: Decodable, Equatable {
-    var name: String
-    var email: String?
-    var timestamp: Date
+public struct Signature: Decodable, Equatable {
+    public var name: String
+    public var email: String?
+    public var timestamp: Date
 
     // TODO: This can outout just "@" if email is empty
-    static let template = Template(name: "JUDO_SIGNATURE", parameters: ["p"], content: """
+    public static let template = Template(name: "JUDO_SIGNATURE", parameters: ["p"], content: """
         "{"
         ++ "'name': " ++ p.name().escape_json()
         ++ ", " ++ "'email': '" ++ p.email().local() ++ "@" ++ p.email().domain() ++ "'"
@@ -207,23 +207,22 @@ struct Signature: Decodable, Equatable {
     )
 }
 
-struct CommitRecord: Identifiable, Decodable, Equatable {
-    var id: ChangeID { change_id }
-
-    var change_id: ChangeID
-    var commit_id: CommitID
-    var author: Signature
-    var description: String
-    var root: Bool
-    var empty: Bool
-    var immutable: Bool
-    var git_head: Bool
-    var conflict: Bool
-    var parents: [ChangeID]
-    var bookmarks: [String]
+public struct CommitRecord: Identifiable, Decodable, Equatable {
+    public var id: ChangeID { change_id }
+    public var change_id: ChangeID
+    public var commit_id: CommitID
+    public var author: Signature
+    public var description: String
+    public var root: Bool
+    public var empty: Bool
+    public var immutable: Bool
+    public var git_head: Bool
+    public var conflict: Bool
+    public var parents: [ChangeID]
+    public var bookmarks: [String]
 
     // TODO: Make sure everything is escaped properly (esp. parents and bookmarks
-    static let template = Template(name: "judo_commit_record", content: """
+    public static let template = Template(name: "judo_commit_record", content: """
         "{\\n"
         ++ "\t'change_id': " ++ JUDO_CHANGE_ID(change_id) ++ ",\\n"
         ++ "\t'commit_id': " ++ JUDO_COMMIT_ID(commit_id) ++ ",\\n"

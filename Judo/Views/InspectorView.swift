@@ -1,5 +1,6 @@
 import Collections
 import SwiftUI
+import JudoSupport
 
 struct InspectorView: View {
     @Environment(Repository.self)

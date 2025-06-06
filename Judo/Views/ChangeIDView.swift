@@ -1,4 +1,5 @@
 import SwiftUI
+import JudoSupport
 
 extension Color {
     static let magenta = Color(nsColor: .magenta)
