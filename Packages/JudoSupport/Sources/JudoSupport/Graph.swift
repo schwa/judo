@@ -12,7 +12,7 @@ func makeGraphRows(commits: [(change_id: ChangeID, parents: [ChangeID])]) -> [Gr
         }
         return LaneID(id: nextLaneID)
     }
-    //
+//    print(commits)
     var rows: [GraphRow] = []
     for (index, commit) in commits.enumerated() {
         let isAtEnd = index == commits.count - 1

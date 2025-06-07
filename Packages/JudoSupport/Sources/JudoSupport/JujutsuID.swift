@@ -1,17 +1,17 @@
 import SwiftUI
 
-//public typealias ChangeID = JujutsuID
+public typealias ChangeID = JujutsuID
 public typealias CommitID = JujutsuID
 
 public struct JujutsuID {
     internal let rawValue: String
 
     // TODO: This is ephemeral and can change as repositories are updated.
-    public let shortestPrefixCount: Int?
+//    public let shortestPrefixCount: Int?
 
     public init?(rawValue: String) {
         self.rawValue = rawValue
-        self.shortestPrefixCount = nil
+//        self.shortestPrefixCount = nil
     }
 
     public init(rawValue: String, shortest: String?) {
@@ -20,7 +20,7 @@ public struct JujutsuID {
         if let shortest = shortest {
             precondition(rawValue.hasPrefix(shortest), "Shortest prefix must be a prefix of the raw value")
         }
-        self.shortestPrefixCount = shortest?.count
+//        self.shortestPrefixCount = shortest?.count
     }
 }
 
@@ -43,18 +43,17 @@ extension JujutsuID: Decodable {
         let string = try container.decode(String.self)
 
         // Match the format: [shortest]remaining
-        let regex = #/^(\[(?<shortest>[a-z0-9]+)\])?(?<remaining>[a-z0-9]+)$/#
+        let regex = #/^((?<shortest>[a-z0-9]+)\|)?(?<full>[a-z0-9]+)$/#
         guard let match = try regex.firstMatch(in: string) else {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid id format")
         }
         let shortest = match.output.shortest
-        let remaining = match.output.remaining
-        let full = shortest ?? "" + remaining
+        let full = match.output.full
         self.init(rawValue: String(full), shortest: shortest.map(String.init))
     }
 
     public static let template = Template(name: "JUDO_ID", parameters: ["p"], content: """
-        "'[" ++ p.shortest() ++ "]" ++ p ++ "'"
+        "'" ++ p.shortest() ++ "|" ++ p ++ "'"
         """.replacingOccurrences(of: "'", with: "\\\"")
     )
 }
@@ -62,7 +61,6 @@ extension JujutsuID: Decodable {
 extension JujutsuID: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         rawValue = value
-        shortestPrefixCount = nil
     }
 }
 
@@ -73,15 +71,15 @@ public extension JujutsuID {
     }
 
     func shortAttributedString(style: Style) -> AttributedString {
-        if shortestPrefixCount != nil {
-            return AttributedString(shortest()).modifying {
-                $0.foregroundColor = style == .changeID ? Color.blue : Color.magenta
-            }
-            + AttributedString(rawValue.trimmingPrefix(shortest()).prefix(7))
-        }
-        else {
+//        if shortestPrefixCount != nil {
+//            return AttributedString(shortest()).modifying {
+//                $0.foregroundColor = style == .changeID ? Color.blue : Color.magenta
+//            }
+//            + AttributedString(rawValue.trimmingPrefix(shortest()).prefix(7))
+//        }
+//        else {
             return AttributedString(rawValue.prefix(8), attributes: .init([.foregroundColor: Color.secondary]))
-        }
+//        }
     }
 }
 
@@ -103,10 +101,11 @@ public extension JujutsuID {
     }
 
     func shortest() -> String{
-        if let shortestPrefixCount {
-            return String(rawValue.prefix(shortestPrefixCount))
-        }
-        return rawValue
+//        if let shortestPrefixCount {
+//            return String(rawValue.prefix(shortestPrefixCount))
+//        }
+//        return rawValue
+        return short(4)
     }
 }
 

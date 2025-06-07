@@ -24,7 +24,6 @@ struct GraphTests {
 
         let rows = makeGraphRows(commits: changes)
         #expect(rows.count == 5)
-        print(rows)
 
         #expect(rows[0].changeID == "vvnt")
         #expect(rows[0].activeLane == LaneID(id: 0))
