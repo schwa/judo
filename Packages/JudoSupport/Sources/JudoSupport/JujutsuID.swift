@@ -16,6 +16,10 @@ public struct JujutsuID: Hashable, Decodable {
 
     public init(rawValue: String, shortest: String?) {
         self.rawValue = rawValue
+        // Assert shortest is part of rawValue if it exists
+        if let shortest = shortest {
+            precondition(rawValue.hasPrefix(shortest), "Shortest prefix must be a prefix of the raw value")
+        }
         self.shortestPrefixCount = shortest?.count
     }
 
