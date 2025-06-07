@@ -11,31 +11,45 @@ struct ChangeRowView: View {
     var change: Change
 
     var body: some View {
-        VStack(alignment: .leading) {
+        ViewThatFits {
             HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading) {
-                    HStack {
-                        changeIDView
-                        emailView
-                        timestampView
-                        bookmarksView
-                        gitHeadView
-                        rootView
-                        conflictView
-                    }
-                    emptyView
-                    descriptionView
-                }
+                primaryDataView
                 Spacer()
-                VStack {
-                    commitIDView
-                    parentCountView
-                }
+                secondaryDataView
             }
+            primaryDataView
         }
         .contextMenu {
             contextMenu
         }
+    }
+
+    @ViewBuilder
+    var primaryDataView: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                changeIDView
+                emailView
+                timestampView
+            }
+            isEmptyView
+            descriptionView
+        }
+    }
+
+    @ViewBuilder
+    var secondaryDataView: some View {
+        HStack(alignment: .firstTextBaseline) {
+            bookmarksView
+            gitHeadView
+            rootView
+            conflictView
+            VStack {
+                commitIDView
+                parentCountView
+            }
+        }
+
     }
 
     @ViewBuilder
@@ -65,32 +79,29 @@ struct ChangeRowView: View {
     @ViewBuilder
     var gitHeadView: some View {
         if change.isGitHead {
-            Text("git_head()").italic()
-                .foregroundStyle(.green)
-                .fixedSize()
+            TagView("git_head()")
+            .backgroundStyle(.green)
         }
     }
 
     @ViewBuilder
     var rootView: some View {
         if change.isRoot {
-            Text("root()").italic()
-                .foregroundStyle(.green)
-                .fixedSize()
+            TagView("root()")
+            .backgroundStyle(.green)
         }
     }
 
     @ViewBuilder
     var conflictView: some View {
         if change.isConflict {
-            Text("conflict()").italic()
-                .foregroundStyle(.red)
-                .fixedSize()
+            TagView("conflict()")
+            .foregroundStyle(.red)
         }
     }
 
     @ViewBuilder
-    var emptyView: some View {
+    var isEmptyView: some View {
         if change.isEmpty && change.isRoot == false {
             Text("(empty)").italic()
                 .foregroundStyle(.green)
@@ -112,9 +123,12 @@ struct ChangeRowView: View {
     @ViewBuilder
     var bookmarksView: some View {
         if change.bookmarks.isEmpty == false {
-            Text("\(change.bookmarks.joined(separator: ", "))")
-                .foregroundStyle(.purple)
-                .fixedSize()
+            HStack {
+                ForEach(change.bookmarks, id: \.self) { bookmark in
+                    TagView(bookmark)
+                        .backgroundStyle(.purple)
+                }
+            }
         }
     }
 
@@ -154,5 +168,33 @@ struct ChangeRowView: View {
                 })
             }
         }
+    }
+}
+
+struct TagView <Content: View>: View {
+    let content: Content
+
+    @Environment(\.backgroundStyle)
+    var backgroundStyle
+
+    init(@ViewBuilder _ content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        content
+        .fixedSize()
+        .font(.caption)
+        .foregroundStyle(.white)
+        .backgroundStyle(.clear)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 2)
+        .background(backgroundStyle ?? AnyShapeStyle(.white), in: Capsule())
+    }
+}
+
+extension TagView where Content == Text {
+    init(_ text: String) {
+        self.init { Text(text) }
     }
 }

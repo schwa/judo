@@ -6,7 +6,7 @@ struct StatusView: View {
     var status: Status
 
     @State
-    var isErrorPresented: Bool = false
+    var isPopoverPresented: Bool = false
 
     var body: some View {
         Group {
@@ -17,33 +17,39 @@ struct StatusView: View {
             case .success(let action):
                 Text("Success: \(action.name)")
                 .controlSize(.small)
-            case .failure(let action, let error):
+            case .failure(let action, _):
                 HStack {
                     Text("Failed: \(action.name)")
-                    Toggle(isOn: $isErrorPresented) {
+                    Toggle(isOn: $isPopoverPresented) {
                         Image(systemName: "x.circle.fill")
                             .foregroundColor(.red)
-//                        Image(systemName: "exclamationmark.triangle.fill")
-//                            .foregroundColor(.yellow)
                     }
                 }
                 .controlSize(.small)
-                .popover(isPresented: $isErrorPresented) {
-                    Form {
-                        switch error {
-                        case let error as SimpleAsyncProcess.Error:
-                            LabeledContent("ExitCode", value: error.exitCode, format: .number)
-                            LabeledContent("stderr") {
-                                Text(error.stderr)
-                                    .monospaced()
-                            }
-                        default:
-                            Text("\(error.localizedDescription)")
-                        }
-                    }
-                    .padding()
-                }
             }
         }
+        .popover(isPresented: $isPopoverPresented) {
+            statusPopover
+        }
+    }
+
+    @ViewBuilder
+    var statusPopover: some View  {
+        if case let .failure(_, error) = status {
+            Form {
+                switch error {
+                case let error as SimpleAsyncProcess.Error:
+                    LabeledContent("ExitCode", value: error.exitCode, format: .number)
+                    LabeledContent("stderr") {
+                        Text(error.stderr)
+                            .monospaced()
+                    }
+                default:
+                    Text("\(error.localizedDescription)")
+                }
+            }
+            .padding()
+        }
+
     }
 }

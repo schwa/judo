@@ -47,7 +47,7 @@ struct RepositoryView: View {
             }
             .padding()
             if !isRawViewPresented {
-                RepositoryLogView(selection: $selection, log: repository.currentLog)
+                RepositoryLogView(log: repository.currentLog, selection: $selection)
             } else {
                 RawTimelineView(revisionQuery: revisionQuery)
             }
