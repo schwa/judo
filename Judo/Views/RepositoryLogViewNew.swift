@@ -45,12 +45,8 @@ struct LanesView: View {
                 return (CGFloat(laneID.id) + 0.5) * laneWidth
             }
 
-            print("##################")
             let lanes = (lastRow?.nextLanes ?? [:]).sorted { $0.key.id < $1.key.id }.map { (laneIDToX($0.key), $0.value) }
             let nextLanes = row.nextLanes.sorted { $0.key.id < $1.key.id }.map { (laneIDToX($0.key), $0.value) }
-            print("lanes", lanes)
-            print("activeLane", row.commit.change_id.short(4), row.activeLane)
-            print("nextLanes", nextLanes)
             // Top half
             for (sourceX, currentChange) in lanes {
                 let destinationX: CGFloat
@@ -119,7 +115,7 @@ extension RepositoryLog {
         for (index, commit) in commits.values.enumerated() {
             let isAtEnd = index == commits.count - 1
             let lastRow = rows.last
-//            print("** \(commit.change_id.short(4)), [\(commit.parents.map { $0.short(4) })]")
+            print("** \(commit.change_id.short(4)), [\(commit.parents.map { $0.short(4) })]")
             if let lastRow {
                 var nextLanes = lastRow.nextLanes
                 let activeLane = nextLanes
@@ -151,7 +147,7 @@ extension RepositoryLog {
                 let row = GraphRow(commit: commit, activeLane: activeLane, nextLanes: nextLanes)
                 rows.append(row)
             }
-//            print(">>", rows.last)
+            print(">>", rows.last)
         }
         return rows
     }
@@ -167,23 +163,11 @@ extension GraphRow: CustomDebugStringConvertible {
 
 // MARK: -
 
-extension ChangeID {
-    func short(_ count: Int = 8) -> String {
-        return String(rawValue.prefix(count))
-    }
-}
-
 public extension String.StringInterpolation {
     mutating func appendInterpolation(_ value: String, paddedTo length: Int, pad: Character = " ") {
         let padCount = max(0, length - value.count)
         let padded = value + String(repeating: pad, count: padCount)
         appendLiteral(padded)
-    }
-}
-
-extension ChangeID: CustomDebugStringConvertible {
-    public var debugDescription: String {
-        return short(4)
     }
 }
 

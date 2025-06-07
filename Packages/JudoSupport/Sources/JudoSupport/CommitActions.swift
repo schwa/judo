@@ -19,20 +19,20 @@ public extension Repository {
     }
 
     func abandon(commits: Collections.OrderedSet<ChangeID>) async throws {
-        let arguments = commits.map(\.rawValue)
+        let arguments = commits.map(\.description)
         let data = try await jujutsu.run(subcommand: "abandon", arguments: arguments, repository: self)
         print(String(data: data, encoding: .utf8) ?? "No output")
     }
 
     func squash(commits: Collections.OrderedSet<ChangeID>, destination: ChangeID, description: String) async throws {
-        let arguments = ["--from", commits.map(\.rawValue).joined(separator: " | "), "--into", destination.rawValue] + ["--message", description]
+        let arguments = ["--from", commits.map(\.description).joined(separator: " | "), "--into", destination.description] + ["--message", description]
         print(arguments)
         let data = try await jujutsu.run(subcommand: "squash", arguments: arguments, repository: self)
         print(String(data: data, encoding: .utf8) ?? "No output")
     }
 
     func describe(commits: Collections.OrderedSet<ChangeID>, description: String) async throws {
-        let arguments = ["--message", description] + commits.map(\.rawValue)
+        let arguments = ["--message", description] + commits.map(\.description)
         let data = try await jujutsu.run(subcommand: "describe", arguments: arguments, repository: self)
         print(String(data: data, encoding: .utf8) ?? "No output")
     }
@@ -42,8 +42,8 @@ public extension Repository {
     }
 
     func rebase(from: [ChangeID], to: ChangeID) async throws {
-        let arguments = ["--revisions"] + from.map(\.rawValue)
-         + ["--insert-after", to.rawValue]
+        let arguments = ["--revisions"] + from.map(\.description)
+         + ["--insert-after", to.description]
         print(arguments)
         let data = try await jujutsu.run(subcommand: "rebase", arguments: arguments, repository: self)
         print(">", String(data: data, encoding: .utf8) ?? "No output")

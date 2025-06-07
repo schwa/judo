@@ -37,7 +37,7 @@ struct CommitDetailView: View {
                         Button("Describe") {
                             Task {
                                 do {
-                                    let arguments = ["describe", "-r", commit.change_id.rawValue, "-m", description]
+                                    let arguments = ["describe", "-r", commit.change_id.description, "-m", description]
                                     print("Describing commit with arguments: \(arguments)")
                                     let process = SimpleAsyncProcess(executableURL: repository.binaryPath.url, arguments: arguments, currentDirectoryURL: repository.path.url)
                                     _ = try await process.run()

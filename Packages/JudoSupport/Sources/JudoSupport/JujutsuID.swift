@@ -3,8 +3,8 @@ import SwiftUI
 //public typealias ChangeID = JujutsuID
 public typealias CommitID = JujutsuID
 
-public struct JujutsuID: Hashable, Decodable {
-    public let rawValue: String
+public struct JujutsuID {
+    private let rawValue: String
 
     // TODO: This is ephemeral and can change as repositories are updated.
     public let shortestPrefixCount: Int?
@@ -22,7 +22,12 @@ public struct JujutsuID: Hashable, Decodable {
         }
         self.shortestPrefixCount = shortest?.count
     }
+}
 
+extension JujutsuID: Sendable {
+}
+
+extension JujutsuID: Hashable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.rawValue == rhs.rawValue
     }
@@ -30,7 +35,9 @@ public struct JujutsuID: Hashable, Decodable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(rawValue)
     }
+}
 
+extension JujutsuID: Decodable {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         let string = try container.decode(String.self)
@@ -52,14 +59,13 @@ public struct JujutsuID: Hashable, Decodable {
     )
 }
 
-extension JujutsuID {
-
-    public enum Style {
+public extension JujutsuID {
+    enum Style {
         case changeID
         case commitID
     }
 
-    public func shortAttributedString(style: Style) -> AttributedString {
+    func shortAttributedString(style: Style) -> AttributedString {
         if shortestPrefixCount != nil {
             return AttributedString(shortest()).modifying {
                 $0.foregroundColor = style == .changeID ? Color.blue : Color.magenta
@@ -69,6 +75,12 @@ extension JujutsuID {
         else {
             return AttributedString(rawValue.prefix(8), attributes: .init([.foregroundColor: Color.secondary]))
         }
+    }
+}
+
+extension JujutsuID: CustomStringConvertible {
+    public var description: String {
+        return short(4)
     }
 }
 
@@ -90,6 +102,8 @@ public extension JujutsuID {
         return rawValue
     }
 }
+
+// MARK: -
 
 private extension AttributedString {
     func modifying(_ modifier: (inout AttributedString) -> Void) -> AttributedString {

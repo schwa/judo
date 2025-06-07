@@ -72,50 +72,13 @@ public class Repository {
                 return nil
             }
 
-            return ChangeID(rawValue: string)
+            return ChangeID(rawValue: string, shortest: nil)
         } catch {
             print(error)
             return nil
         }
     }
 }
-
-public struct ChangeID: Hashable, Decodable {
-    public let rawValue: String
-
-    // TODO: This is ephemeral and can change as repositories are updated.
-    public let shortest: String?
-
-    public init(rawValue: String, shortest: String? = nil) {
-        self.rawValue = rawValue
-        self.shortest = shortest
-    }
-
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.rawValue == rhs.rawValue
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(rawValue)
-    }
-
-    public init(from decoder: any Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        let string = try container.decode(String.self)
-
-        let regex = #/^(\[(?<shortest>[a-z0-9]+)\])?(?<remaining>[a-z0-9]+)$/#
-        guard let match = try regex.firstMatch(in: string) else {
-            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid ChangeID format")
-        }
-
-        let shortest = match.output.shortest
-        let remaining = match.output.remaining
-
-        self.shortest = shortest.map(String.init)
-        self.rawValue = String(remaining)
-    }
-}
-
 
 public struct JujutsuConfig: Codable {
     enum CodingKeys: String, CodingKey {
@@ -189,8 +152,3 @@ public struct CommitRecord: Identifiable, Decodable, Equatable {
     )
 }
 
-public extension ChangeID {
-    func shortAttributedString(style: JujutsuID.Style) -> AttributedString {
-        return AttributedString(rawValue)
-    }
-}
