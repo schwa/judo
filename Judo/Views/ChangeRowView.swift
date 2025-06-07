@@ -15,53 +15,91 @@ struct ChangeRowView: View {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading) {
                     HStack {
-                        IDView(change.changeID, style: .changeID)
-                        if let email = change.author.email {
-                            Text(email).fixedSize()
-                        }
-                        Text(change.author.timestamp, style: .relative)
-                            .foregroundStyle(.cyan)
-                            .fixedSize()
-                        bookmarks
-                        if change.isGitHead {
-                            Text("git_head()").italic()
-                                .foregroundStyle(.green)
-                                .fixedSize()
-                        }
-                        if change.isRoot {
-                            Text("root()").italic()
-                                .foregroundStyle(.green)
-                                .fixedSize()
-                        }
-                        if change.isConflict {
-                            Text("conflict()").italic()
-                                .foregroundStyle(.red)
-                                .fixedSize()
-                        }
+                        changeIDView
+                        emailView
+                        timestampView
+                        bookmarksView
+                        gitHeadView
+                        rootView
+                        conflictView
                     }
-                    if change.isEmpty && change.isRoot == false {
-                        Text("(empty)").italic().foregroundStyle(.green)
-                            .fixedSize()
-                    }
-                    description
-
+                    emptyView
+                    descriptionView
                 }
                 Spacer()
                 VStack {
-                    IDView(change.commitID, style: .commitID)
-                    parentCount
+                    commitIDView
+                    parentCountView
                 }
             }
         }
-
-        Spacer()
         .contextMenu {
             contextMenu
         }
     }
 
     @ViewBuilder
-    var parentCount: some View {
+    var changeIDView: some View {
+        IDView(change.changeID, style: .changeID)
+    }
+
+    @ViewBuilder
+    var commitIDView: some View {
+        IDView(change.commitID, style: .commitID)
+    }
+
+    @ViewBuilder
+    var emailView: some View {
+        if let email = change.author.email {
+            Text(email).fixedSize()
+        }
+    }
+
+    @ViewBuilder
+    var timestampView: some View {
+        Text(change.author.timestamp, style: .relative)
+            .foregroundStyle(.cyan)
+            .fixedSize()
+    }
+
+    @ViewBuilder
+    var gitHeadView: some View {
+        if change.isGitHead {
+            Text("git_head()").italic()
+                .foregroundStyle(.green)
+                .fixedSize()
+        }
+    }
+
+    @ViewBuilder
+    var rootView: some View {
+        if change.isRoot {
+            Text("root()").italic()
+                .foregroundStyle(.green)
+                .fixedSize()
+        }
+    }
+
+    @ViewBuilder
+    var conflictView: some View {
+        if change.isConflict {
+            Text("conflict()").italic()
+                .foregroundStyle(.red)
+                .fixedSize()
+        }
+    }
+
+    @ViewBuilder
+    var emptyView: some View {
+        if change.isEmpty && change.isRoot == false {
+            Text("(empty)").italic()
+                .foregroundStyle(.green)
+                .fixedSize()
+        }
+    }
+
+    @ViewBuilder
+    var parentCountView: some View {
         VStack {
             Text("\(change.parents.count)")
             Text(change.parents.count == 1 ? "parent" : "parents")
@@ -72,7 +110,7 @@ struct ChangeRowView: View {
     }
 
     @ViewBuilder
-    var bookmarks: some View {
+    var bookmarksView: some View {
         if change.bookmarks.isEmpty == false {
             Text("\(change.bookmarks.joined(separator: ", "))")
                 .foregroundStyle(.purple)
@@ -81,7 +119,7 @@ struct ChangeRowView: View {
     }
 
     @ViewBuilder
-    var description: some View {
+    var descriptionView: some View {
         Group {
             if change.description.isEmpty && change.isRoot == false {
                 Text("(no description set").italic().fixedSize()
@@ -90,6 +128,7 @@ struct ChangeRowView: View {
                 Text(verbatim: description).lineLimit(1)
             }
         }
+        .fixedSize()
         .font(.body)
     }
 
