@@ -4,7 +4,7 @@ import SwiftUI
 public typealias CommitID = JujutsuID
 
 public struct JujutsuID {
-    private let rawValue: String
+    internal let rawValue: String
 
     // TODO: This is ephemeral and can change as repositories are updated.
     public let shortestPrefixCount: Int?
@@ -57,6 +57,13 @@ extension JujutsuID: Decodable {
         "'[" ++ p.shortest() ++ "]" ++ p ++ "'"
         """.replacingOccurrences(of: "'", with: "\\\"")
     )
+}
+
+extension JujutsuID: ExpressibleByStringLiteral {
+    public init(stringLiteral value: String) {
+        rawValue = value
+        shortestPrefixCount = nil
+    }
 }
 
 public extension JujutsuID {

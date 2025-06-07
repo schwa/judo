@@ -2,7 +2,7 @@ import SwiftUI
 
 public typealias ChangeID = ChangeIDOld_
 
-public struct ChangeIDOld_: Hashable, Decodable, CustomStringConvertible {
+public struct ChangeIDOld_: Hashable, Decodable, CustomStringConvertible, ExpressibleByStringLiteral {
     public let rawValue: String
 
     // TODO: This is ephemeral and can change as repositories are updated.
@@ -47,5 +47,10 @@ public struct ChangeIDOld_: Hashable, Decodable, CustomStringConvertible {
 
     public var description: String {
         return short(4)
+    }
+
+    public init(stringLiteral value: String) {
+        rawValue = value
+        shortest = nil
     }
 }
