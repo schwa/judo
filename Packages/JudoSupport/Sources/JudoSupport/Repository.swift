@@ -114,11 +114,6 @@ public struct ChangeID: Hashable, Decodable {
         self.shortest = shortest.map(String.init)
         self.rawValue = String(remaining)
     }
-
-    public static let template = Template(name: "JUDO_CHANGE_ID", parameters: ["p"], content: """
-        "'[" ++ p.shortest() ++ "]" ++ p ++ "'"
-        """.replacingOccurrences(of: "'", with: "\\\"")
-    )
 }
 
 
@@ -192,4 +187,10 @@ public struct CommitRecord: Identifiable, Decodable, Equatable {
         """
                                     .replacingOccurrences(of: "'", with: "\\\"")
     )
+}
+
+public extension ChangeID {
+    func shortAttributedString(style: JujutsuID.Style) -> AttributedString {
+        return AttributedString(rawValue)
+    }
 }

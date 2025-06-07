@@ -86,7 +86,7 @@ struct MiniCommitView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text(commit.change_id.shortAttributedString).foregroundStyle(.secondary)
+                Text(commit.change_id.shortAttributedString(style: .changeID)).foregroundStyle(.secondary)
                 .textSelection(.enabled)
 
                 Text("|")

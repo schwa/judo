@@ -3,7 +3,7 @@ import SwiftUI
 //public typealias ChangeID = JujutsuID
 public typealias CommitID = JujutsuID
 
-public struct JujutsuID: Hashable, Decodable, RawRepresentable {
+public struct JujutsuID: Hashable, Decodable {
     public let rawValue: String
 
     // TODO: This is ephemeral and can change as repositories are updated.

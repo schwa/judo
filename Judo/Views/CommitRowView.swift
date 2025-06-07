@@ -10,7 +10,7 @@ struct CommitRowView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                ChangeIDView(changeID: commit.change_id).monospaced()
+                Text(commit.change_id.shortAttributedString(style: .changeID))
                 if let email = commit.author.email {
                     Text(email)
                 }

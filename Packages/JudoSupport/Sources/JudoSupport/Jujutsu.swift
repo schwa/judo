@@ -20,8 +20,7 @@ public struct Jujutsu {
         let temporaryConfig = JujutsuConfig(templateAliases: [
             CommitRecord.template.key: CommitRecord.template.content,
             Signature.template.key: Signature.template.content,
-            ChangeID.template.key: ChangeID.template.content,
-            CommitID.template.key: CommitID.template.content
+            JujutsuID.template.key: JujutsuID.template.content,
         ])
 
         try TOMLEncoder().encode(temporaryConfig).write(toFile: tempConfigPath.path, atomically: true, encoding: .utf8)
