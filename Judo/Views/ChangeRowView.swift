@@ -54,12 +54,12 @@ struct ChangeRowView: View {
 
     @ViewBuilder
     var changeIDView: some View {
-        IDView(change.changeID, style: .changeID)
+        IDView(change.changeID, variant: .changeID)
     }
 
     @ViewBuilder
     var commitIDView: some View {
-        IDView(change.commitID, style: .commitID)
+        IDView(change.commitID, variant: .commitID)
     }
 
     @ViewBuilder

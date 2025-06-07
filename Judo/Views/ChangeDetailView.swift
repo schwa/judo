@@ -20,9 +20,9 @@ struct ChangeDetailView: View {
     var body: some View {
         Form {
             HStack {
-                IDView(change.changeID, style: .changeID)
+                IDView(change.changeID, variant: .changeID)
                 Text("|")
-                IDView(change.commitID, style: .commitID)
+                IDView(change.commitID, variant: .commitID)
             }
             LabeledContent("Author") {
                 ContactView(name: change.author.name, email: change.author.email)
@@ -54,7 +54,7 @@ struct ChangeDetailView: View {
             LabeledContent("Parent") {
                 ForEach(change.parents, id: \.self) { parent in
                     HStack {
-                        IDView(parent, style: .changeID)
+                        IDView(parent, variant: .changeID)
                         if let parentChange = changes[parent] {
                             Text(parentChange.description).lineLimit(1)
                         }

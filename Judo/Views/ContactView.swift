@@ -14,16 +14,16 @@ struct ContactView: View {
                     .aspectRatio(1.0, contentMode: .fit)
                     .frame(maxHeight: 18)
 
-                Group {
-                    Text(name)
-                    if let email {
-                        Text(email)
-                            .foregroundStyle(.secondary)
-                    }
-                }
+                Text(name)
                 .foregroundStyle(.judoContactColor)
+
+                if let email {
+                    Text(email)
+                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.judoContactColor)
+                }
             }
-            .fixedSize()
+
             Text(email ?? name).fixedSize()
             .foregroundStyle(.judoContactColor)
         }

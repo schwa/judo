@@ -3,14 +3,19 @@ import JudoSupport
 
 struct IDView: View {
     let id: JujutsuID
-    let style: JujutsuID.Style
+    let variant: JujutsuID.Variant
 
-    init(_ id: JujutsuID, style: JujutsuID.Style) {
+    @Environment(\.isRowSelected)
+    private var isRowSelected: Bool
+
+    init(_ id: JujutsuID, variant: JujutsuID.Variant) {
         self.id = id
-        self.style = style
+        self.variant = variant
     }
 
     var body: some View {
-        Text(id.shortAttributedString(style: style)).monospaced().textSelection(.enabled).fixedSize()
+        Text(id.shortAttributedString(variant: variant, style: isRowSelected ? .plain : .shortestHighlighted)).monospaced().textSelection(.enabled).fixedSize()
+
     }
 }
+

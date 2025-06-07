@@ -67,20 +67,32 @@ extension JujutsuID: ExpressibleByStringLiteral {
 }
 
 public extension JujutsuID {
-    enum Style {
+    enum Variant {
         case changeID
         case commitID
     }
 
-    func shortAttributedString(style: Style) -> AttributedString {
-        if shortestPrefixCount != nil {
+    enum Style {
+        case plain
+        case shortestHighlighted
+    }
+
+    func shortAttributedString(variant: Variant, style: Style = .shortestHighlighted) -> AttributedString {
+
+        switch (variant, style, shortestPrefixCount) {
+        case (.changeID, .shortestHighlighted, .some):
             return AttributedString(shortest()).modifying {
-                $0.foregroundColor = style == .changeID ? Color.judoShortChangeIDColor : Color.judoShortCommitIDColor
+                $0.foregroundColor = Color.judoShortChangeIDColor
             }
             + AttributedString(rawValue.trimmingPrefix(shortest()).prefix(7))
-        }
-        else {
-            return AttributedString(rawValue.prefix(8), attributes: .init([.foregroundColor: Color.secondary]))
+        case (.commitID, .shortestHighlighted, .some):
+            return AttributedString(shortest()).modifying {
+                $0.foregroundColor = Color.judoShortCommitIDColor
+            }
+            + AttributedString(rawValue.trimmingPrefix(shortest()).prefix(7))
+        default:
+            return AttributedString(short())
+
         }
     }
 }

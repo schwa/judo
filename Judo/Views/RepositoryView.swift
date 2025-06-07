@@ -70,7 +70,7 @@ struct RepositoryView: View {
         }
         .inspector(isPresented: $isInspectorPresented) {
             inspector
-            .inspectorColumnWidth(min: 200, ideal: 320, max: 4000)
+            .inspectorColumnWidth(min: 200, ideal: 320)
             .toolbar {
                 Spacer()
                 Toggle("Toggle Inspector", systemImage: "sidebar.leading", isOn: $isInspectorPresented)

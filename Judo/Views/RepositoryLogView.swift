@@ -24,8 +24,12 @@ struct RepositoryLogView: View {
             }
             .scrollContentBackground(.hidden)
             .background(Color.white)
-            warningView
         }
+        .overlay(alignment: .bottomTrailing) {
+            warningView
+            .padding()
+        }
+
     }
 
     @ViewBuilder
@@ -38,6 +42,7 @@ struct RepositoryLogView: View {
                     LanesView(change: change, row: row, lastRow: isLastRow, laneCount: laneCount)
                     ChangeRowView(change: change)
                 }
+                .environment(\.isRowSelected, selection.contains(row.changeID))
                 .tag(row.id)
             }
         }
@@ -54,9 +59,8 @@ struct RepositoryLogView: View {
         Text("Warning: Timeline graph not 100% working yet.")
             .lineLimit(1)
             .foregroundStyle(.white)
-            .padding(.vertical, 4)
-            .frame(maxWidth: .infinity)
-            .background(.yellow)
+            .padding()
+            .background(.yellow, in: Capsule())
 
     }
 

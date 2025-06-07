@@ -86,9 +86,9 @@ struct MiniChangeView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                IDView(change.changeID, style: .changeID)
+                IDView(change.changeID, variant: .changeID)
                 Text("|")
-                IDView(change.commitID, style: .commitID)
+                IDView(change.commitID, variant: .commitID)
 
                 MiniSignatureView(signature: change.author)
             }

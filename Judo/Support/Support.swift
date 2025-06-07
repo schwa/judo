@@ -47,3 +47,8 @@ extension AttributedString {
     }
 }
 
+
+extension EnvironmentValues {
+    @Entry
+    var isRowSelected: Bool = false
+}
