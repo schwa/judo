@@ -20,9 +20,9 @@ struct CommitDetailView: View {
     var body: some View {
         Form {
             HStack {
-                Text(commit.change_id.shortAttributedString(style: .changeID))
+                IDView(commit.change_id, style: .changeID)
                 Text("|")
-                Text(commit.commit_id.shortAttributedString(style: .commitID))
+                IDView(commit.commit_id, style: .commitID)
             }
             LabeledContent("Author") {
                 Text(commit.author.name)
@@ -54,7 +54,7 @@ struct CommitDetailView: View {
             LabeledContent("Parent") {
                 ForEach(commit.parents, id: \.self) { parent in
                     HStack {
-                        Text(parent.shortAttributedString(style: .changeID))
+                        IDView(parent, style: .changeID)
                         if let parentCommit = commits[parent] {
                             Text(parentCommit.description).lineLimit(1)
                         }

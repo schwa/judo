@@ -10,7 +10,7 @@ struct CommitRowView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text(commit.change_id.shortAttributedString(style: .changeID))
+                IDView(commit.change_id, style: .changeID)                    
                 if let email = commit.author.email {
                     Text(email)
                 }
@@ -28,7 +28,7 @@ struct CommitRowView: View {
                     Text("root()").italic()
                         .foregroundStyle(.green)
                 }
-                Text(commit.commit_id.shortAttributedString(style: .commitID))
+                IDView(commit.commit_id, style: .commitID)
                 if commit.conflict {
                     Text("conflict()").italic()
                         .foregroundStyle(.red)

@@ -86,12 +86,9 @@ struct MiniCommitView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text(commit.change_id.shortAttributedString(style: .changeID)).foregroundStyle(.secondary)
-                .textSelection(.enabled)
-
+                IDView(commit.change_id, style: .changeID)
                 Text("|")
-                Text(commit.commit_id.shortAttributedString(style: .commitID))
-                .textSelection(.enabled)
+                IDView(commit.commit_id, style: .commitID)
 
                 MiniSignatureView(signature: commit.author)
             }
