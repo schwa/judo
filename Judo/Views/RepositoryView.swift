@@ -26,8 +26,11 @@ struct RepositoryView: View {
     @State
     private var status: Status = .waiting
 
-    init() {
+    @State
+    var actionHost: ActionHost?
 
+
+    init() {
     }
 
     var body: some View {
@@ -61,7 +64,11 @@ struct RepositoryView: View {
         .inspector(isPresented: .constant(true)) {
             inspector
         }
+        .onAppear {
+            actionHost = ActionHost(status: $status)
+        }
         .environment(repository)
+        .environment(\.actionHost, actionHost)
     }
 
     var selectedChanges: [Change] {
@@ -142,23 +149,20 @@ struct RepositoryView: View {
                 .disabled(selection.count < 2)
                 .sheet(isPresented: value) {
                     DescriptionEditor(targetChange: targetChange, sourceChanges: sourceChanges, isSquash: true) { description in
-
                         with(action: Action(name: "Squash") {
                             try await repository.squash(changes: sourceChanges.map(\.id), destination: targetChange!.id, description: description)
                             await refresh()
                         })
-
-
                     }
                 }
             }
         }
 
-        ToolbarItem(placement: .primaryAction) {
-            Button("Describe") {
-            }
-            .disabled(true)
-        }
+//        ToolbarItem(placement: .primaryAction) {
+//            Button("Describe") {
+//            }
+//            .disabled(true)
+//        }
 
         ToolbarItem(placement: .primaryAction) {
             Toggle(isOn: $isRawViewPresented) {
@@ -177,14 +181,32 @@ struct RepositoryView: View {
     }
 
     func with(action: Action) {
+        actionHost!.with(action: action)
+    }
+}
+
+extension EnvironmentValues {
+    @Entry
+    var actionHost: ActionHost?
+}
+
+struct ActionHost {
+
+    @Binding
+    var status: Status
+
+    func with(action: Action) {
         Task {
             do {
                 try await action.closure()
                 status = .success(action)
             }
             catch {
+                print("Action failed: \(action.name), error: \(error)")
                 status = .failure(action, error)
             }
         }
     }
+
 }
+

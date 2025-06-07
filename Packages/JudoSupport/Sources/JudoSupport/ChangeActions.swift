@@ -10,6 +10,7 @@ public extension Repository {
 
     func new(changes: [ChangeID] = []) async throws {
         let data = try await jujutsu.run(subcommand: "new", arguments: [], repository: self)
+        // TODO; Not basing it on changes
         print(String(data: data, encoding: .utf8) ?? "No output")
     }
 
@@ -21,6 +22,14 @@ public extension Repository {
     func abandon(changes: [ChangeID]) async throws {
         let arguments = changes.map(\.description)
         let data = try await jujutsu.run(subcommand: "abandon", arguments: arguments, repository: self)
+        print(String(data: data, encoding: .utf8) ?? "No output")
+    }
+
+    func squash(changes: [ChangeID]) async throws {
+        let arguments = ["-r", changes.map(\.description).joined(separator: " | ")
+        ]
+        print(arguments)
+        let data = try await jujutsu.run(subcommand: "squash", arguments: arguments, repository: self)
         print(String(data: data, encoding: .utf8) ?? "No output")
     }
 

@@ -23,6 +23,10 @@ public class Repository {
         self.currentLog = RepositoryLog()
     }
 
+    public func refresh() async throws {
+        try await log(revset: self.currentLog.revset ?? "")
+    }
+
     public func log(revset: String) async throws {
 
         var arguments = ["--no-graph",

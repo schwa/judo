@@ -19,13 +19,14 @@ struct RepositoryLogView: View {
         let laneCount = rows.reduce(0) { max($0, $1.nextLanes.count) }
             List(selection: $selection) {
                 ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
-                    let change = log.changes[row.changeID]! // TODO: Bang!
-                    let lastRow = index > 0 ? rows[index - 1] : nil
-                    HStack {
-                        LanesView(change: change, row: row, lastRow: lastRow, laneCount: laneCount)
-                        ChangeRowView(change: change)
+                    if let change = log.changes[row.changeID] {
+                        let lastRow = index > 0 ? rows[index - 1] : nil
+                        HStack {
+                            LanesView(change: change, row: row, lastRow: lastRow, laneCount: laneCount)
+                            ChangeRowView(change: change)
+                        }
+                        .tag(row.id)
                     }
-                    .tag(row.id)
                 }
                 .onMove { from, to in
                     let from = from.map {

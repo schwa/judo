@@ -5,6 +5,9 @@ struct ChangeRowView: View {
     @Environment(Repository.self)
     var repository
 
+    @Environment(\.actionHost)
+    var actionHost
+
     var change: Change
 
     var body: some View {
@@ -56,5 +59,32 @@ struct ChangeRowView: View {
                 .font(.caption)
         }
         .foregroundStyle(.secondary)
+        .contextMenu {
+            contextMenu
+        }
+    }
+
+    @ViewBuilder
+    var contextMenu: some View {
+        if let actionHost {
+            Button("Squash Change") {
+                actionHost.with(action: Action(name: "Squash Change") {
+                    try await repository.squash(changes: [change.changeID])
+                    try await repository.refresh()
+                })
+            }
+            Button("Abandon Change") {
+                actionHost.with(action: Action(name: "Abandon Change") {
+                    try await repository.abandon(changes: [change.changeID])
+                    try await repository.refresh()
+                })
+            }
+            Button("New Change") {
+                actionHost.with(action: Action(name: "New Change") {
+                    try await repository.new(changes: [change.changeID])
+                    try await repository.refresh()
+                })
+            }
+        }
     }
 }
