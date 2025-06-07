@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreTransferable
 
 public typealias ChangeID = JujutsuID
 public typealias CommitID = JujutsuID
@@ -121,4 +122,11 @@ private extension AttributedString {
 
 private extension Color {
     static let magenta = Color(nsColor: .magenta)
+}
+
+extension JujutsuID: Transferable {
+    public static var transferRepresentation: some TransferRepresentation {
+        ProxyRepresentation(exporting: \.rawValue)
+
+    }
 }

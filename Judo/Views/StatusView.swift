@@ -1,22 +1,27 @@
-import SwiftUI
 import JudoSupport
+import SwiftUI
 
 struct StatusView: View {
     @Binding
     var status: Status
 
     @State
-    var isPopoverPresented: Bool = false
+    private var isPopoverPresented: Bool = false
+
+    @State
+    private var animateFailure: Bool = false
 
     var body: some View {
         Group {
             switch status {
             case .waiting:
                 Text("Ready…")
-                .controlSize(.small)
+                    .controlSize(.small)
+
             case .success(let action):
                 Text("Success: \(action.name)")
-                .controlSize(.small)
+                    .controlSize(.small)
+
             case .failure(let action, _):
                 HStack {
                     Text("Failed: \(action.name)")
@@ -28,13 +33,22 @@ struct StatusView: View {
                 .controlSize(.small)
             }
         }
+        .scaleEffect(animateFailure ? 1.4 : 1.0)
+        .onChange(of: status.action, initial: true) {
+            if case .failure = status {
+                withAnimation(.interpolatingSpring(stiffness: 300, damping: 10)) {
+                    animateFailure = true
+                }
+                animateFailure = false
+            }
+        }
         .popover(isPresented: $isPopoverPresented) {
             statusPopover
         }
     }
 
     @ViewBuilder
-    var statusPopover: some View  {
+    var statusPopover: some View {
         if case let .failure(_, error) = status {
             Form {
                 switch error {
@@ -44,12 +58,12 @@ struct StatusView: View {
                         Text(error.stderr)
                             .monospaced()
                     }
+
                 default:
                     Text("\(error.localizedDescription)")
                 }
             }
             .padding()
         }
-
     }
 }

@@ -148,6 +148,11 @@ struct ChangeRowView: View {
 
     @ViewBuilder
     var contextMenu: some View {
+
+        CopyButton("Copy Change ID", value: change.changeID)
+        CopyButton("Copy Description", value: change.description)
+        Divider()
+
         if let actionHost {
             Button("Squash Change") {
                 actionHost.with(action: Action(name: "Squash Change") {
