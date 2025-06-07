@@ -3,6 +3,7 @@ import SwiftUI
 public extension Color {
     static let magenta = Color(nsColor: .magenta)
 
+    // TODO: Rename - remove `Color` suffix
     static let judoBookmarkColor = Color.purple
     static let judoHeadColor = Color.green
     static let judoConflictColor = Color.red
@@ -11,6 +12,7 @@ public extension Color {
     static let judoEmptyCommitLabelColor = Color.green
     static let judoLanesColor = Color.black
     static let judoTimestampColor = Color.cyan
+    static let judoContactColor = Color.primary
 }
 
 public extension Color {
@@ -19,6 +21,7 @@ public extension Color {
 public extension ShapeStyle where Self == Color {
     static var magenta: Self { .magenta }
 
+    // TODO: Rename - remove `Color` suffix
     static var judoBookmarkColor: Self { .judoBookmarkColor }
     static var judoHeadColor: Self { .judoHeadColor}
     static var judoConflictColor: Self { .judoConflictColor}
@@ -27,4 +30,5 @@ public extension ShapeStyle where Self == Color {
     static var judoEmptyCommitLabelColor: Self { .judoEmptyCommitLabelColor}
     static var judoLanesColor: Self { .judoLanesColor}
     static var judoTimestampColor: Self { .judoTimestampColor}
+    static var judoContactColor: Self { .judoContactColor}
 }

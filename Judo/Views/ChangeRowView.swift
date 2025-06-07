@@ -64,7 +64,7 @@ struct ChangeRowView: View {
 
     @ViewBuilder
     var authorView: some View {
-        AuthorView(name: change.author.name, email: change.author.email)
+        ContactView(name: change.author.name, email: change.author.email)
     }
 
     @ViewBuilder

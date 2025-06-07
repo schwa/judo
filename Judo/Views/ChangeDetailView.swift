@@ -25,7 +25,7 @@ struct ChangeDetailView: View {
                 IDView(change.commitID, style: .commitID)
             }
             LabeledContent("Author") {
-                Text(change.author.name)
+                ContactView(name: change.author.name, email: change.author.email)
                 Text(change.author.timestamp, style: .relative)
             }
             TextEditor(text: $description)

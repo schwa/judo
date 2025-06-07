@@ -29,6 +29,8 @@ struct RepositoryView: View {
     @State
     var actionHost: ActionHost?
 
+    @State
+    var isInspectorPresented: Bool = true
 
     init() {
     }
@@ -66,8 +68,13 @@ struct RepositoryView: View {
             head = repository.head
             await refresh()
         }
-        .inspector(isPresented: .constant(true)) {
+        .inspector(isPresented: $isInspectorPresented) {
             inspector
+            .inspectorColumnWidth(min: 200, ideal: 320, max: 4000)
+            .toolbar {
+                Spacer()
+                Toggle("Toggle Inspector", systemImage: "sidebar.leading", isOn: $isInspectorPresented)
+            }
         }
         .onAppear {
             actionHost = ActionHost(status: $status)
@@ -101,7 +108,7 @@ struct RepositoryView: View {
         HStack {
             ForEach(repository.currentLog.bookmarks.values) { bookmark in
                 TagView(bookmark.name)
-//                    .backgroundStyle(.judoHeadColor)
+                .backgroundStyle(.judoBookmarkColor)
             }
         }
         .padding(.bottom, 4)
