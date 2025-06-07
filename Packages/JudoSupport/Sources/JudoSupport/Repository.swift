@@ -28,67 +28,76 @@ public class Repository {
     }
 
     public func log(revset: String) async throws {
-
-        var arguments = ["--no-graph",
-                         "--template", Change.template.name,
-                         "--config-file", appModel.jujutsu.tempConfigPath.path
-                         //                "--limit", "1"
-        ]
+        var arguments = ["--no-graph"]
         if !revset.isEmpty {
             arguments.append(contentsOf: ["-r", revset])
         }
-
-//        print("jj \(arguments.joined(separator: " "))")
-//        let start = CFAbsoluteTimeGetCurrent()
-//            print("Fetching...")
-
-        let data = try await appModel.jujutsu.run(subcommand: "log", arguments: arguments, repository: self)
-
-        let header = "[\n".data(using: .utf8)!
-        let footer = "\n]".data(using: .utf8)!
-        let jsonData = header + data + footer
-        //            let jsonString = String(data: jsonData, encoding: .utf8)!
-        //            print(jsonString)
-
-        let decoder = JSONDecoder()
-        decoder.allowsJSON5 = true
-        decoder.dateDecodingStrategy = .iso8601
-        var changes = try decoder.decode([Change].self, from: jsonData)
+        var changes: [Change] = try await fetch(subcommand: "log", arguments: arguments)
 
         let head = head
-
         changes = changes.map {
             var change = $0
             change.isHead = head == change.changeID
             return change
         }
 
-
-//        let end = CFAbsoluteTimeGetCurrent()
-//            print("... fetched \(commits.count) (\(data.count) bytes) commits in \(end - start) seconds")
-        let orderedChanges = OrderedDictionary(uniqueKeys: changes.map(\.id), values: changes)
-
-        self.currentLog = RepositoryLog(revset: revset, changes: orderedChanges)
+        let bookmarks: [CommitRef] = try await fetch(subcommand: "bookmark", arguments: ["list"])
+        self.currentLog = RepositoryLog(
+            revset: revset,
+            changes: OrderedDictionary(uniqueKeys: changes.map(\.id), values: changes),
+            bookmarks: OrderedDictionary(uniqueKeys: bookmarks.map(\.name), values: bookmarks)
+        )
     }
 
     public var head: ChangeID? {
         do {
-            let arguments = ["log", "--no-graph",
-                             "-r", "@",
-                             "--template", "change_id"
+            let arguments = [
+                "log", "--no-graph",
+                "-r", "@",
+                "--template", "change_id"
             ]
-
-//            print("Fetching...")
             let process = SimpleAsyncProcess(executableURL: binaryPath.url, arguments: arguments, currentDirectoryURL: path.url)
             let data = try process.runSync()
             guard let string = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) else {
                 return nil
             }
-
             return ChangeID(rawValue: string, shortest: nil)
         } catch {
             print(error)
             return nil
         }
     }
+
+    func fetch<T>(subcommand: String, arguments: [String]) async throws -> [T] where T: Decodable & JutsuTemplateProviding {
+        let arguments = arguments + [
+            "--template", T.template.name,
+            "--config-file", appModel.jujutsu.tempConfigPath.path
+        ]
+        let data = try await appModel.jujutsu.run(subcommand: subcommand, arguments: arguments, repository: self)
+        let header = "[\n".data(using: .utf8)!
+        let footer = "\n]".data(using: .utf8)!
+        let jsonData = header + data + footer
+        let decoder = JSONDecoder()
+        decoder.allowsJSON5 = true
+        decoder.dateDecodingStrategy = .iso8601
+        do {
+            return try decoder.decode([T].self, from: jsonData)
+        }
+        catch {
+            print("Error decoding \(T.self): \(error)")
+            print("Data: \(String(data: jsonData, encoding: .utf8) ?? "<invalid data>")")
+            throw error
+        }
+    }
+}
+
+
+protocol JutsuTemplateProviding {
+    static var template: Template { get }
+}
+
+extension CommitRef: JutsuTemplateProviding {
+}
+
+extension Change: JutsuTemplateProviding {
 }

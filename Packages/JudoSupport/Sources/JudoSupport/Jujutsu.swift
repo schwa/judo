@@ -18,9 +18,10 @@ public struct Jujutsu {
         // TODO: We shouldn't need to do these every time.
 
         let temporaryConfig = JujutsuConfig(templateAliases: [
+            CommitRef.template.key: CommitRef.template.content,
             Change.template.key: Change.template.content,
-            Signature.template.key: Signature.template.content,
             JujutsuID.template.key: JujutsuID.template.content,
+            Signature.template.key: Signature.template.content,
         ])
 
         try TOMLEncoder().encode(temporaryConfig).write(toFile: tempConfigPath.path, atomically: true, encoding: .utf8)
@@ -28,6 +29,12 @@ public struct Jujutsu {
 
     public func run(subcommand: String, arguments: [String], repository: Repository) async throws -> Data {
         let process = SimpleAsyncProcess(executableURL: binaryPath.url, arguments: [subcommand] + arguments, currentDirectoryURL: repository.path.url)
-        return try await process.run()
+        do {
+            return try await process.run()
+        }
+        catch {
+            print(binaryPath, subcommand, arguments.joined(separator: " "))
+            throw error
+        }
     }
 }

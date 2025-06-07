@@ -33,7 +33,7 @@ struct StatusView: View {
                 .controlSize(.small)
             }
         }
-        .scaleEffect(animateFailure ? 1.4 : 1.0)
+        .scaleEffect(animateFailure ? 1.333 : 1.0)
         .onChange(of: status.action, initial: true) {
             if case .failure = status {
                 withAnimation(.interpolatingSpring(stiffness: 300, damping: 10)) {
