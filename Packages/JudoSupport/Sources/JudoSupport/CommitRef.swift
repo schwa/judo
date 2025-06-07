@@ -9,6 +9,12 @@ public struct CommitRef: Codable, Sendable {
 
 }
 
+extension CommitRef: Identifiable {
+    public var id: String {
+        name
+    }
+}
+
 //    .name() -> RefSymbol: Local bookmark or tag name.
 //    .remote() -> Option<RefSymbol>: Remote name if this is a remote ref.
 //    .present() -> Boolean: True if the ref points to any commit.

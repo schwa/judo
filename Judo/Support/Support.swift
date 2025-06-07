@@ -39,10 +39,6 @@ extension Path {
     }
 }
 
-extension Color {
-    static let magenta = Color(nsColor: .magenta)
-}
-
 extension AttributedString {
     func modifying(_ modifier: (inout AttributedString) -> Void) -> AttributedString {
         var modified = self

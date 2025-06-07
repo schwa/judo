@@ -31,7 +31,7 @@ struct LanesView: View {
                 else {
                     destinationX = sourceX
                 }
-                context.stroke(Path.wire(from: CGPoint(x: sourceX, y: minY), to: CGPoint(x: destinationX, y: midY)), with: .color(.black), lineWidth: 2)
+                context.stroke(Path.wire(from: CGPoint(x: sourceX, y: minY), to: CGPoint(x: destinationX, y: midY)), with: .color(.judoLanesColor), lineWidth: 2)
             }
             // Bottom half
             for (destinationX, nextChange) in nextLanes {
@@ -42,7 +42,7 @@ struct LanesView: View {
                 else {
                     sourceX = destinationX
                 }
-                context.stroke(Path.wire(from: CGPoint(x: sourceX, y: midY), to: CGPoint(x: destinationX, y: maxY)), with: .color(.black), lineWidth: 2)
+                context.stroke(Path.wire(from: CGPoint(x: sourceX, y: midY), to: CGPoint(x: destinationX, y: maxY)), with: .color(.judoLanesColor), lineWidth: 2)
             }
 
             if let icon = context.resolveSymbol(id: "icon") {
@@ -53,14 +53,14 @@ struct LanesView: View {
             Group {
                 if change.isHead == true {
                     Text("@")
-                        .foregroundStyle(.green)
+                        .foregroundStyle(.judoHeadColor)
                 }
                 else if change.isImmutable {
                     Image(systemName: "diamond.fill")
-                        .foregroundStyle(.black)
+                        .foregroundStyle(.judoLanesColor)
                 } else {
                     Image(systemName: "circle")
-                        .foregroundStyle(.black)
+                        .foregroundStyle(.judoLanesColor)
                 }
             }
             .padding(2)

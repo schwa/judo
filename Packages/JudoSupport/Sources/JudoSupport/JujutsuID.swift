@@ -75,7 +75,7 @@ public extension JujutsuID {
     func shortAttributedString(style: Style) -> AttributedString {
         if shortestPrefixCount != nil {
             return AttributedString(shortest()).modifying {
-                $0.foregroundColor = style == .changeID ? Color.blue : Color.magenta
+                $0.foregroundColor = style == .changeID ? Color.judoShortChangeIDColor : Color.judoShortCommitIDColor
             }
             + AttributedString(rawValue.trimmingPrefix(shortest()).prefix(7))
         }
@@ -118,10 +118,6 @@ private extension AttributedString {
         modifier(&modified)
         return modified
     }
-}
-
-private extension Color {
-    static let magenta = Color(nsColor: .magenta)
 }
 
 extension JujutsuID: Transferable {

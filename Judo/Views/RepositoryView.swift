@@ -48,9 +48,14 @@ struct RepositoryView: View {
             .padding()
             if !isRawViewPresented {
                 RepositoryLogView(log: repository.currentLog, selection: $selection)
+
+
+                bookmarksView
+
             } else {
                 RawTimelineView(revisionQuery: revisionQuery)
             }
+            
         }
         .navigationDocument(repository.path.url)
         .navigationSubtitle("\(repository.path.description)")
@@ -91,15 +96,24 @@ struct RepositoryView: View {
         }
     }
 
+    @ViewBuilder
+    var bookmarksView: some View {
+        HStack {
+            ForEach(repository.currentLog.bookmarks.values) { bookmark in
+                TagView(bookmark.name)
+//                    .backgroundStyle(.judoHeadColor)
+            }
+        }
+        .padding(.bottom, 4)
+    }
+
     @ToolbarContentBuilder
     var toolbar: some ToolbarContent {
-
         ToolbarItem(placement: .status) {
             StatusView(status: $status)
                 .frame(width: 480)
                 .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 6))
         }
-
         ToolbarItem(placement: .primaryAction) {
             Button("New") {
                 with(action: Action(name: "new") {
@@ -184,4 +198,5 @@ struct RepositoryView: View {
         actionHost!.with(action: action)
     }
 }
+
 
