@@ -35,8 +35,7 @@ struct SettingsView: View {
 
             Spacer()
 
-            Section(header: Text("Debug"), footer: Text("(these settings are not persistent))")) {
-                Toggle("isNewTimelineViewEnabled", isOn: $appModel.isNewTimelineViewEnabled)
+            Section(header: Text("Debug")) {
 
                 Button("Generate Demo Repo") {
                     Task {

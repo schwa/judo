@@ -44,12 +44,7 @@ struct RepositoryView: View {
             }
             .padding()
             if !isRawViewPresented {
-                if appModel.isNewTimelineViewEnabled {
-                    RepositoryLogViewNew(selection: $selection, log: repository.currentLog)
-                }
-                else {
-                    RepositoryLogView(selection: $selection, log: $repository.currentLog)
-                }
+                RepositoryLogView(selection: $selection, log: repository.currentLog)
             } else {
                 RawTimelineView(revisionQuery: revisionQuery)
             }

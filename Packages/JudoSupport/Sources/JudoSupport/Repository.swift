@@ -49,7 +49,16 @@ public class Repository {
         let decoder = JSONDecoder()
         decoder.allowsJSON5 = true
         decoder.dateDecodingStrategy = .iso8601
-        let commits = try decoder.decode([CommitRecord].self, from: jsonData)
+        var commits = try decoder.decode([CommitRecord].self, from: jsonData)
+
+        let head = head
+
+        commits = commits.map {
+            var commit = $0
+            commit.isHead = head == commit.change_id
+            return commit
+        }
+
 
 //        let end = CFAbsoluteTimeGetCurrent()
 //            print("... fetched \(commits.count) (\(data.count) bytes) commits in \(end - start) seconds")
@@ -129,6 +138,7 @@ public struct CommitRecord: Identifiable, Decodable, Equatable {
     public var immutable: Bool
     public var git_head: Bool
     public var conflict: Bool
+    public var isHead: Bool?
     public var parents: [ChangeID]
     public var bookmarks: [String]
 

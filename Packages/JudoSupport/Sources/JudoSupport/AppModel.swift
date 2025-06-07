@@ -20,8 +20,6 @@ public class AppModel {
         }
     }
 
-    public var isNewTimelineViewEnabled = true
-
     public var jujutsu: Jujutsu
 
     public init() {
