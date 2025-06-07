@@ -1,49 +1,49 @@
 import SwiftUI
 import JudoSupport
 
-struct CommitRowView: View {
+struct ChangeRowView: View {
     @Environment(Repository.self)
     var repository
 
-    var commit: CommitRecord
+    var change: Change
 
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                IDView(commit.change_id, style: .changeID)                    
-                if let email = commit.author.email {
+                IDView(change.changeID, style: .changeID)                    
+                if let email = change.author.email {
                     Text(email)
                 }
-                Text(commit.author.timestamp, style: .relative)
+                Text(change.author.timestamp, style: .relative)
                     .foregroundStyle(.cyan)
-                if commit.bookmarks.isEmpty == false {
-                    Text("\(commit.bookmarks.joined(separator: ", "))")
+                if change.bookmarks.isEmpty == false {
+                    Text("\(change.bookmarks.joined(separator: ", "))")
                         .foregroundStyle(.purple)
                 }
-                if commit.git_head {
+                if change.isGitHead {
                     Text("git_head()").italic()
                         .foregroundStyle(.green)
                 }
-                if commit.root {
+                if change.isRoot {
                     Text("root()").italic()
                         .foregroundStyle(.green)
                 }
-                IDView(commit.commit_id, style: .commitID)
-                if commit.conflict {
+                IDView(change.commitID, style: .commitID)
+                if change.isConflict {
                     Text("conflict()").italic()
                         .foregroundStyle(.red)
                 }
             }
             .font(.subheadline)
-            if commit.empty && commit.root == false {
+            if change.isEmpty && change.isRoot == false {
                 Text("(empty)").italic().foregroundStyle(.green)
             }
 
             Group {
-                if commit.description.isEmpty && commit.root == false {
+                if change.description.isEmpty && change.isRoot == false {
                     Text("(no description set").italic()
                 } else {
-                    let description = commit.description.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let description = change.description.trimmingCharacters(in: .whitespacesAndNewlines)
                     Text(verbatim: description).lineLimit(1)
                 }
             }
@@ -51,8 +51,8 @@ struct CommitRowView: View {
         }
         Spacer()
         VStack {
-            Text("\(commit.parents.count)")
-            Text(commit.parents.count == 1 ? "parent" : "parents")
+            Text("\(change.parents.count)")
+            Text(change.parents.count == 1 ? "parent" : "parents")
                 .font(.caption)
         }
         .foregroundStyle(.secondary)

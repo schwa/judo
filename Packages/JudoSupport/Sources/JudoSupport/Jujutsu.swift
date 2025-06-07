@@ -18,7 +18,7 @@ public struct Jujutsu {
         // TODO: We shouldn't need to do these every time.
 
         let temporaryConfig = JujutsuConfig(templateAliases: [
-            CommitRecord.template.key: CommitRecord.template.content,
+            Change.template.key: Change.template.content,
             Signature.template.key: Signature.template.content,
             JujutsuID.template.key: JujutsuID.template.content,
         ])

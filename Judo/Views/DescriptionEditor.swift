@@ -3,8 +3,8 @@ import JudoSupport
 
 struct DescriptionEditor: View {
 
-    let targetCommit: CommitRecord?
-    let sourceCommits: [CommitRecord]
+    let targetChange: Change?
+    let sourceChanges: [Change]
     let isSquash: Bool
     let callback: (String) -> Void
 
@@ -17,20 +17,20 @@ struct DescriptionEditor: View {
     @Environment(\.dismiss)
     var dismiss
 
-    init(targetCommit: CommitRecord? = nil, sourceCommits: [CommitRecord] = [], isSquash: Bool = false, callback: @escaping (String) -> Void) {
-        self.targetCommit = targetCommit
-        self.sourceCommits = sourceCommits
+    init(targetChange: Change? = nil, sourceChanges: [Change] = [], isSquash: Bool = false, callback: @escaping (String) -> Void) {
+        self.targetChange = targetChange
+        self.sourceChanges = sourceChanges
         self.isSquash = isSquash
         self.callback = callback
-        let description = targetCommit?.description ?? ""
+        let description = targetChange?.description ?? ""
         self._description = State(initialValue: description)
         self._textSelection = State(initialValue: .init(range: description.startIndex..<description.endIndex))
     }
 
     var body: some View {
         Form {
-            if let targetCommit {
-                MiniCommitView(commit: targetCommit, includeDescription: false)
+            if let targetChange {
+                MiniChangeView(change: targetChange, includeDescription: false)
             }
             TextEditor(text: $description, selection: $textSelection)
             .frame(maxHeight: .infinity)
@@ -39,21 +39,21 @@ struct DescriptionEditor: View {
             .layoutPriority(1000)
 
             if isSquash {
-                Section("(\(sourceCommits.count)) Squashed Commits") {
+                Section("(\(sourceChanges.count)) Squashed Changes") {
                     Button("Use All", systemImage: "doc.on.doc") {
-                        let allDescriptions = sourceCommits.map { $0.description }.joined(separator: "\n")
+                        let allDescriptions = sourceChanges.map { $0.description }.joined(separator: "\n")
                         description.append(contentsOf: allDescriptions)
                     }
                     .buttonStyle(.borderless)
                     .labelsHidden()
-                    List(sourceCommits) { commit in
+                    List(sourceChanges) { change in
                         HStack {
                             Button("Use", systemImage: "doc.on.doc") {
-                                description.append(contentsOf: commit.description)
+                                description.append(contentsOf: change.description)
                             }
                             .buttonStyle(.borderless)
                             .labelsHidden()
-                            MiniCommitView(commit: commit)
+                            MiniChangeView(change: change)
                         }
                     }
                     .frame(minHeight: 50)
@@ -79,21 +79,21 @@ struct DescriptionEditor: View {
     }
 }
 
-struct MiniCommitView: View {
-    var commit: CommitRecord
+struct MiniChangeView: View {
+    var change: Change
     var includeDescription: Bool = true
 
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                IDView(commit.change_id, style: .changeID)
+                IDView(change.changeID, style: .changeID)
                 Text("|")
-                IDView(commit.commit_id, style: .commitID)
+                IDView(change.commitID, style: .commitID)
 
-                MiniSignatureView(signature: commit.author)
+                MiniSignatureView(signature: change.author)
             }
             if includeDescription {
-                Text(commit.description)
+                Text(change.description)
             }
         }
     }

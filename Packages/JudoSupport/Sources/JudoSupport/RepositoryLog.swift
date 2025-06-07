@@ -2,10 +2,10 @@ import Collections
 
 public struct RepositoryLog {
     public var revset: String?
-    public var commits: OrderedDictionary<ChangeID, CommitRecord>
+    public var changes: OrderedDictionary<ChangeID, Change>
 
-    public init(revset: String? = nil, commits: OrderedDictionary<ChangeID, CommitRecord> = [:]) {
+    public init(revset: String? = nil, changes: OrderedDictionary<ChangeID, Change> = [:]) {
         self.revset = revset
-        self.commits = commits
+        self.changes = changes
     }
 }

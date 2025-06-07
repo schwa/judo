@@ -64,15 +64,15 @@ struct RepositoryView: View {
         .environment(repository)
     }
 
-    var selectedCommits: [CommitRecord] {
+    var selectedChanges: [Change] {
         let log = repository.currentLog
         return selection
             .sorted { lhs, rhs in
-                let lhs = log.commits.index(forKey: lhs) ?? -1 // TODO: -1?
-                let rhs = log.commits.index(forKey: rhs) ?? -1 // TODO: -1?
+                let lhs = log.changes.index(forKey: lhs) ?? -1 // TODO: -1?
+                let rhs = log.changes.index(forKey: rhs) ?? -1 // TODO: -1?
                 return lhs < rhs
             }
-            .compactMap { log.commits[$0] } // Filter commits based on selection
+            .compactMap { log.changes[$0] } // Filter changes based on selection
 
     }
 
@@ -96,7 +96,7 @@ struct RepositoryView: View {
         ToolbarItem(placement: .primaryAction) {
             Button("New") {
                 with(action: Action(name: "new") {
-                    try await repository.new(selectedCommit: selectedCommits.first)
+                    try await repository.new(changes: selectedChanges)
                     await refresh()
                 })
             }
@@ -115,7 +115,7 @@ struct RepositoryView: View {
         ToolbarItem(placement: .primaryAction) {
             Button("Abandon") {
                 with(action: Action(name: "Abandon") {
-                    try await repository.abandon(commits: OrderedSet(selection))
+                    try await repository.abandon(changes: OrderedSet(selection))
                     await refresh()
                 })
             }
@@ -124,14 +124,14 @@ struct RepositoryView: View {
 
         ToolbarItem(placement: .primaryAction) {
             ValueView(value: false) { value in
-                let selectedCommits = self.selectedCommits
-                let targetCommit = selectedCommits.first
-                let sourceCommits = selectedCommits.dropFirst().map { $0 }
+                let selectedChanges = self.selectedChanges
+                let targetChange = selectedChanges.first
+                let sourceChanges = selectedChanges.dropFirst().map { $0 }
                 Button("Squash") {
-                    let descriptions = selectedCommits.compactMap { $0.description.isEmpty ? nil : $0.description }
+                    let descriptions = selectedChanges.compactMap { $0.description.isEmpty ? nil : $0.description }
                     if descriptions.count <= 1 {
                         with(action: Action(name: "Squash") {
-                            try await repository.squash(commits: OrderedSet(sourceCommits.map(\.id)), destination: targetCommit!.id, description: descriptions.first ?? "")
+                            try await repository.squash(changes: OrderedSet(sourceChanges.map(\.id)), destination: targetChange!.id, description: descriptions.first ?? "")
                             await refresh()
                         })
                     }
@@ -141,10 +141,10 @@ struct RepositoryView: View {
                 }
                 .disabled(selection.count < 2)
                 .sheet(isPresented: value) {
-                    DescriptionEditor(targetCommit: targetCommit, sourceCommits: sourceCommits, isSquash: true) { description in
+                    DescriptionEditor(targetChange: targetChange, sourceChanges: sourceChanges, isSquash: true) { description in
 
                         with(action: Action(name: "Squash") {
-                            try await repository.squash(commits: OrderedSet(sourceCommits.map(\.id)), destination: targetCommit!.id, description: description)
+                            try await repository.squash(changes: OrderedSet(sourceChanges.map(\.id)), destination: targetChange!.id, description: description)
                             await refresh()
                         })
 
@@ -169,10 +169,10 @@ struct RepositoryView: View {
 
     @ViewBuilder
     var inspector: some View {
-        if !selectedCommits.isEmpty {
-            InspectorView(commits: repository.currentLog.commits, selectedCommits: selectedCommits)
+        if !selectedChanges.isEmpty {
+            InspectorView(changes: repository.currentLog.changes, selectedChanges: selectedChanges)
         } else {
-            ContentUnavailableView { Text("(no commits selected)") }
+            ContentUnavailableView { Text("(no changes selected)") }
         }
     }
 

@@ -22,7 +22,7 @@ struct GraphTests {
             (change_id: "zzzz", parents: [])
         ]
 
-        let rows = makeGraphRows(commits: changes)
+        let rows = makeGraphRows(changes: changes)
         #expect(rows.count == 5)
 
         #expect(rows[0].changeID == "vvnt")

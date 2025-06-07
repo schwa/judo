@@ -18,39 +18,39 @@ struct RepositoryLogView: View {
         let laneCount = rows.reduce(0) { max($0, $1.nextLanes.count) }
         List(selection: $selection) {
             ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
-                let commit = log.commits[row.changeID]! // TODO: Bang!
+                let change = log.changes[row.changeID]! // TODO: Bang!
                 let lastRow = index > 0 ? rows[index - 1] : nil
                 HStack {
-                    LanesView(commit: commit, row: row, lastRow: lastRow, laneCount: laneCount)
-                    CommitRowView(commit: commit)
+                    LanesView(change: change, row: row, lastRow: lastRow, laneCount: laneCount)
+                    ChangeRowView(change: change)
                 }
                 .tag(row.id)
             }
             .onMove { from, to in
                 let from = from.map {
-                    log.commits.values[$0]
+                    log.changes.values[$0]
                 }
-                let to = log.commits.values[to]
+                let to = log.changes.values[to]
                 Task {
                     do {
-                        try await repository.rebase(from: from.map(\.change_id), to: to.change_id)
+                        try await repository.rebase(from: from.map(\.changeID), to: to.changeID)
 //                        try await self.log?.refresh()
                         try await repository.log(revset: log.revset ?? "")
                     }
                     catch {
-                        print("Error moving commits: \(error)")
+                        print("Error moving changes: \(error)")
                     }
                 }
             }
         }
-        .onChange(of: log.commits) {
+        .onChange(of: log.changes) {
             rows = log.makeGraphRows()
         }
     }
 }
 
 struct LanesView: View {
-    var commit: CommitRecord
+    var change: Change
     var row: GraphRow
     var lastRow: GraphRow?
     var laneCount: Int
@@ -98,11 +98,11 @@ struct LanesView: View {
         }
         symbols: {
             Group {
-                if commit.isHead == true {
+                if change.isHead == true {
                     Text("@")
                         .foregroundStyle(.green)
                 }
-                else if commit.immutable {
+                else if change.isImmutable {
                     Image(systemName: "diamond.fill")
                         .foregroundStyle(.black)
                 } else {

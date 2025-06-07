@@ -7,17 +7,17 @@ struct InspectorView: View {
     var repository
 
     @State
-    private var commitIndex: Int = 0
+    private var changeIndex: Int = 0
 
-    var commits: OrderedDictionary<ChangeID, CommitRecord>
+    var changes: OrderedDictionary<ChangeID, Change>
 
-    var selectedCommits: [CommitRecord]
+    var selectedChanges: [Change]
 
     var body: some View {
         VStack {
-            Text("Commit \(commitIndex + 1) of \(selectedCommits.count)")
-            if let commit = selectedCommits.first {
-                CommitDetailView(commits: commits, commit: commit)
+            Text("Change \(changeIndex + 1) of \(selectedChanges.count)")
+            if let change = selectedChanges.first {
+                ChangeDetailView(changes: changes, change: change)
             }
         }
     }

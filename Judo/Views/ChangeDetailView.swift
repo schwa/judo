@@ -2,17 +2,17 @@ import Collections
 import SwiftUI
 import JudoSupport
 
-struct CommitDetailView: View {
+struct ChangeDetailView: View {
     @Environment(AppModel.self)
     var appModel
 
     @Environment(Repository.self)
     var repository
 
-    var commits: OrderedDictionary<ChangeID, CommitRecord>
+    var changes: OrderedDictionary<ChangeID, Change>
 
     // TODO: This is not getting reloaded when description changes??
-    var commit: CommitRecord
+    var change: Change
 
     @State
     private var description: String = ""
@@ -20,30 +20,30 @@ struct CommitDetailView: View {
     var body: some View {
         Form {
             HStack {
-                IDView(commit.change_id, style: .changeID)
+                IDView(change.changeID, style: .changeID)
                 Text("|")
-                IDView(commit.commit_id, style: .commitID)
+                IDView(change.commitID, style: .commitID)
             }
             LabeledContent("Author") {
-                Text(commit.author.name)
-                Text(commit.author.timestamp, style: .relative)
+                Text(change.author.name)
+                Text(change.author.timestamp, style: .relative)
             }
             TextEditor(text: $description)
-                .disabled(commit.immutable)
+                .disabled(change.isImmutable)
             HStack {
-                if !commit.immutable {
+                if !change.isImmutable {
                     Spacer()
-                    if commit.description != description {
+                    if change.description != description {
                         Button("Describe") {
                             Task {
                                 do {
-                                    let arguments = ["describe", "-r", commit.change_id.description, "-m", description]
+                                    let arguments = ["describe", "-r", change.changeID.description, "-m", description]
                                     print("Describing commit with arguments: \(arguments)")
                                     let process = SimpleAsyncProcess(executableURL: repository.binaryPath.url, arguments: arguments, currentDirectoryURL: repository.path.url)
                                     _ = try await process.run()
-                                    print("Commit described successfully.")
+                                    print("Change described successfully.")
                                 } catch {
-                                    print("Error describing commit: \(error)")
+                                    print("Error describing change: \(error)")
                                 }
                             }
                         }
@@ -52,18 +52,18 @@ struct CommitDetailView: View {
             }
 
             LabeledContent("Parent") {
-                ForEach(commit.parents, id: \.self) { parent in
+                ForEach(change.parents, id: \.self) { parent in
                     HStack {
                         IDView(parent, style: .changeID)
-                        if let parentCommit = commits[parent] {
-                            Text(parentCommit.description).lineLimit(1)
+                        if let parentChange = changes[parent] {
+                            Text(parentChange.description).lineLimit(1)
                         }
                     }
                 }
             }
         }
-        .onChange(of: commit.description) {
-            description = commit.description
+        .onChange(of: change.description) {
+            description = change.description
         }
     }
 }
