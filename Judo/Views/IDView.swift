@@ -11,6 +11,6 @@ struct IDView: View {
     }
 
     var body: some View {
-        Text(id.shortAttributedString(style: style)).monospaced().textSelection(.enabled)
+        Text(id.shortAttributedString(style: style)).monospaced().textSelection(.enabled).fixedSize()
     }
 }
