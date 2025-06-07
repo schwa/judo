@@ -121,42 +121,6 @@ public struct ChangeID: Hashable, Decodable {
     )
 }
 
-// TODO: merge with ChangeID
-public struct CommitID: Hashable, Decodable {
-    public let rawValue: String
-
-    // TODO: This is ephemeral and can change as repositories are updated.
-    public let shortest: String
-
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.rawValue == rhs.rawValue
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(rawValue)
-    }
-
-    public init(from decoder: any Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        let string = try container.decode(String.self)
-
-        let regex = #/^\[(?<shortest>[a-z0-9]+)\]?(?<remaining>[a-z0-9]+)$/#
-        guard let match = try regex.firstMatch(in: string) else {
-            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid ChangeID format")
-        }
-
-        let shortest = match.output.shortest
-        let remaining = match.output.remaining
-
-        self.shortest = String(shortest)
-        self.rawValue = String(remaining)
-    }
-
-    public static let template = Template(name: "JUDO_COMMIT_ID", parameters: ["p"], content: """
-        "'[" ++ p.shortest() ++ "]" ++ p ++ "'"
-        """.replacingOccurrences(of: "'", with: "\\\"")
-    )
-}
 
 public struct JujutsuConfig: Codable {
     enum CodingKeys: String, CodingKey {
@@ -213,8 +177,8 @@ public struct CommitRecord: Identifiable, Decodable, Equatable {
     // TODO: Make sure everything is escaped properly (esp. parents and bookmarks
     public static let template = Template(name: "judo_commit_record", content: """
         "{\\n"
-        ++ "\t'change_id': " ++ JUDO_CHANGE_ID(change_id) ++ ",\\n"
-        ++ "\t'commit_id': " ++ JUDO_COMMIT_ID(commit_id) ++ ",\\n"
+        ++ "\t'change_id': " ++ JUDO_ID(change_id) ++ ",\\n"
+        ++ "\t'commit_id': " ++ JUDO_ID(commit_id) ++ ",\\n"
         ++ "\t'author': " ++ JUDO_SIGNATURE(author) ++ ",\\n"
         ++ "\t'description': " ++ description.escape_json() ++ ",\\n"
         ++ "\t'root': " ++ root ++ ",\\n"

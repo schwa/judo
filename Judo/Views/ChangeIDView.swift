@@ -27,17 +27,6 @@ extension ChangeID {
     }
 }
 
-extension CommitID {
-    var shortAttributedString: AttributedString {
-        return AttributedString(shortest) .modifying {
-            $0.foregroundColor = Color.blue
-        }
-
-        + AttributedString(rawValue.trimmingPrefix(shortest).prefix(7))
-    }
-}
-
-
 struct ChangeIDView: View {
     var changeID: ChangeID
 
@@ -54,13 +43,3 @@ struct ChangeIDView: View {
     }
 }
 
-struct CommitIDView: View {
-    var commitID: CommitID
-
-    var body: some View {
-        Text(commitID.shortest)
-            .foregroundStyle(.blue)
-            + Text(commitID.rawValue.trimmingPrefix(commitID.shortest).prefix(7))
-            .foregroundStyle(.secondary)
-    }
-}

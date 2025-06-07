@@ -1,0 +1,100 @@
+import SwiftUI
+
+//public typealias ChangeID = JujutsuID
+public typealias CommitID = JujutsuID
+
+public struct JujutsuID: Hashable, Decodable, RawRepresentable {
+    public let rawValue: String
+
+    // TODO: This is ephemeral and can change as repositories are updated.
+    public let shortestPrefixCount: Int?
+
+    public init?(rawValue: String) {
+        self.rawValue = rawValue
+        self.shortestPrefixCount = nil
+    }
+
+    public init(rawValue: String, shortest: String?) {
+        self.rawValue = rawValue
+        self.shortestPrefixCount = shortest?.count
+    }
+
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.rawValue == rhs.rawValue
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(rawValue)
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let string = try container.decode(String.self)
+
+        // Match the format: [shortest]remaining
+        let regex = #/^(\[(?<shortest>[a-z0-9]+)\])?(?<remaining>[a-z0-9]+)$/#
+        guard let match = try regex.firstMatch(in: string) else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid id format")
+        }
+        let shortest = match.output.shortest
+        let remaining = match.output.remaining
+        let full = shortest ?? "" + remaining
+        self.init(rawValue: String(full), shortest: shortest.map(String.init))
+    }
+
+    public static let template = Template(name: "JUDO_ID", parameters: ["p"], content: """
+        "'[" ++ p.shortest() ++ "]" ++ p ++ "'"
+        """.replacingOccurrences(of: "'", with: "\\\"")
+    )
+}
+
+extension JujutsuID {
+
+    public enum Style {
+        case changeID
+        case commitID
+    }
+
+    public func shortAttributedString(style: Style) -> AttributedString {
+        if shortestPrefixCount != nil {
+            return AttributedString(shortest()).modifying {
+                $0.foregroundColor = style == .changeID ? Color.blue : Color.magenta
+            }
+            + AttributedString(rawValue.trimmingPrefix(shortest()).prefix(7))
+        }
+        else {
+            return AttributedString(rawValue.prefix(8), attributes: .init([.foregroundColor: Color.secondary]))
+        }
+    }
+}
+
+extension JujutsuID: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        return short(4)
+    }
+}
+
+public extension JujutsuID {
+    func short(_ count: Int = 8) -> String {
+        return String(rawValue.prefix(count))
+    }
+
+    func shortest() -> String{
+        if let shortestPrefixCount {
+            return String(rawValue.prefix(shortestPrefixCount))
+        }
+        return rawValue
+    }
+}
+
+private extension AttributedString {
+    func modifying(_ modifier: (inout AttributedString) -> Void) -> AttributedString {
+        var modified = self
+        modifier(&modified)
+        return modified
+    }
+}
+
+private extension Color {
+    static let magenta = Color(nsColor: .magenta)
+}

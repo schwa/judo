@@ -90,7 +90,7 @@ struct MiniCommitView: View {
                 .textSelection(.enabled)
 
                 Text("|")
-                Text(commit.commit_id.shortAttributedString).foregroundStyle(.secondary)
+                Text(commit.commit_id.shortAttributedString(style: .commitID))
                 .textSelection(.enabled)
 
                 MiniSignatureView(signature: commit.author)

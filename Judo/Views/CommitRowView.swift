@@ -28,7 +28,7 @@ struct CommitRowView: View {
                     Text("root()").italic()
                         .foregroundStyle(.green)
                 }
-                CommitIDView(commitID: commit.commit_id)
+                Text(commit.commit_id.shortAttributedString(style: .commitID))
                 if commit.conflict {
                     Text("conflict()").italic()
                         .foregroundStyle(.red)

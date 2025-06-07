@@ -22,7 +22,7 @@ struct CommitDetailView: View {
             HStack {
                 ChangeIDView(changeID: commit.change_id)
                 Text("|")
-                CommitIDView(commitID: commit.commit_id)
+                Text(commit.commit_id.shortAttributedString(style: .commitID))
             }
             LabeledContent("Author") {
                 Text(commit.author.name)
