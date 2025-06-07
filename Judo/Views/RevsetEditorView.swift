@@ -35,17 +35,36 @@ struct RevsetEditorView: View {
                         submit(revset)
                     }
                 }
-                HStack {
-                    ForEach(Self.revsetShortcuts, id: \.0) { name, query in
-                        Button(name) {
-                            revset = query
-                            submit(revset)
+                ViewThatFits {
+                    ForEach(Array((1...Self.revsetShortcuts.count).reversed()), id: \.self) { count in
+                        HStack {
+                            ForEach(Self.revsetShortcuts[..<count], id: \.0) { name, query in
+                                queryButton(name: name, query: query)
+                            }
+                            let remaining = Self.revsetShortcuts[count...]
+                            if !remaining.isEmpty {
+                                Menu("…") {
+                                    ForEach(remaining, id: \.0) { name, query in
+                                        queryButton(name: name, query: query)
+                                    }
+                                }
+                                .menuStyle(.borderlessButton)
+                                .fixedSize()
+                            }
                         }
-                        .buttonStyle(.link)
-                        .font(.caption)
                     }
                 }
             }
         }
+    }
+
+    func queryButton(name: String, query: String) -> some View {
+        Button(name) {
+            revset = query
+            submit(revset)
+        }
+        .fixedSize()
+        .buttonStyle(.link)
+        .font(.caption)
     }
 }

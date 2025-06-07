@@ -185,28 +185,3 @@ struct RepositoryView: View {
     }
 }
 
-extension EnvironmentValues {
-    @Entry
-    var actionHost: ActionHost?
-}
-
-struct ActionHost {
-
-    @Binding
-    var status: Status
-
-    func with(action: Action) {
-        Task {
-            do {
-                try await action.closure()
-                status = .success(action)
-            }
-            catch {
-                print("Action failed: \(action.name), error: \(error)")
-                status = .failure(action, error)
-            }
-        }
-    }
-
-}
-
