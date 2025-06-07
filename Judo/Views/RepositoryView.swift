@@ -96,7 +96,7 @@ struct RepositoryView: View {
         ToolbarItem(placement: .primaryAction) {
             Button("New") {
                 with(action: Action(name: "new") {
-                    try await repository.new(changes: selectedChanges)
+                    try await repository.new(changes: selectedChanges.map(\.changeID))
                     await refresh()
                 })
             }
@@ -115,7 +115,7 @@ struct RepositoryView: View {
         ToolbarItem(placement: .primaryAction) {
             Button("Abandon") {
                 with(action: Action(name: "Abandon") {
-                    try await repository.abandon(changes: OrderedSet(selection))
+                    try await repository.abandon(changes: selectedChanges.map(\.changeID))
                     await refresh()
                 })
             }
@@ -131,7 +131,7 @@ struct RepositoryView: View {
                     let descriptions = selectedChanges.compactMap { $0.description.isEmpty ? nil : $0.description }
                     if descriptions.count <= 1 {
                         with(action: Action(name: "Squash") {
-                            try await repository.squash(changes: OrderedSet(sourceChanges.map(\.id)), destination: targetChange!.id, description: descriptions.first ?? "")
+                            try await repository.squash(changes: sourceChanges.map(\.id), destination: targetChange!.id, description: descriptions.first ?? "")
                             await refresh()
                         })
                     }
@@ -144,7 +144,7 @@ struct RepositoryView: View {
                     DescriptionEditor(targetChange: targetChange, sourceChanges: sourceChanges, isSquash: true) { description in
 
                         with(action: Action(name: "Squash") {
-                            try await repository.squash(changes: OrderedSet(sourceChanges.map(\.id)), destination: targetChange!.id, description: description)
+                            try await repository.squash(changes: sourceChanges.map(\.id), destination: targetChange!.id, description: description)
                             await refresh()
                         })
 

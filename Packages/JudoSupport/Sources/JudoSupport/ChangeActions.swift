@@ -8,7 +8,7 @@ public extension Repository {
         appModel.jujutsu
     }
 
-    func new(changes: [Change] = []) async throws {
+    func new(changes: [ChangeID] = []) async throws {
         let data = try await jujutsu.run(subcommand: "new", arguments: [], repository: self)
         print(String(data: data, encoding: .utf8) ?? "No output")
     }
@@ -18,20 +18,20 @@ public extension Repository {
         print(String(data: data, encoding: .utf8) ?? "No output")
     }
 
-    func abandon(changes: Collections.OrderedSet<ChangeID>) async throws {
+    func abandon(changes: [ChangeID]) async throws {
         let arguments = changes.map(\.description)
         let data = try await jujutsu.run(subcommand: "abandon", arguments: arguments, repository: self)
         print(String(data: data, encoding: .utf8) ?? "No output")
     }
 
-    func squash(changes: Collections.OrderedSet<ChangeID>, destination: ChangeID, description: String) async throws {
+    func squash(changes: [ChangeID], destination: ChangeID, description: String) async throws {
         let arguments = ["--from", changes.map(\.description).joined(separator: " | "), "--into", destination.description] + ["--message", description]
         print(arguments)
         let data = try await jujutsu.run(subcommand: "squash", arguments: arguments, repository: self)
         print(String(data: data, encoding: .utf8) ?? "No output")
     }
 
-    func describe(changes: Collections.OrderedSet<ChangeID>, description: String) async throws {
+    func describe(changes: [ChangeID], description: String) async throws {
         let arguments = ["--message", description] + changes.map(\.description)
         let data = try await jujutsu.run(subcommand: "describe", arguments: arguments, repository: self)
         print(String(data: data, encoding: .utf8) ?? "No output")
