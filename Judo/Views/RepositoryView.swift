@@ -73,7 +73,9 @@ struct RepositoryView: View {
             .inspectorColumnWidth(min: 200, ideal: 320)
             .toolbar {
                 Spacer()
-                Toggle("Toggle Inspector", systemImage: "sidebar.leading", isOn: $isInspectorPresented)
+                Button("Toggle Inspector", systemImage: "sidebar.leading") {
+                    isInspectorPresented.toggle()
+                }
             }
         }
         .onAppear {
@@ -118,7 +120,6 @@ struct RepositoryView: View {
     var toolbar: some ToolbarContent {
         ToolbarItem(placement: .status) {
             StatusView(status: $status)
-                .frame(width: 480)
                 .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 6))
         }
         ToolbarItem(placement: .primaryAction) {

@@ -16,7 +16,7 @@ public struct Change {
     public var totalRemoved: Int
 
     // TODO: Make sure everything is escaped properly (esp. parents and bookmarks
-    public static let template = Template(name: "judo_change_record", content: """
+    public static let template = Template(name: "JUDO_CHANGE", content: """
         "{\\n"
         ++ "\t'change_id': " ++ JUDO_ID(change_id) ++ ",\\n"
         ++ "\t'commit_id': " ++ JUDO_ID(commit_id) ++ ",\\n"
@@ -34,7 +34,7 @@ public struct Change {
         ++ "\t'bookmarks': [" ++ bookmarks.map(|c| "'" ++ c ++ "'").join(",") ++ "],\\n"
         ++ "},\\n"
         """
-                                    .replacingOccurrences(of: "'", with: "\\\"")
+        .replacingOccurrences(of: "'", with: "\\\"")
     )
 }
 

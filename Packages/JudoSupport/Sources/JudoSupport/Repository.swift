@@ -61,7 +61,7 @@ public class Repository {
         }
     }
 
-    func fetch<T>(subcommand: String, arguments: [String]) async throws -> [T] where T: Decodable & JutsuTemplateProviding {
+    public func fetch<T>(subcommand: String, arguments: [String]) async throws -> [T] where T: Decodable & JutsuTemplateProviding {
         let arguments = arguments + [
             "--template", T.template.name,
             "--config-file", appModel.jujutsu.tempConfigPath.path
@@ -85,7 +85,7 @@ public class Repository {
 }
 
 
-protocol JutsuTemplateProviding {
+public protocol JutsuTemplateProviding {
     static var template: Template { get }
 }
 

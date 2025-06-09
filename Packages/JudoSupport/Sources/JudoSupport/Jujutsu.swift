@@ -22,9 +22,14 @@ public struct Jujutsu {
             Change.template.key: Change.template.content,
             JujutsuID.template.key: JujutsuID.template.content,
             Signature.template.key: Signature.template.content,
+            FullChangeRecord.template.key: FullChangeRecord.template.content,
+            TreeDiff.template.key: TreeDiff.template.content,
+            TreeDiffEntry.template.key: TreeDiffEntry.template.content,
+            TreeEntry.template.key: TreeEntry.template.content,
         ])
 
         try TOMLEncoder().encode(temporaryConfig).write(toFile: tempConfigPath.path, atomically: true, encoding: .utf8)
+        print(">>>", tempConfigPath)
     }
 
     public func run(subcommand: String, arguments: [String], repository: Repository) async throws -> Data {

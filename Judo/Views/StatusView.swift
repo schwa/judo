@@ -12,28 +12,36 @@ struct StatusView: View {
     private var animateFailure: Bool = false
 
     var body: some View {
-        Group {
+        HStack(spacing: 6) {
             switch status {
             case .waiting:
-                Text("Ready…")
-                    .controlSize(.small)
+                Label("Ready", systemImage: "clock")
+                    .labelStyle(.iconOnly)
+                    .foregroundColor(.secondary)
+                    .padding(6)
 
             case .success(let action):
-                Text("Success: \(action.name)")
-                    .controlSize(.small)
-
+                Label(action.name, systemImage: "checkmark.circle.fill")
+                    .labelStyle(.iconOnly)
+                    .foregroundColor(.green)
+                    .padding(6)
+                    .help("Success: \(action.name)")
+            
             case .failure(let action, _):
-                HStack {
-                    Text("Failed: \(action.name)")
-                    Toggle(isOn: $isPopoverPresented) {
-                        Image(systemName: "x.circle.fill")
-                            .foregroundColor(.red)
-                    }
+                Button {
+                    isPopoverPresented.toggle()
+                } label: {
+                    Label("\(action.name) failed ", systemImage: "xmark.circle.fill")
+                        .foregroundColor(.red)
+                        .scaleEffect(animateFailure ? 1.333 : 1.0)
+                        .padding(6)
                 }
-                .controlSize(.small)
+                .buttonStyle(.plain)
+                .popover(isPresented: $isPopoverPresented) {
+                    statusPopover
+                }
             }
         }
-        .scaleEffect(animateFailure ? 1.333 : 1.0)
         .onChange(of: status.action, initial: true) {
             if case .failure = status {
                 withAnimation(.interpolatingSpring(stiffness: 300, damping: 10)) {
@@ -41,9 +49,6 @@ struct StatusView: View {
                 }
                 animateFailure = false
             }
-        }
-        .popover(isPresented: $isPopoverPresented) {
-            statusPopover
         }
     }
 
@@ -66,4 +71,23 @@ struct StatusView: View {
             .padding()
         }
     }
+}
+
+struct DummyError: LocalizedError {
+    var errorDescription: String? { "Dummy failure" }
+}
+
+#Preview("StatusView – Waiting") {
+    StatusView(status: .constant(.waiting))
+        .padding()
+}
+
+#Preview("StatusView – Success") {
+    StatusView(status: .constant(.success(.init(name: "Build", closure: {}))))
+        .padding()
+}
+
+#Preview("StatusView – Failure") {
+    StatusView(status: .constant(.failure(.init(name: "Run", closure: {}), DummyError())))
+        .padding()
 }

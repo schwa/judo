@@ -61,6 +61,30 @@ struct ChangeDetailView: View {
                     }
                 }
             }
+
+            AsyncValueView { value in
+                List(value.diff.files, id: \.path) { f in
+                    VStack {
+                        HStack {
+                            Text(describing: f.path)
+                            Text(describing: f.status)
+                        }
+                        Text(describing: f.source.path)
+                        Text(describing: f.source.conflict)
+                        Text(describing: f.source.fileType)
+                        Text(describing: f.source.executable)
+                        Text(describing: f.target.path)
+                        Text(describing: f.target.conflict)
+                        Text(describing: f.target.fileType)
+                        Text(describing: f.target.executable)
+                    }
+                }
+            }
+            task: {
+                try await repository.fullChange(change: change.changeID)
+            }
+            .id(change.changeID)
+
         }
         .onChange(of: change.description) {
             description = change.description
@@ -68,14 +92,35 @@ struct ChangeDetailView: View {
     }
 }
 
-struct ShowRecord {
+struct AsyncValueView<Value, Content> : View where Content: View{
 
-}
+    var content: (Value) -> Content
+    var task: () async throws -> Value
 
-extension Repository {
-    func show(change: ChangeID) async throws -> ShowRecord {
+    @State
+    var result: Result<Value, Error>? = nil
 
-        fatalError()
+    var body: some View {
+        Group {
+            switch result {
+            case .none:
+                ProgressView()
+            case .some(.success(let value)):
+                content(value)
+            case .some(.failure(let error)):
+                ContentUnavailableView {
+                    Text("Error: \(error.localizedDescription)")
+                }
+            }
+        }
+        .task {
+            do {
+                let value = try await task()
+                result = .success(value)
+            }
+            catch {
+                result = .failure(error)
+            }
+        }
     }
 }
-
