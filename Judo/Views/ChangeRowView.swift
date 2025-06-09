@@ -30,11 +30,36 @@ struct ChangeRowView: View {
             HStack {
                 changeIDView
                 authorView
+
+                diffStatView
+
                 timestampView
             }
             isEmptyView
             descriptionView
         }
+    }
+
+    @ViewBuilder
+    var diffStatView: some View {
+        HStack(spacing: 0) {
+            Text("+\(change.totalAdded, format: .number)")
+                .padding(.vertical, 2)
+                .padding(.leading, 4)
+                .padding(.trailing, 2)
+                .background(.green)
+                .fixedSize()
+            Text("-\(change.totalRemoved, format: .number)")
+                .padding(.vertical, 2)
+                .padding(.leading, 2)
+                .padding(.trailing, 4)
+                .background(.red)
+                .fixedSize()
+        }
+        .foregroundStyle(.white)
+        .font(.caption2)
+//        .background(.green)
+        .clipShape(Capsule())
     }
 
     @ViewBuilder

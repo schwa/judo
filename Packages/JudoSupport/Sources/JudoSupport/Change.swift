@@ -12,6 +12,8 @@ public struct Change {
     public var isHead: Bool?
     public var parents: [ChangeID]
     public var bookmarks: [String]
+    public var totalAdded: Int
+    public var totalRemoved: Int
 
     // TODO: Make sure everything is escaped properly (esp. parents and bookmarks
     public static let template = Template(name: "judo_change_record", content: """
@@ -25,6 +27,9 @@ public struct Change {
         ++ "\t'git_head': " ++ git_head ++ ",\\n"
         ++ "\t'conflict': " ++ conflict ++ ",\\n"
         ++ "\t'immutable': " ++ immutable ++ ",\\n"
+        ++ "\t'head': " ++ self.contained_in("@") ++ ",\\n"
+        ++ "\t'diff_stat_total_added': " ++ diff.stat().total_added() ++ ",\\n"
+        ++ "\t'diff_stat_total_removed': " ++ diff.stat().total_removed() ++ ",\\n"
         ++ "\t'parents': [" ++ parents.map(|c| "'" ++ c.change_id() ++ "'").join(",") ++ "],\\n"
         ++ "\t'bookmarks': [" ++ bookmarks.map(|c| "'" ++ c ++ "'").join(",") ++ "],\\n"
         ++ "},\\n"
@@ -56,5 +61,7 @@ extension Change: Decodable {
         case isHead = "head"
         case parents
         case bookmarks
+        case totalAdded = "diff_stat_total_added"
+        case totalRemoved = "diff_stat_total_removed"
     }
 }

@@ -67,3 +67,15 @@ struct ChangeDetailView: View {
         }
     }
 }
+
+struct ShowRecord {
+
+}
+
+extension Repository {
+    func show(change: ChangeID) async throws -> ShowRecord {
+
+        fatalError()
+    }
+}
+

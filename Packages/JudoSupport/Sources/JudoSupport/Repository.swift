@@ -32,14 +32,7 @@ public class Repository {
         if !revset.isEmpty {
             arguments.append(contentsOf: ["-r", revset])
         }
-        var changes: [Change] = try await fetch(subcommand: "log", arguments: arguments)
-
-        let head = head
-        changes = changes.map {
-            var change = $0
-            change.isHead = head == change.changeID
-            return change
-        }
+        let changes: [Change] = try await fetch(subcommand: "log", arguments: arguments)
 
         let bookmarks: [CommitRef] = try await fetch(subcommand: "bookmark", arguments: ["list"])
         self.currentLog = RepositoryLog(
