@@ -1,5 +1,7 @@
 import SwiftUI
 import Everything
+import System
+import JudoSupport
 
 struct AvatarIcon: View {
     var email: String
@@ -7,7 +9,7 @@ struct AvatarIcon: View {
     static let avatarCache = URLCache(
         memoryCapacity: 50 * 1024 * 1024,  // 50 MB in RAM
         diskCapacity: 200 * 1024 * 1024,   // 200 MB on disk
-        diskPath: (FSPath.temporaryDirectory + "AvatarCache").path
+        diskPath: (FilePath.temporaryDirectory + "AvatarCache").path
     )
 
 

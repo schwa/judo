@@ -1,6 +1,7 @@
 import SwiftUI
 import Everything
 import JudoSupport
+import System
 
 struct SettingsScene: Scene {
     var body: some Scene {
@@ -30,7 +31,7 @@ struct SettingsView: View {
                     binaryPath = appModel.binaryPath.path
                 }
                 .onChange(of: binaryPath) {
-                    appModel.binaryPath = FSPath(binaryPath)
+                    appModel.binaryPath = FilePath(binaryPath)
                 }
 
             Spacer()
@@ -42,7 +43,7 @@ struct SettingsView: View {
                         let scriptURL = Bundle.main.url(forResource: "generate-demo-repo", withExtension: "sh")!
                         _ = try await SimpleAsyncProcess(executableURL: scriptURL, useShell: true).run()
 //                        print(String(data: data, encoding: .utf8) ?? "No output")
-                        openWindow(value: FSPath("/tmp/fake-repo"))
+                        openWindow(value: FilePath("/tmp/fake-repo"))
                     }
                 }
             }

@@ -56,6 +56,3 @@ extension EnvironmentValues {
     var isRowSelected: Bool = false
 }
 
-enum JudoError: Swift.Error {
-    case generic(String)
-}

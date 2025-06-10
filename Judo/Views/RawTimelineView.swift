@@ -2,6 +2,7 @@ import Everything
 import SwiftUI
 import SwiftTerm
 import JudoSupport
+import System
 
 struct RawTimelineView: View {
     @Environment(Repository.self)
@@ -15,7 +16,7 @@ struct RawTimelineView: View {
         }
         update: { view in
             var env = Terminal.getEnvironmentVariables(termName: "xterm-256color")
-            FSPath.currentDirectory = repository.path
+            FilePath.currentDirectory = repository.path
             env.append("PWD=\(repository.path.path)")
             var args = ["log"]
             if revisionQuery.isEmpty == false {
@@ -28,3 +29,4 @@ struct RawTimelineView: View {
         .background(Color.black)
     }
 }
+

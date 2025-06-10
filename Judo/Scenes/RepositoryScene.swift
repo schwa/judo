@@ -1,6 +1,7 @@
 import SwiftUI
 import Everything
 import JudoSupport
+import System
 
 struct RepositoryScene: Scene {
 
@@ -9,7 +10,7 @@ struct RepositoryScene: Scene {
 
     var body: some Scene {
         // TODO: We should use Documents here - but trickier to do when our docs are directories.
-        WindowGroup("Judo", for: FSPath.self) { path in
+        WindowGroup("Judo", for: FilePath.self) { path in
             if let path = path.wrappedValue {
                 let repository = Repository(appModel: appModel, path: path)
                 RepositoryView()

@@ -140,45 +140,45 @@ struct GitDiffParser {
     }
 }
 
-import Playgrounds
-#Playground {
-    let sampleDiffText = """
-    diff --git a/foo.txt b/foo.txt
-    --- a/foo.txt
-    +++ b/foo.txt
-    @@ -0,0 +1 @@
-    +hello
-    """
-    _ = GitDiffParser.parse(diffText: sampleDiffText)
-
-    let sample2 = """
-    diff --git a/file_1.txt b/file_1.txt
-    new file mode 100644
-    index 0000000000..01709e248d
-    --- /dev/null
-    +++ b/file_1.txt
-    @@ -0,0 +1,1 @@
-    +File 1 Content        
-    """
-    _ = GitDiffParser.parse(diffText: sample2)
-
-    let sample3 = """
-        diff --git a/Judo/Support/Support.swift b/Judo/Support/Support.swift
-        index 32df63de9c..4f78b5e4e9 100644
-        --- a/Judo/Support/Support.swift
-        +++ b/Judo/Support/Support.swift
-        @@ -1,6 +1,9 @@
-        +import os
-         import Collections
-         import SwiftUI
-         
-        +let logger: Logger? = Logger()
-        +
-         extension Dictionary {
-             init(_ orderedDictionary: OrderedDictionary<Key, Value>) {
-                 self.init(uniqueKeysWithValues: Array(orderedDictionary))
-        """
-    _ = GitDiffParser.parse(diffText: sample3)
-
-
-}
+//import Playgrounds
+//#Playground {
+//    let sampleDiffText = """
+//    diff --git a/foo.txt b/foo.txt
+//    --- a/foo.txt
+//    +++ b/foo.txt
+//    @@ -0,0 +1 @@
+//    +hello
+//    """
+//    _ = GitDiffParser.parse(diffText: sampleDiffText)
+//
+//    let sample2 = """
+//    diff --git a/file_1.txt b/file_1.txt
+//    new file mode 100644
+//    index 0000000000..01709e248d
+//    --- /dev/null
+//    +++ b/file_1.txt
+//    @@ -0,0 +1,1 @@
+//    +File 1 Content        
+//    """
+//    _ = GitDiffParser.parse(diffText: sample2)
+//
+//    let sample3 = """
+//        diff --git a/Judo/Support/Support.swift b/Judo/Support/Support.swift
+//        index 32df63de9c..4f78b5e4e9 100644
+//        --- a/Judo/Support/Support.swift
+//        +++ b/Judo/Support/Support.swift
+//        @@ -1,6 +1,9 @@
+//        +import os
+//         import Collections
+//         import SwiftUI
+//         
+//        +let logger: Logger? = Logger()
+//        +
+//         extension Dictionary {
+//             init(_ orderedDictionary: OrderedDictionary<Key, Value>) {
+//                 self.init(uniqueKeysWithValues: Array(orderedDictionary))
+//        """
+//    _ = GitDiffParser.parse(diffText: sample3)
+//
+//
+//}

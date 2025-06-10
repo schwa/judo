@@ -11,7 +11,6 @@ struct CopyButton <Label, Value>: View where Label: View, Value: Transferable {
 
     var body: some View {
         Button {
-            // Implement copy functionality here
             Task {
                 let pasteboard = NSPasteboard.general
                 pasteboard.clearContents()

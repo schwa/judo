@@ -54,7 +54,8 @@ struct MixedModeRepositoryView: View {
                 }
             }
         }
-        .searchable(text: $revisionQuery, placement: .toolbarPrincipal)
+//        .searchable(text: $revisionQuery, placement: .toolbarPrincipal)
+        .searchable(text: $revisionQuery, placement: .toolbar)
         .searchSuggestions{
             Text("hello?")
                 .searchCompletion("hello?")

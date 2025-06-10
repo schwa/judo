@@ -3,12 +3,13 @@ import Everything
 import Foundation
 import Observation
 import TOMLKit
+import System
 
 @Observable
 public class Repository {
     public var appModel: AppModel
-    public var path: FSPath
-    public var binaryPath: FSPath {
+    public var path: FilePath
+    public var binaryPath: FilePath {
         appModel.binaryPath
     }
     public var currentLog: RepositoryLog
@@ -17,7 +18,7 @@ public class Repository {
         return true
     }
 
-    public init(appModel: AppModel, path: FSPath) {
+    public init(appModel: AppModel, path: FilePath) {
         self.appModel = appModel
         self.path = path
         self.currentLog = RepositoryLog()

@@ -1,6 +1,7 @@
 import SwiftUI
 import Everything
 import JudoSupport
+import System
 
 struct SplashScene: Scene {
     var body: some Scene {
@@ -25,7 +26,7 @@ struct SplashView: View {
     var dismissWindow
 
     @State
-    var selectedRepository: FSPath?
+    var selectedRepository: FilePath?
 
     @State
     var isOpeningRepositoryPresented: Bool = false
@@ -87,11 +88,11 @@ struct SplashView: View {
             return
         }
         urls.forEach { url in
-            openRepository(FSPath(url))
+            openRepository(FilePath(url))
         }
     }
 
-    func openRepository(_ path: FSPath) {
+    func openRepository(_ path: FilePath) {
         dismissWindow()
         openWindow(value: path)
     }

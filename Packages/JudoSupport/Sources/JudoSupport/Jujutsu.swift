@@ -1,14 +1,16 @@
 import Everything
 import Foundation
 import TOMLKit
+import Subprocess
+import System
 
 public struct Jujutsu {
-    public var binaryPath: FSPath
-    public var tempConfigPath: FSPath
+    public var binaryPath: FilePath
+    public var tempConfigPath: FilePath
 
-    public init(binaryPath: FSPath) {
+    public init(binaryPath: FilePath) {
         self.binaryPath = binaryPath
-        tempConfigPath = FSPath.temporaryDirectory + "judo.toml"
+        tempConfigPath = FilePath.temporaryDirectory + "judo.toml"
 
         // TODO: try!
         try! makeTemplates()
@@ -33,13 +35,26 @@ public struct Jujutsu {
     }
 
     public func run(subcommand: String, arguments: [String], repository: Repository) async throws -> Data {
-        let process = SimpleAsyncProcess(executableURL: binaryPath.url, arguments: [subcommand] + arguments, currentDirectoryURL: repository.path.url)
         do {
-            return try await process.run()
+            // TODO: Bug in Subprocess.
+            if #available(macOS 9999, *) {
+                let arguments = Arguments([subcommand] + arguments)
+                let result = try await Subprocess.run(.path(binaryPath), arguments: arguments, workingDirectory: repository.path, output: .data, error: .string)
+                if !result.terminationStatus.isSuccess {
+                    logger?.log("Error running jujutsu: \(result.standardError ?? "")")
+                    throw JudoError.generic("TODO")
+                }
+                return result.standardOutput
+            } else {
+                let process = SimpleAsyncProcess(executableURL: binaryPath.url, arguments: [subcommand] + arguments, currentDirectoryURL: repository.path.url)
+                return try await process.run()
+            }
         }
         catch {
             print(binaryPath, subcommand, arguments.joined(separator: " "))
+            ////            logger?.log("Error running jujutsu: \(error)")
             throw error
         }
     }
 }
+

@@ -1,13 +1,13 @@
 {
-  "originHash" : "469e4cdd490caab77f2337110fa623bcab8e2283cc2773f91735f6db9d6898bf",
+  "originHash" : "dfb1adfd5f82172d1b29822d08496f2a1d027757c9ae29c5531c29091c1b669d",
   "pins" : [
     {
       "identity" : "everything",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/schwa/Everything",
       "state" : {
-        "revision" : "a7a99f3637f6bc0c017ac9897fe1c8d851f7280d",
-        "version" : "1.2.0"
+        "revision" : "15e3b60f56fd6488c7e910717317e781219ca35c",
+        "version" : "1.2.2"
       }
     },
     {
@@ -35,6 +35,24 @@
       "state" : {
         "revision" : "e0ec0f5f3af6f3e4d5e7a19d2af26b481acb6ba8",
         "version" : "1.0.3"
+      }
+    },
+    {
+      "identity" : "swift-subprocess",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-subprocess.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "43f99d981c7486858b4bcb8cb5861e63bd63d841"
+      }
+    },
+    {
+      "identity" : "swift-system",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-system",
+      "state" : {
+        "revision" : "61e4ca4b81b9e09e2ec863b00c340eb13497dac6",
+        "version" : "1.5.0"
       }
     },
     {
