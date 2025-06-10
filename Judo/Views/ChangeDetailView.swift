@@ -9,8 +9,6 @@ struct ChangeDetailView: View {
     @Environment(Repository.self)
     var repository
 
-    var changes: OrderedDictionary<ChangeID, Change>
-
     // TODO: This is not getting reloaded when description changes??
     var change: Change
 
@@ -55,7 +53,7 @@ struct ChangeDetailView: View {
                 ForEach(change.parents, id: \.self) { parent in
                     HStack {
                         IDView(parent, variant: .changeID)
-                        if let parentChange = changes[parent] {
+                        if let parentChange = repository.currentLog.changes[parent] {
                             Text(parentChange.description).lineLimit(1)
                         }
                     }

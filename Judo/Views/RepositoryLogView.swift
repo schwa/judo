@@ -18,33 +18,33 @@ struct RepositoryLogView: View {
     var rows: [GraphRow] = []
 
     var body: some View {
-        VStack {
-            List(selection: $selection) {
-                listContent
-            }
-            .scrollContentBackground(.hidden)
-            .background(Color.white)
+        List(selection: $selection) {
+            listContent
         }
-        .overlay(alignment: .bottomTrailing) {
-            warningView
-            .padding()
-        }
-
+//        .scrollContentBackground(.hidden)
+//        .background(Color.white)
+//        .overlay(alignment: .bottomTrailing) {
+//            warningView
+//            .padding()
+//        }
     }
 
     @ViewBuilder
     var listContent: some View {
         let laneCount = rows.reduce(0) { max($0, $1.nextLanes.count) }
         ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
-            if let change = log.changes[row.changeID] {
-                let isLastRow = index > 0 ? rows[index - 1] : nil
-                HStack {
-                    LanesView(change: change, row: row, lastRow: isLastRow, laneCount: laneCount)
-                    ChangeRowView(change: change)
+            Group {
+                if let change = log.changes[row.changeID] {
+                    let isLastRow = index > 0 ? rows[index - 1] : nil
+                    HStack {
+                        LanesView(change: change, row: row, lastRow: isLastRow, laneCount: laneCount)
+                        ChangeRowView(change: change)
+                    }
+                    .environment(\.isRowSelected, selection.contains(row.changeID))
+                    .tag(row.id)
                 }
-                .environment(\.isRowSelected, selection.contains(row.changeID))
-                .tag(row.id)
             }
+//            .border(Color.red)
         }
         .onMove { from, to in
             move(from: from, to: to)
