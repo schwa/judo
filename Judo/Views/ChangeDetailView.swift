@@ -47,25 +47,12 @@ struct ChangeDetailView: View {
 
     @ViewBuilder
     var detail: some View {
-        AsyncValueView { (raw, diff) in
-            ScrollView {
-                Text(verbatim: raw)
-                .monospaced()
-            }
-
-//            GitDiffView(parsedDiff: diff)
-//                List(value.diff.files, id: \.path) { f in
-//                    HStack {
-//                        f.status.view
-//                        Text(describing: f.path)
-//                    }
-//                }
+        AsyncValueView { data in
+            GitDiffingView(data: data)
         }
         task: {
             let data = try await appModel.jujutsu.run(subcommand: "diff", arguments: ["-r", change.changeID.description, "--git"], repository: repository)
-            let string = String(data: data, encoding: .utf8) ?? "No output"
-            let diff = GitDiffParser.parse(diffText: string)
-            return (string, diff)
+            return data
         }
         .id(change.changeID)
     }

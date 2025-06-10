@@ -1,5 +1,8 @@
+import os
 import Collections
 import SwiftUI
+
+let logger: Logger? = Logger()
 
 extension Dictionary {
     init(_ orderedDictionary: OrderedDictionary<Key, Value>) {
@@ -51,4 +54,8 @@ extension AttributedString {
 extension EnvironmentValues {
     @Entry
     var isRowSelected: Bool = false
+}
+
+enum JudoError: Swift.Error {
+    case generic(String)
 }

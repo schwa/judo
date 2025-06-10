@@ -33,7 +33,7 @@ struct Diff {
 }
 
 struct GitDiffParser {
-    static let hunkHeaderRegex = try! Regex {
+    static let hunkHeaderRegex = Regex {
         "@@ -"
         Capture {
             OneOrMore(.digit)
@@ -123,6 +123,7 @@ struct GitDiffParser {
                 currentHunk = hunk
             }
             else {
+                logger?.debug("Unrecognized line in diff: \(line)")
                 // Skip unrelated lines
             }
         }
@@ -139,79 +140,45 @@ struct GitDiffParser {
     }
 }
 
-struct LineChangeView: View {
-    let change: LineChange
+import Playgrounds
+#Playground {
+    let sampleDiffText = """
+    diff --git a/foo.txt b/foo.txt
+    --- a/foo.txt
+    +++ b/foo.txt
+    @@ -0,0 +1 @@
+    +hello
+    """
+    _ = GitDiffParser.parse(diffText: sampleDiffText)
 
-    var body: some View {
-        HStack(spacing: 4) {
-            Text(prefixSymbol)
-                .frame(width: 20, alignment: .trailing)
-                .font(.system(.body, design: .monospaced))
-                .foregroundColor(prefixColor)
+    let sample2 = """
+    diff --git a/file_1.txt b/file_1.txt
+    new file mode 100644
+    index 0000000000..01709e248d
+    --- /dev/null
+    +++ b/file_1.txt
+    @@ -0,0 +1,1 @@
+    +File 1 Content        
+    """
+    _ = GitDiffParser.parse(diffText: sample2)
 
-            Text(change.content)
-                .font(.system(.body, design: .monospaced))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .textSelection(.enabled)
-        }
-        .padding(.horizontal, 4)
-        .background(backgroundColor)
-    }
+    let sample3 = """
+        diff --git a/Judo/Support/Support.swift b/Judo/Support/Support.swift
+        index 32df63de9c..4f78b5e4e9 100644
+        --- a/Judo/Support/Support.swift
+        +++ b/Judo/Support/Support.swift
+        @@ -1,6 +1,9 @@
+        +import os
+         import Collections
+         import SwiftUI
+         
+        +let logger: Logger? = Logger()
+        +
+         extension Dictionary {
+             init(_ orderedDictionary: OrderedDictionary<Key, Value>) {
+                 self.init(uniqueKeysWithValues: Array(orderedDictionary))
+        """
+    _ = GitDiffParser.parse(diffText: sample3)
 
-    private var prefixSymbol: String {
-        switch change.type {
-        case .addition: return "+"
-        case .deletion: return "-"
-        case .unchanged: return " "
-        }
-    }
 
-    private var prefixColor: Color {
-        switch change.type {
-        case .addition: return .green
-        case .deletion: return .red
-        case .unchanged: return .secondary
-        }
-    }
-
-    private var backgroundColor: Color {
-        switch change.type {
-        case .addition: return Color.green.opacity(0.1)
-        case .deletion: return Color.red.opacity(0.1)
-        case .unchanged: return Color.clear
-        }
-    }
-}
-
-struct GitDiffView: View {
-
-    var parsedDiff: Diff
-
-    var body: some View {
-        List {
-            ForEach(Array(parsedDiff.files.indices), id: \.self) { fileIndex in
-                let file = parsedDiff.files[fileIndex]
-                Section(header: Text("\(file.oldPath) → \(file.newPath)")) {
-
-                    //
-                    //                    .font(.headline)
-                    //                    .padding(.vertical, 4)
-                    VStack(alignment: .leading, spacing: 0) {
-                        ForEach(file.hunks.indices, id: \.self) { hunkIndex in
-                            let hunk = file.hunks[hunkIndex]
-                            Text(hunk.header)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                                .padding(.vertical, 2)
-
-                            ForEach(hunk.changes.indices, id: \.self) { changeIndex in
-                                LineChangeView(change: hunk.changes[changeIndex])
-                                //                        Text("?")
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 }

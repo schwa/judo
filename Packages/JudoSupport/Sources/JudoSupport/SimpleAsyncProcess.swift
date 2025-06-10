@@ -18,6 +18,7 @@ public struct SimpleAsyncProcess {
         self.useShell = useShell
     }
 
+    // TODO: should return a byte stream (and have extension for returning other things)
     public func run() async throws -> Data {
         let process = Process()
 

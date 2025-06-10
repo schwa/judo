@@ -64,7 +64,7 @@ struct SplashView: View {
                     Image(nsImage: path.icon)
                     VStack(alignment: .leading) {
                         Text("\(path.displayName)")
-                        Text("\(path)").foregroundStyle(.secondary)
+                        Text(verbatim: path.path).foregroundStyle(.secondary)
                             .font(.caption)
                     }
                 }
