@@ -1,22 +1,33 @@
-import Collections
 import SwiftUI
 import JudoSupport
 
 struct ChangesDetailView: View {
-    @Environment(Repository.self)
-    var repository
 
     @State
-    private var changeIndex: Int = 0
+    var currentIndex: Int = 0
 
-    var selectedChanges: [Change]
+    var changes: [Change]
 
     var body: some View {
-        VStack {
-            Text("Change \(changeIndex + 1) of \(selectedChanges.count)")
-            if let change = selectedChanges.first {
-                ChangeDetailView(change: change)
-            }
+        if changes.isEmpty {
+            ContentUnavailableView("", systemImage: "gear", description: Text(""))
+        }
+        else {
+            ChangeDetailView(change: changes[currentIndex])
+                .id(changes[currentIndex].id)
+                .toolbar {
+                    ToolbarItem(placement: .navigation) {
+                        Button("Previous", systemImage: "chevron.up") {
+                            currentIndex = max(currentIndex - 1, 0)
+                        }
+                    }
+                    ToolbarItem(placement: .navigation) {
+                        Button("Next", systemImage: "chevron.down") {
+                            currentIndex = min(currentIndex + 1, changes.count - 1)
+                        }
+                    }
+                }
         }
     }
 }
+

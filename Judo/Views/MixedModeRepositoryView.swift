@@ -4,7 +4,7 @@ import SwiftTerm
 import SwiftUI
 import JudoSupport
 
-struct MixedRepositoryView: View {
+struct MixedModeRepositoryView: View {
     @Binding
     var selection: Set<ChangeID>
 
@@ -169,7 +169,7 @@ struct MixedRepositoryView: View {
     @ViewBuilder
     var inspector: some View {
         if !selectedChanges.isEmpty {
-            ChangesDetailView(selectedChanges: selectedChanges)
+            MixedModeChangesDetailView(selectedChanges: selectedChanges)
         } else {
             ContentUnavailableView { Text("(no changes selected)") }
         }

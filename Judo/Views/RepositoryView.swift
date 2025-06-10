@@ -33,11 +33,11 @@ struct RepositoryView: View {
         Group {
             switch mode {
             case .timeline:
-                Color.white
+                ChangesGraphView(selection: $selection)
             case .mixed:
-                MixedRepositoryView(selection: $selection)
+                MixedModeRepositoryView(selection: $selection)
             case .change:
-                ChangesDetailView(selectedChanges: selectedChanges)
+                ChangesDetailView(changes: selectedChanges)
             }
         }
         .environment(\.actionHost, actionHost)

@@ -1,80 +1,109 @@
-import Collections
 import SwiftUI
 import JudoSupport
 
 struct ChangeDetailView: View {
+
     @Environment(AppModel.self)
     var appModel
 
     @Environment(Repository.self)
     var repository
 
+    @State
+    var editedDescription: String = ""
+
     // TODO: This is not getting reloaded when description changes??
     var change: Change
 
-    @State
-    private var description: String = ""
-
     var body: some View {
+
+        HSplitView {
+            sidebar
+            .frame(minWidth: 200)
+            .border(Color.red)
+            detail
+            .frame(minWidth: 200, maxWidth: .infinity, maxHeight: .infinity)
+            .border(Color.red)
+        }
+        .border(Color.red)
+
+//        NavigationSplitView {
+//        } detail: {
+//        }
+        .onChange(of: change.description, initial: true) {
+            editedDescription = change.description
+        }
+    }
+
+    @ViewBuilder
+    var sidebar: some View {
+        VSplitView {
+            metadata
+                .frame(minHeight: 200)
+            entries
+                .frame(minHeight: 200)
+        }
+    }
+
+    @ViewBuilder
+    var detail: some View {
+        AsyncValueView { (raw, diff) in
+            ScrollView {
+                Text(verbatim: raw)
+                .monospaced()
+            }
+
+//            GitDiffView(parsedDiff: diff)
+//                List(value.diff.files, id: \.path) { f in
+//                    HStack {
+//                        f.status.view
+//                        Text(describing: f.path)
+//                    }
+//                }
+        }
+        task: {
+            let data = try await appModel.jujutsu.run(subcommand: "diff", arguments: ["-r", change.changeID.description, "--git"], repository: repository)
+            let string = String(data: data, encoding: .utf8) ?? "No output"
+            let diff = GitDiffParser.parse(diffText: string)
+            return (string, diff)
+        }
+        .id(change.changeID)
+    }
+
+    @ViewBuilder
+    var metadata: some View {
         Form {
+            IDView(change.changeID, variant: .changeID)
+            IDView(change.commitID, variant: .commitID)
+            TextEditor(text: $editedDescription)
+                .font(.body)
             HStack {
-                IDView(change.changeID, variant: .changeID)
-                Text("|")
-                IDView(change.commitID, variant: .commitID)
-            }
-            LabeledContent("Author") {
+                Image(systemName: "gear")
                 ContactView(name: change.author.name, email: change.author.email)
-                Text(change.author.timestamp, style: .relative)
+                Text("\(change.author.timestamp, style: .relative)")
             }
-            TextEditor(text: $description)
-                .disabled(change.isImmutable)
             HStack {
-                if !change.isImmutable {
-                    Spacer()
-                    if change.description != description {
-                        Button("Describe") {
-                            Task {
-                                do {
-                                    let arguments = ["describe", "-r", change.changeID.description, "-m", description]
-                                    print("Describing commit with arguments: \(arguments)")
-                                    let process = SimpleAsyncProcess(executableURL: repository.binaryPath.url, arguments: arguments, currentDirectoryURL: repository.path.url)
-                                    _ = try await process.run()
-                                    print("Change described successfully.")
-                                } catch {
-                                    print("Error describing change: \(error)")
-                                }
-                            }
-                        }
-                    }
-                }
+                Image(systemName: "gear")
+                ContactView(name: change.author.name, email: change.author.email)
+                Text("\(change.author.timestamp, style: .relative)")
             }
+        }
+        .padding()
+    }
 
-            LabeledContent("Parent") {
-                ForEach(change.parents, id: \.self) { parent in
-                    HStack {
-                        IDView(parent, variant: .changeID)
-                        if let parentChange = repository.currentLog.changes[parent] {
-                            Text(parentChange.description).lineLimit(1)
-                        }
-                    }
-                }
-            }
-
+    @ViewBuilder
+    var entries: some View {
+        VStack {
             AsyncValueView { value in
-                List(value.diff.files, id: \.path) { f in
-                    VStack {
+                if value.diff.files.isEmpty {
+                    ContentUnavailableView("No files", systemImage: "gear")
+                }
+                else {
+                    List(value.diff.files, id: \.path) { f in
                         HStack {
+                            f.status.view
                             Text(describing: f.path)
-                            Text(describing: f.status)
                         }
-                        Text(describing: f.source.path)
-                        Text(describing: f.source.conflict)
-                        Text(describing: f.source.fileType)
-                        Text(describing: f.source.executable)
-                        Text(describing: f.target.path)
-                        Text(describing: f.target.conflict)
-                        Text(describing: f.target.fileType)
-                        Text(describing: f.target.executable)
                     }
                 }
             }
@@ -82,43 +111,33 @@ struct ChangeDetailView: View {
                 try await repository.fullChange(change: change.changeID)
             }
             .id(change.changeID)
-
-        }
-        .onChange(of: change.description) {
-            description = change.description
         }
     }
 }
 
-struct AsyncValueView<Value, Content> : View where Content: View{
-
-    var content: (Value) -> Content
-    var task: () async throws -> Value
-
-    @State
-    var result: Result<Value, Error>? = nil
-
-    var body: some View {
-        Group {
-            switch result {
-            case .none:
-                ProgressView()
-            case .some(.success(let value)):
-                content(value)
-            case .some(.failure(let error)):
-                ContentUnavailableView {
-                    Text("Error: \(error.localizedDescription)")
-                }
-            }
-        }
-        .task {
-            do {
-                let value = try await task()
-                result = .success(value)
-            }
-            catch {
-                result = .failure(error)
-            }
+extension TreeDiffEntry.Status {
+    var view: some View {
+        switch self {
+        case .modified:
+            Image(systemName: "pencil")
+                .foregroundStyle(.white)
+                .background(Color.blue, in: RoundedRectangle(cornerRadius: 2))
+        case .added:
+            Image(systemName: "plus")
+                .foregroundStyle(.white)
+                .background(Color.green, in: RoundedRectangle(cornerRadius: 2))
+        case .removed:
+            Image(systemName: "minus")
+                .foregroundStyle(.white)
+                .background(Color.red, in: RoundedRectangle(cornerRadius: 2))
+        case .copied:
+            Image(systemName: "doc.on.doc")
+                .foregroundStyle(.white)
+                .background(Color.cyan, in: RoundedRectangle(cornerRadius: 2))
+        case .renamed:
+            Image(systemName: "arrow.right.arrow.left")
+                .foregroundStyle(.white)
+                .background(Color.purple, in: RoundedRectangle(cornerRadius: 2))
         }
     }
 }
