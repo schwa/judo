@@ -1,6 +1,7 @@
 import Foundation
 import System
 import AppKit
+import Subprocess
 
 public extension FilePath {
     var displayName: String {
@@ -52,4 +53,48 @@ public extension FilePath {
 
 public enum JudoError: Swift.Error {
     case generic(String)
+}
+
+
+public func run<
+    Input: InputProtocol,
+    Output: OutputProtocol,
+    Error: OutputProtocol
+>(
+    _ executable: Executable,
+    useShell: Bool,
+    arguments: [String] = [],
+    environment: Subprocess.Environment = .inherit,
+    workingDirectory: FilePath? = nil,
+    platformOptions: PlatformOptions = PlatformOptions(),
+    input: Input = .none,
+    output: Output = .string,
+    error: Error = .discarded
+) async throws -> CollectedResult<Output, Error> {
+    var executable = executable
+    var arguments = arguments
+    if useShell  {
+        let shell: String
+        if let pw = getpwuid(getuid()), let shellCString = pw.pointee.pw_shell {
+            shell = String(cString: shellCString)
+        }
+        else {
+            shell = "/bin/sh"
+        }
+        arguments = ["-l", "-c", try executable.resolveExecutablePath(in: environment).string] + arguments
+        executable = .path(FilePath(shell))
+    }
+    let configuration = Configuration(
+        executable: executable,
+        arguments: Arguments(arguments),
+        environment: environment,
+        workingDirectory: workingDirectory,
+        platformOptions: platformOptions
+    )
+    return try await run(
+        configuration,
+        input: input,
+        output: output,
+        error: error
+    )
 }

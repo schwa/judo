@@ -57,13 +57,13 @@ struct StatusView: View {
         if case let .failure(_, error) = status {
             Form {
                 switch error {
-                case let error as SimpleAsyncProcess.Error:
-                    LabeledContent("ExitCode", value: error.exitCode, format: .number)
-                    LabeledContent("stderr") {
-                        Text(error.stderr)
-                            .monospaced()
-                    }
-
+//                case let error as SimpleAsyncProcess.Error:
+//                    LabeledContent("ExitCode", value: error.exitCode, format: .number)
+//                    LabeledContent("stderr") {
+//                        Text(error.stderr)
+//                            .monospaced()
+//                    }
+//
                 default:
                     Text("\(error.localizedDescription)")
                 }

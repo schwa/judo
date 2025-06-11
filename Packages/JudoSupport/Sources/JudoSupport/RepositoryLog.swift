@@ -1,6 +1,6 @@
 import Collections
 
-public struct RepositoryLog {
+public struct RepositoryLog: Sendable {
     public var revset: String?
     public var changes: OrderedDictionary<ChangeID, Change>
     public var bookmarks: OrderedDictionary<String, CommitRef>

@@ -4,7 +4,7 @@ import TOMLKit
 import Subprocess
 import System
 
-public struct Jujutsu {
+public struct Jujutsu: Sendable {
     public var binaryPath: FilePath
     public var tempConfigPath: FilePath
 
@@ -36,19 +36,13 @@ public struct Jujutsu {
 
     public func run(subcommand: String, arguments: [String], repository: Repository) async throws -> Data {
         do {
-            // TODO: Bug in Subprocess.
-            if #available(macOS 9999, *) {
-                let arguments = Arguments([subcommand] + arguments)
-                let result = try await Subprocess.run(.path(binaryPath), arguments: arguments, workingDirectory: repository.path, output: .data, error: .string)
-                if !result.terminationStatus.isSuccess {
-                    logger?.log("Error running jujutsu: \(result.standardError ?? "")")
-                    throw JudoError.generic("TODO")
-                }
-                return result.standardOutput
-            } else {
-                let process = SimpleAsyncProcess(executableURL: binaryPath.url, arguments: [subcommand] + arguments, currentDirectoryURL: repository.path.url)
-                return try await process.run()
+            let arguments = Arguments([subcommand] + arguments)
+            let result = try await Subprocess.run(.path(binaryPath), arguments: arguments, workingDirectory: repository.path, output: .data, error: .string)
+            if !result.terminationStatus.isSuccess {
+                logger?.log("Error running jujutsu: \(result.standardError ?? "")")
+                throw JudoError.generic("TODO")
             }
+            return result.standardOutput
         }
         catch {
             print(binaryPath, subcommand, arguments.joined(separator: " "))

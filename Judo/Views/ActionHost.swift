@@ -6,6 +6,7 @@ struct ActionHost {
     @Binding
     var status: Status
 
+    @MainActor
     func with(action: Action) {
         Task {
             do {

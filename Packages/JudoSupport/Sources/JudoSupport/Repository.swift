@@ -6,6 +6,7 @@ import TOMLKit
 import System
 
 @Observable
+@MainActor
 public class Repository {
     public var appModel: AppModel
     public var path: FilePath
@@ -41,25 +42,6 @@ public class Repository {
             changes: OrderedDictionary(uniqueKeys: changes.map(\.id), values: changes),
             bookmarks: OrderedDictionary(uniqueKeys: bookmarks.map(\.name), values: bookmarks)
         )
-    }
-
-    public var head: ChangeID? {
-        do {
-            let arguments = [
-                "log", "--no-graph",
-                "-r", "@",
-                "--template", "change_id"
-            ]
-            let process = SimpleAsyncProcess(executableURL: binaryPath.url, arguments: arguments, currentDirectoryURL: path.url)
-            let data = try process.runSync()
-            guard let string = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) else {
-                return nil
-            }
-            return ChangeID(rawValue: string, shortest: nil)
-        } catch {
-            print(error)
-            return nil
-        }
     }
 
     public func fetch<T>(subcommand: String, arguments: [String]) async throws -> [T] where T: Decodable & JutsuTemplateProviding {

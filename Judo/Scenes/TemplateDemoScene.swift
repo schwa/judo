@@ -1,4 +1,5 @@
 import SwiftUI
+import System
 import JudoSupport
 
 struct TemplateDemoScene: Scene {
@@ -65,10 +66,11 @@ struct TemplateDemoView: View {
                 arguments.append(contentsOf: ["--template", template])
             }
 
-            let process = SimpleAsyncProcess(executableURL: appModel.binaryPath.url, arguments: arguments, currentDirectoryURL: URL(fileURLWithPath: path))
+
+//            let process = SimpleAsyncProcess(executableURL: appModel.binaryPath.url, arguments: arguments, currentDirectoryURL: URL(fileURLWithPath: path))
             do {
-                let data = try await process.run()
-                output = String(data: data, encoding: .utf8) ?? "Failed to decode output"
+                let result = try await JudoSupport.run(.path(appModel.binaryPath), useShell: true, arguments: arguments, workingDirectory: FilePath(path))
+                output = result.standardOutput!
             } catch {
                 output = "Error: \(error)"
             }

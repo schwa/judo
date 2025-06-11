@@ -35,10 +35,11 @@ struct MixedModeChangeDetailView: View {
                         Button("Describe") {
                             Task {
                                 do {
-                                    let arguments = ["describe", "-r", change.changeID.description, "-m", description]
+                                    let arguments = ["-r", change.changeID.description, "-m", description]
                                     print("Describing commit with arguments: \(arguments)")
-                                    let process = SimpleAsyncProcess(executableURL: repository.binaryPath.url, arguments: arguments, currentDirectoryURL: repository.path.url)
-                                    _ = try await process.run()
+
+                                    _ = try await appModel.jujutsu.run(subcommand: "describe", arguments: arguments, repository: repository)
+
                                     print("Change described successfully.")
                                 } catch {
                                     print("Error describing change: \(error)")

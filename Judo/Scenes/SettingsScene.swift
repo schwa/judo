@@ -2,6 +2,7 @@ import SwiftUI
 import Everything
 import JudoSupport
 import System
+import Subprocess
 
 struct SettingsScene: Scene {
     var body: some Scene {
@@ -12,10 +13,10 @@ struct SettingsScene: Scene {
 }
 
 struct SettingsView: View {
-    @Environment(AppModel.self)
+    @SwiftUI.Environment(AppModel.self)
     var appModel
 
-    @Environment(\.openWindow)
+    @SwiftUI.Environment(\.openWindow)
     var openWindow
 
     @State
@@ -40,8 +41,14 @@ struct SettingsView: View {
 
                 Button("Generate Demo Repo") {
                     Task {
+
                         let scriptURL = Bundle.main.url(forResource: "generate-demo-repo", withExtension: "sh")!
-                        _ = try await SimpleAsyncProcess(executableURL: scriptURL, useShell: true).run()
+
+                        let result = try! await run(.path(FilePath(scriptURL.path)), useShell: true)
+                        print(result)
+
+
+//                        _ = try await SimpleAsyncProcess(executableURL: scriptURL, useShell: true).run()
 //                        print(String(data: data, encoding: .utf8) ?? "No output")
                         openWindow(value: FilePath("/tmp/fake-repo"))
                     }
@@ -50,6 +57,6 @@ struct SettingsView: View {
         }
         .frame(width: 480, height: 320)
         .padding()
-
     }
 }
+

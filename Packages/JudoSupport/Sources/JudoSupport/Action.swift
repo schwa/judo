@@ -1,11 +1,11 @@
 import Foundation
 
-public struct Action: Identifiable, Equatable {
+public struct Action: Identifiable, Equatable, Sendable {
     public let id = UUID()
     public let name: String
-    public let closure: () async throws -> Void
+    public let closure: @Sendable () async throws -> Void
 
-    public init(name: String, closure: @escaping () async throws -> Void) {
+    public init(name: String, closure: @Sendable @escaping () async throws -> Void) {
         self.name = name
         self.closure = closure
     }
