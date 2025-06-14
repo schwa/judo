@@ -5,7 +5,7 @@ import Collections
 @Suite
 struct GraphTests {
 
-    @Test("Empty graph")
+    @Test
     func testEmptyGraph() {
         let changes: [(String, [String])] = []
         let graph = Graph(adjacency: changes)
@@ -14,7 +14,7 @@ struct GraphTests {
         #expect(graph.laneCount == 0)
     }
 
-    @Test("Single node - no connections")
+    @Test
     func testSingleNode() {
         let changes: [(String, [String])] = [
             ("N0", []),
@@ -27,7 +27,7 @@ struct GraphTests {
         #expect(graph.rows[0] == Graph.Row(node: "N0", currentLane: 0, lanes: [0], exits: []))
     }
 
-    @Test("Two disconnected nodes", .disabled())
+    @Test
     func testTwoDisconnectedNodes() {
         let changes: [(String, [String])] = [
             ("N0", []),
@@ -42,7 +42,7 @@ struct GraphTests {
         #expect(graph.rows[1] == Graph.Row(node: "N1", currentLane: 0, lanes: [0], exits: []))
     }
 
-    @Test("Linear chain - simple sequence of nodes")
+    @Test
     func testLinearChain() {
         let changes = [
             ("N0", ["N1"]),
@@ -60,7 +60,7 @@ struct GraphTests {
         #expect(graph.rows[2] == Graph.Row(node: "N2", currentLane: 0, lanes: [0], exits: []))
     }
 
-    @Test("Simple merge - two nodes merging into one", .disabled())
+    @Test
     func testSimpleMerge() {
         let changes = [
             ("N0", ["N2"]),
@@ -79,7 +79,7 @@ struct GraphTests {
         #expect(graph.rows[2] == Graph.Row(node: "N2", currentLane: 0, lanes: [0], exits: []))
     }
 
-    @Test("Simple branch - one node branching to two children", .disabled())
+    @Test
     func testSimpleBranch() {
         let changes = [
             ("N0", ["N1", "N2"]),
@@ -93,11 +93,11 @@ struct GraphTests {
 
         // Expected behavior: N0 branches, N1 stays on lane 0, N2 moves to lane 1
         #expect(graph.rows[0] == Graph.Row(node: "N0", currentLane: 0, lanes: [0], exits: [[0, 0], [0, 1]]))
-        #expect(graph.rows[1] == Graph.Row(node: "N1", currentLane: 0, lanes: [0, 1], exits: [[0, 1]]))
-        #expect(graph.rows[2] == Graph.Row(node: "N2", currentLane: 1, lanes: [0, 1], exits: []))
+        #expect(graph.rows[1] == Graph.Row(node: "N1", currentLane: 0, lanes: [0, 1], exits: [[1, 1]]))
+        #expect(graph.rows[2] == Graph.Row(node: "N2", currentLane: 1, lanes: [1], exits: []))
     }
 
-    @Test("Diamond structure - branch then merge", .disabled("Current implementation doesn't handle branching - requires fixing branch logic first"))
+    @Test
     func testDiamondStructure() {
         let changes = [
             ("N0", ["N1", "N2"]),  // N0 branches to N1 and N2
@@ -112,12 +112,12 @@ struct GraphTests {
 
         // Expected behavior: N0 branches (N1 lane 0, N2 lane 1), then both merge into N3 on lane 0
         #expect(graph.rows[0] == Graph.Row(node: "N0", currentLane: 0, lanes: [0], exits: [[0, 0], [0, 1]]))
-        #expect(graph.rows[1] == Graph.Row(node: "N1", currentLane: 0, lanes: [0, 1], exits: [[0, 1], [0, 0]]))
+        #expect(graph.rows[1] == Graph.Row(node: "N1", currentLane: 0, lanes: [0, 1], exits: [[1, 1], [0, 0]]))
         #expect(graph.rows[2] == Graph.Row(node: "N2", currentLane: 1, lanes: [0, 1], exits: [[0, 0], [1, 0]]))
         #expect(graph.rows[3] == Graph.Row(node: "N3", currentLane: 0, lanes: [0], exits: []))
     }
 
-    @Test("Complex branching - one node branching to three children", .disabled("Current implementation doesn't handle branching - all children end up on same lane"))
+    @Test(.disabled("Current implementation doesn't handle branching - all children end up on same lane"))
     func testComplexBranching() {
         let changes = [
             ("N0", ["N1", "N2", "N3"]),
@@ -132,12 +132,12 @@ struct GraphTests {
 
         // Expected behavior: N0 branches to three children on separate lanes
         #expect(graph.rows[0] == Graph.Row(node: "N0", currentLane: 0, lanes: [0], exits: [[0, 0], [0, 1], [0, 2]]))
-        #expect(graph.rows[1] == Graph.Row(node: "N1", currentLane: 0, lanes: [0, 1, 2], exits: [[0, 1], [0, 2]]))
-        #expect(graph.rows[2] == Graph.Row(node: "N2", currentLane: 1, lanes: [0, 1, 2], exits: [[0, 2]]))
-        #expect(graph.rows[3] == Graph.Row(node: "N3", currentLane: 2, lanes: [0, 1, 2], exits: []))
+        #expect(graph.rows[1] == Graph.Row(node: "N1", currentLane: 0, lanes: [0, 1, 2], exits: [[1, 1], [2, 2]]))
+        #expect(graph.rows[2] == Graph.Row(node: "N2", currentLane: 1, lanes: [1, 2], exits: [[2, 2]]))
+        #expect(graph.rows[3] == Graph.Row(node: "N3", currentLane: 2, lanes: [2], exits: []))
     }
 
-    @Test("Multiple disconnected components", .disabled("Current implementation doesn't properly reuse lanes for disconnected components"))
+    @Test
     func testMultipleDisconnectedComponents() {
         let changes = [
             ("N0", ["N1"]),  // First component: N0 -> N1
@@ -157,7 +157,7 @@ struct GraphTests {
         #expect(graph.rows[3] == Graph.Row(node: "N3", currentLane: 0, lanes: [0], exits: []))
     }
 
-    @Test("Fork and rejoin - lanes diverge then converge", .disabled("Current implementation doesn't handle branching - requires fixing branch logic first"))
+    @Test
     func testForkAndRejoin() {
         let changes = [
             ("N0", ["N1"]),        // Linear start
@@ -168,14 +168,13 @@ struct GraphTests {
             ("N5", []),            // End
         ]
         let graph = Graph(adjacency: changes)
-
         #expect(graph.rows.count == 6)
         #expect(graph.laneCount == 2) // Should need 2 lanes for the fork
 
         // Expected behavior: fork at N1, rejoin at N4, continue on lane 0
         #expect(graph.rows[0] == Graph.Row(node: "N0", currentLane: 0, lanes: [0], exits: [[0, 0]]))
         #expect(graph.rows[1] == Graph.Row(node: "N1", currentLane: 0, lanes: [0], exits: [[0, 0], [0, 1]]))
-        #expect(graph.rows[2] == Graph.Row(node: "N2", currentLane: 0, lanes: [0, 1], exits: [[0, 1], [0, 0]]))
+        #expect(graph.rows[2] == Graph.Row(node: "N2", currentLane: 0, lanes: [0, 1], exits: [[1, 1], [0, 0]]))
         #expect(graph.rows[3] == Graph.Row(node: "N3", currentLane: 1, lanes: [0, 1], exits: [[0, 0], [1, 0]]))
         #expect(graph.rows[4] == Graph.Row(node: "N4", currentLane: 0, lanes: [0], exits: [[0, 0]]))
         #expect(graph.rows[5] == Graph.Row(node: "N5", currentLane: 0, lanes: [0], exits: []))
@@ -193,13 +192,13 @@ extension Graph.Edge: ExpressibleByArrayLiteral where Node == String {
     }
 }
 
-extension Graph.Exit: Equatable {
-    public static func == (lhs: Graph.Exit, rhs: Graph.Exit) -> Bool {
+extension Graph.Intersection: Equatable {
+    public static func == (lhs: Graph.Intersection, rhs: Graph.Intersection) -> Bool {
         return lhs.childLane == rhs.childLane && lhs.parentLane == rhs.parentLane
     }
 }
 
-extension Graph.Exit: ExpressibleByArrayLiteral {
+extension Graph.Intersection: ExpressibleByArrayLiteral {
     public init(arrayLiteral elements: Int...) {
         guard elements.count == 2 else {
             fatalError("Exit array literal must have exactly 2 elements: [childLane, parentLane]")
@@ -210,9 +209,10 @@ extension Graph.Exit: ExpressibleByArrayLiteral {
 
 extension Graph.Row: Equatable where Node: Equatable {
     public static func == (lhs: Graph.Row, rhs: Graph.Row) -> Bool {
-        return lhs.node == rhs.node &&
-               lhs.currentLane == rhs.currentLane &&
-               lhs.lanes == rhs.lanes &&
-               lhs.exits == rhs.exits
+        return lhs.node == rhs.node
+            && lhs.currentLane == rhs.currentLane
+            && lhs.lanes == rhs.lanes
+            && lhs.entrances == rhs.entrance
+            && lhs.exits == rhs.exits
     }
 }

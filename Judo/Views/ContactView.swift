@@ -13,11 +13,11 @@ struct ContactView: View {
                 }
                 Text(name)
                     .foregroundStyle(.judoContactColor)
-                if let email {
-                    Text(email)
-                        .foregroundStyle(.secondary)
-                        .foregroundStyle(.judoContactColor)
-                }
+//                if let email {
+//                    Text(email)
+//                        .foregroundStyle(.secondary)
+//                        .foregroundStyle(.judoContactColor)
+//                }
             }
 
             Text(email ?? name).fixedSize()

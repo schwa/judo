@@ -49,6 +49,6 @@ public extension Graph {
             return [row0] + [row1]
         }
 
-        printTable([["Graph", "ID", "Lane", "Lanes", "Exits", "Debug Label"]] + rows)
+        printTable([["Graph", "Node", "Lane", "Lanes", "Exits", "Debug Label"]] + rows)
     }
 }

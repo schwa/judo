@@ -32,34 +32,47 @@ struct ChangeRowView: View {
                 authorView
 
                 diffStatView
-
                 timestampView
             }
-            isEmptyView
             descriptionView
         }
     }
 
     @ViewBuilder
     var diffStatView: some View {
-        HStack(spacing: 0) {
-            Text("+\(change.totalAdded, format: .number)")
+
+
+        if change.totalAdded == 0 && change.totalRemoved == 0 && change.isEmpty {
+            Text("empty")
                 .padding(.vertical, 2)
                 .padding(.leading, 4)
                 .padding(.trailing, 2)
-                .background(.green)
-                .fixedSize()
-            Text("-\(change.totalRemoved, format: .number)")
-                .padding(.vertical, 2)
-                .padding(.leading, 2)
-                .padding(.trailing, 4)
-                .background(.red)
-                .fixedSize()
+                .foregroundStyle(.white)
+            //            .background(Color.red.mix(with: Color.green, by: 0.5), in: Capsule())
+                .background(Color.orange, in: Capsule())
         }
-        .foregroundStyle(.white)
-//        .font(.caption2)
-//        .background(.green)
-        .clipShape(Capsule())
+        else {
+
+            HStack(spacing: 0) {
+                Text("+\(change.totalAdded, format: .number)")
+                    .padding(.vertical, 2)
+                    .padding(.leading, 4)
+                    .padding(.trailing, 2)
+                    .background(.green)
+                    .fixedSize()
+                Text("-\(change.totalRemoved, format: .number)")
+                    .padding(.vertical, 2)
+                    .padding(.leading, 2)
+                    .padding(.trailing, 4)
+                    .background(.red)
+                    .fixedSize()
+            }
+            .monospaced()
+            .foregroundStyle(.white)
+            //        .font(.caption2)
+            //        .background(.green)
+            .clipShape(Capsule())
+        }
     }
 
     @ViewBuilder
@@ -89,14 +102,18 @@ struct ChangeRowView: View {
 
     @ViewBuilder
     var authorView: some View {
-        ContactView(name: change.author.name, email: change.author.email)
+        if !change.author.name.isEmpty && !(change.author.email ?? "").isEmpty {
+            ContactView(name: change.author.name, email: change.author.email)
+        }
     }
 
     @ViewBuilder
     var timestampView: some View {
-        Text(change.author.timestamp, style: .relative)
-            .foregroundStyle(.judoTimestampColor)
-            .fixedSize()
+        if change.author.timestamp.timeIntervalSince1970 != 0 {
+            Text(change.author.timestamp, style: .relative)
+                .foregroundStyle(.judoTimestampColor)
+                .fixedSize()
+        }
     }
 
     @ViewBuilder
@@ -120,15 +137,6 @@ struct ChangeRowView: View {
         if change.isConflict {
             TagView("conflict()")
                 .foregroundStyle(.judoConflictColor)
-        }
-    }
-
-    @ViewBuilder
-    var isEmptyView: some View {
-        if change.isEmpty && change.isRoot == false {
-            Text("(empty)").italic()
-                .foregroundStyle(.judoEmptyCommitLabelColor)
-                .fixedSize()
         }
     }
 
@@ -158,8 +166,8 @@ struct ChangeRowView: View {
     @ViewBuilder
     var descriptionView: some View {
         Group {
-            if change.description.isEmpty && change.isRoot == false {
-                Text("(no description set").italic().fixedSize()
+            if change.description.isEmpty {
+                Text("(no description set)").italic().fixedSize().foregroundStyle(.secondary)
             } else {
                 let description = change.description.trimmingCharacters(in: .whitespacesAndNewlines)
                 Text(verbatim: description).lineLimit(1)

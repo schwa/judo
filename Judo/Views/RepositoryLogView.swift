@@ -42,7 +42,7 @@ struct RepositoryLogView: View {
 //                    }
                         VStack(alignment: .leading) {
                             ChangeRowView(change: change)
-                            Text("\(String(describing: row))").monospaced().font(.caption)
+//                            Text("\(String(describing: row))").monospaced().font(.caption)
                         }
                     }
                     .environment(\.isRowSelected, selection.contains(row.node))

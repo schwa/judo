@@ -84,12 +84,12 @@ public extension JujutsuID {
             return AttributedString(shortest()).modifying {
                 $0.foregroundColor = Color.judoShortChangeIDColor
             }
-            + AttributedString(rawValue.trimmingPrefix(shortest()).prefix(7))
+            + AttributedString(rawValue.trimmingPrefix(shortest()).prefix(8 - shortest().count))
         case (.commitID, .shortestHighlighted, .some):
             return AttributedString(shortest()).modifying {
                 $0.foregroundColor = Color.judoShortCommitIDColor
             }
-            + AttributedString(rawValue.trimmingPrefix(shortest()).prefix(7))
+            + AttributedString(rawValue.trimmingPrefix(shortest()).prefix(8 - shortest().count))
         default:
             return AttributedString(short())
 

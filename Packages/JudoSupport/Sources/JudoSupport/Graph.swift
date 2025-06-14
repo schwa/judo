@@ -6,7 +6,8 @@ public struct Graph <Node> where Node: Hashable {
         public var node: Node
         public var currentLane: Int
         public var lanes: [Int]
-        public var exits: [Exit] // Will be populated after initial row generation
+        public var entrances: [Intersection]
+        public var exits: [Intersection] // Will be populated after initial row generation
         public var debugLabel: String?
     }
 
@@ -15,7 +16,7 @@ public struct Graph <Node> where Node: Hashable {
         public var parent: Node
     }
 
-    public struct Exit {
+    public struct Intersection {
         public var childLane: Int
         public var parentLane: Int
     }
@@ -37,9 +38,10 @@ public struct Graph <Node> where Node: Hashable {
     }
 
     static func rows(for adjacency: [(node: Node, parents: [Node])]) -> [Row] {
-
         var lanes = LanePool<Node>()
         var currentEdges = OrderedSet<Edge>()
+
+        var lastExits: [Intersection] = []
 
         let rows = adjacency.map { (node, parents) -> Row in
             for edge in currentEdges where edge.parent == node {
@@ -69,12 +71,28 @@ public struct Graph <Node> where Node: Hashable {
             currentEdges.formUnion(edges)
             currentEdges.removeAll(where: { $0.parent == node })
 
+
+
+
             let exits = currentEdges.map { edge in
-                let childLane = lanes.allLanesByKey[edge.child] ?? -1
+                let childLane = node == edge.child ? lanes.allLanesByKey[edge.child] ?? -1 : lanes.allLanesByKey[edge.parent] ?? -1
                 let parentLane = lanes.allLanesByKey[edge.parent] ?? -1
-                return Exit(childLane: childLane, parentLane: parentLane)
+                return Intersection(childLane: childLane, parentLane: parentLane)
             }
-            return Row(node: node, currentLane: lane, lanes: lanes.lanes, exits: exits, debugLabel: "\(edges)")
+
+            // Use lastExits & our exits to compute entrances.
+            let entrances: [Intersection] = lastExits.filter { lastExit in
+                exits.contains(where: { $0.childLane == lastExit.childLane && $0.parentLane == lastExit.parentLane })
+            }
+
+            let lanes_ = Set([lane] + exits.flatMap { [$0.childLane] }).sorted()
+
+
+            lanes.freeLane(for: node)
+
+            lastExits = exits
+
+            return Row(node: node, currentLane: lane, lanes: lanes_, entrances: entrances, exits: exits, debugLabel: "[\(lane)]: \(currentEdges)")
         }
         return rows
     }
@@ -89,7 +107,7 @@ extension Graph.Edge: CustomDebugStringConvertible {
 extension Graph.Edge: Hashable {
 }
 
-extension Graph.Exit: CustomDebugStringConvertible {
+extension Graph.Intersection: CustomDebugStringConvertible {
     public var debugDescription: String {
         "\(childLane)->\(parentLane)"
     }
