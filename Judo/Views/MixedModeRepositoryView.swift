@@ -14,8 +14,8 @@ struct MixedModeRepositoryView: View {
     @Environment(Repository.self)
     private var repository
 
-    @Environment(\.actionHost)
-    private var actionHost
+    @Environment(\.actionRunner)
+    private var actionRunner
 
     @State
     private var search: String = ""
@@ -101,7 +101,7 @@ struct MixedModeRepositoryView: View {
     var toolbar: some ToolbarContent {
         ToolbarItem(placement: .primaryAction) {
             Button("New") {
-                actionHost?.with(action: Action(name: "new") {
+                actionRunner?.with(action: Action(name: "new") {
                     try await repository.new(changes: selectedChanges.map(\.changeID))
                     try await repository.refresh()
                 })
@@ -110,7 +110,7 @@ struct MixedModeRepositoryView: View {
 
         ToolbarItem(placement: .primaryAction) {
             Button("Undo") {
-                actionHost?.with(action: Action(name: "Undo") {
+                actionRunner?.with(action: Action(name: "Undo") {
                     try await repository.undo()
                     try await repository.refresh()
                 })
@@ -120,7 +120,7 @@ struct MixedModeRepositoryView: View {
 
         ToolbarItem(placement: .primaryAction) {
             Button("Abandon") {
-                actionHost?.with(action: Action(name: "Abandon") {
+                actionRunner?.with(action: Action(name: "Abandon") {
                     try await repository.abandon(changes: selectedChanges.map(\.changeID))
                     try await repository.refresh()
                 })
@@ -136,7 +136,7 @@ struct MixedModeRepositoryView: View {
                 Button("Squash") {
                     let descriptions = selectedChanges.compactMap { $0.description.isEmpty ? nil : $0.description }
                     if descriptions.count <= 1 {
-                        actionHost?.with(action: Action(name: "Squash") {
+                        actionRunner?.with(action: Action(name: "Squash") {
                             try await repository.squash(changes: sourceChanges.map(\.id), destination: targetChange!.id, description: descriptions.first ?? "")
                             try await repository.refresh()
                         })
@@ -148,7 +148,7 @@ struct MixedModeRepositoryView: View {
                 .disabled(selection.count < 2)
                 .sheet(isPresented: value) {
                     DescriptionEditor(targetChange: targetChange, sourceChanges: sourceChanges, isSquash: true) { description in
-                        actionHost?.with(action: Action(name: "Squash") {
+                        actionRunner?.with(action: Action(name: "Squash") {
                             try await repository.squash(changes: sourceChanges.map(\.id), destination: targetChange!.id, description: description)
                             try await repository.refresh()
                         })

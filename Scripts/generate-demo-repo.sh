@@ -35,6 +35,11 @@ jj describe --quiet -m "Merged A_${COMMIT_COUNT} and B_${COMMIT_COUNT}"
 jj new --quiet "description(\"Merged\")" -m "Fork F1"
 jj new --quiet "description(\"Merged\")" -m "Fork F2"
 
+# Add some bookmarks
+jj bookmark create --quiet -r "description(\"A_1\")" "Bookmark_1"
+jj bookmark create --quiet -r "description(\"B_1\")" "Bookmark_2"
+
+
 # Display the log
 jj log --no-pager -T "change_id.short(4)"
 

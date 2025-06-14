@@ -13,6 +13,8 @@ public extension Color {
     static let judoLanesColor = Color.black
     static let judoTimestampColor = Color.cyan
     static let judoContactColor = Color.primary
+    static let judoTimelineColor = Color.cyan
+    static let judoTimelineNodeColor = Color.blue
 }
 
 public extension Color {
@@ -31,4 +33,6 @@ public extension ShapeStyle where Self == Color {
     static var judoLanesColor: Self { .judoLanesColor}
     static var judoTimestampColor: Self { .judoTimestampColor}
     static var judoContactColor: Self { .judoContactColor}
+    static var judoTimelineColor: Self { .judoTimelineColor}
+    static var judoTimelineNodeColor: Self { .judoTimelineNodeColor}
 }

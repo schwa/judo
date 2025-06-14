@@ -36,11 +36,12 @@ public class Repository {
         }
         let changes: [Change] = try await fetch(subcommand: "log", arguments: arguments)
 
-        let bookmarks: [CommitRef] = try await fetch(subcommand: "bookmark", arguments: ["list"])
+        // TODO: 
+//        let bookmarks: [CommitRef] = try await fetch(subcommand: "bookmark", arguments: ["list"])
         self.currentLog = RepositoryLog(
             revset: revset,
             changes: OrderedDictionary(uniqueKeys: changes.map(\.id), values: changes),
-            bookmarks: OrderedDictionary(uniqueKeys: bookmarks.map(\.name), values: bookmarks)
+            bookmarks: [:] //OrderedDictionary(uniqueKeys: bookmarks.map(\.name), values: bookmarks)
         )
     }
 
@@ -60,8 +61,8 @@ public class Repository {
             return try decoder.decode([T].self, from: jsonData)
         }
         catch {
-            print("Error decoding \(T.self): \(error)")
-            print("Data: \(String(data: jsonData, encoding: .utf8) ?? "<invalid data>")")
+            logger?.error("Error decoding \(T.self): \(error)")
+            logger?.error("Data: \(String(data: jsonData, encoding: .utf8) ?? "<invalid data>")")
             throw error
         }
     }

@@ -12,7 +12,8 @@ struct JudoApp: App {
     var body: some Scene {
         Group {
             SplashScene()
-            RepositoryScene()
+            JudoDocumentScene()
+            RepositoryScene() // TODO: Remove.
             TemplateDemoScene()
             SettingsScene()
         }

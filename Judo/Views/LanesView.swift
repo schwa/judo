@@ -28,18 +28,18 @@ struct LanesView: View {
             }
 
             for entrance in row.entrances {
-                let sourceX = laneToX(entrance.childLane)
-                let destinationX = laneToX(entrance.parentLane)
-                context.stroke(Path.wire(from: CGPoint(x: sourceX, y: minY), to: CGPoint(x: destinationX, y: midY)), with: .color(.red), lineWidth: 2)
+                let sourceX = laneToX(entrance.source)
+                let destinationX = laneToX(entrance.destination)
+                context.stroke(Path.wire(from: CGPoint(x: sourceX, y: minY), to: CGPoint(x: destinationX, y: midY)), with: .color(.judoTimelineColor), lineWidth: 2)
             }
 
             for exit in row.exits {
-                let sourceX = laneToX(exit.childLane)
-                let destinationX = laneToX(exit.parentLane)
-                context.stroke(Path.wire(from: CGPoint(x: sourceX, y: midY), to: CGPoint(x: destinationX, y: maxY)), with: .color(.red), lineWidth: 2)
+                let sourceX = laneToX(exit.source)
+                let destinationX = laneToX(exit.destination)
+                context.stroke(Path.wire(from: CGPoint(x: sourceX, y: midY), to: CGPoint(x: destinationX, y: maxY)), with: .color(.judoTimelineColor), lineWidth: 2)
             }
 
-            context.fill(Path(ellipseIn: CGRect(x: laneToX(row.currentLane) - 5, y: midY - 5, width: 10, height: 10)), with: .color(.red))
+            context.fill(Path(ellipseIn: CGRect(x: laneToX(row.currentLane) - 5, y: midY - 5, width: 10, height: 10)), with: .color(.judoTimelineNodeColor))
 
 
         }

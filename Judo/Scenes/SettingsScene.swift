@@ -19,6 +19,9 @@ struct SettingsView: View {
     @SwiftUI.Environment(\.openWindow)
     var openWindow
 
+    @AppStorage("judo.debug-ui")
+    var debugUI: Bool = false
+
     @State
     var binaryPath: String = ""
 
@@ -39,17 +42,12 @@ struct SettingsView: View {
 
             Section(header: Text("Debug")) {
 
+                Toggle("Debug UI", isOn: $debugUI)
+
                 Button("Generate Demo Repo") {
                     Task {
-
                         let scriptURL = Bundle.main.url(forResource: "generate-demo-repo", withExtension: "sh")!
-
-                        let result = try! await run(.path(FilePath(scriptURL.path)), useShell: true)
-                        print(result)
-
-
-//                        _ = try await SimpleAsyncProcess(executableURL: scriptURL, useShell: true).run()
-//                        print(String(data: data, encoding: .utf8) ?? "No output")
+                        _ = try! await run(.path(FilePath(scriptURL.path)), useShell: true)
                         openWindow(value: FilePath("/tmp/fake-repo"))
                     }
                 }

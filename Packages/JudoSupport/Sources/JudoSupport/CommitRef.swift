@@ -2,11 +2,8 @@ public struct CommitRef: Codable, Sendable {
     public var name: String
 
     public static let template = Template(name: "judo_bookmark", content: """
-    "{"
-    ++ "'name':" ++ name.escape_json() ++ ","
-    ++ "}"
-    """)
-
+    "{'name':" ++ name.escape_json() ++ "}"
+    """.replacingOccurrences(of: "'", with: "\\\""))
 }
 
 extension CommitRef: Identifiable {

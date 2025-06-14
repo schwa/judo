@@ -101,12 +101,11 @@ public extension Repository {
         do {
             let arguments = ["--no-graph", "-r", change.description]
             let changes: [FullChangeRecord] = try await fetch(subcommand: "log", arguments: arguments)
-            print(changes)
             return changes[0]
         }
         catch {
-            print(error)
-            fatalError()
+            logger?.error(error)
+            throw error
         }
     }
 }

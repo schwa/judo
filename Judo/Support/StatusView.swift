@@ -42,7 +42,7 @@ struct StatusView: View {
                 }
             }
         }
-        .onChange(of: status.action, initial: true) {
+        .onChange(of: status.actionID, initial: true) {
             if case .failure = status {
                 withAnimation(.interpolatingSpring(stiffness: 300, damping: 10)) {
                     animateFailure = true
@@ -83,11 +83,11 @@ struct DummyError: LocalizedError {
 }
 
 #Preview("StatusView – Success") {
-    StatusView(status: .constant(.success(.init(name: "Build", closure: {}))))
+    StatusView(status: .constant(.success(Action(name: "Build", closure: {}))))
         .padding()
 }
 
 #Preview("StatusView – Failure") {
-    StatusView(status: .constant(.failure(.init(name: "Run", closure: {}), DummyError())))
+    StatusView(status: .constant(.failure(Action(name: "Run", closure: {}), DummyError())))
         .padding()
 }

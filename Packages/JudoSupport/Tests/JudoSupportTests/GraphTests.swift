@@ -277,24 +277,18 @@ struct GraphTests {
 extension Graph.Edge: ExpressibleByArrayLiteral where Node == String {
     public init(arrayLiteral elements: String...) {
         guard elements.count == 2 else {
-            fatalError("Edge array literal must have exactly 2 elements: [child, parent]")
+            fatalError("Edge array literal must have exactly 2 elements: [source, destination]")
         }
-        self.init(child: elements[0], parent: elements[1])
-    }
-}
-
-extension Graph.Intersection: Equatable {
-    public static func == (lhs: Graph.Intersection, rhs: Graph.Intersection) -> Bool {
-        return lhs.childLane == rhs.childLane && lhs.parentLane == rhs.parentLane
+        self.init(source: elements[0], destination: elements[1])
     }
 }
 
 extension Graph.Intersection: ExpressibleByArrayLiteral {
     public init(arrayLiteral elements: Int...) {
         guard elements.count == 2 else {
-            fatalError("Exit array literal must have exactly 2 elements: [childLane, parentLane]")
+            fatalError("Exit array literal must have exactly 2 elements: [source, destination]")
         }
-        self.init(childLane: elements[0], parentLane: elements[1])
+        self.init(source: elements[0], destination: elements[1])
     }
 }
 

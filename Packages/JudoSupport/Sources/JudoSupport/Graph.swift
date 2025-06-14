@@ -12,13 +12,13 @@ public struct Graph <Node> where Node: Hashable {
     }
 
     public struct Edge {
-        public var child: Node
-        public var parent: Node
+        public var source: Node
+        public var destination: Node
     }
 
     public struct Intersection {
-        public var childLane: Int
-        public var parentLane: Int
+        public var source: Int
+        public var destination: Int
     }
 
     public private(set) var adjacency: [(node: Node, parents: [Node])]
@@ -38,9 +38,9 @@ public struct Graph <Node> where Node: Hashable {
         var lastExits: [Intersection] = []
 
         let rows = adjacency.map { (node, parents) -> Row in
-            for edge in currentEdges where edge.parent == node {
-                if lanes.lane(for: edge.child) != nil {
-                    lanes.freeLane(for: edge.child)
+            for edge in currentEdges where edge.destination == node {
+                if lanes.lane(for: edge.source) != nil {
+                    lanes.freeLane(for: edge.source)
                 }
             }
 
@@ -60,33 +60,39 @@ public struct Graph <Node> where Node: Hashable {
 
             // Form edges from current node to its parents
             let edges = parents.map {
-                Edge(child: node, parent: $0)
+                Edge(source: node, destination: $0)
             }
             currentEdges.formUnion(edges)
-            currentEdges.removeAll(where: { $0.parent == node })
+            currentEdges.removeAll(where: { $0.destination == node })
 
-
-
-
+            // Form exits...
             let exits = currentEdges.map { edge in
-                let childLane = node == edge.child ? lanes.allLanesByKey[edge.child] ?? -1 : lanes.allLanesByKey[edge.parent] ?? -1
-                let parentLane = lanes.allLanesByKey[edge.parent] ?? -1
-                return Intersection(childLane: childLane, parentLane: parentLane)
+                let childLane = node == edge.source ? lanes.allLanesByKey[edge.source] ?? -1 : lanes.allLanesByKey[edge.destination] ?? -1
+                let parentLane = lanes.allLanesByKey[edge.destination] ?? -1
+                return Intersection(source: childLane, destination: parentLane)
             }
 
             // Use lastExits & our exits to compute entrances.
-            let entrances: [Intersection] = lastExits.filter { lastExit in
-                exits.contains(where: { $0.childLane == lastExit.childLane && $0.parentLane == lastExit.parentLane })
+            var entrances: [Intersection] = []
+
+            for exit in Set(lastExits.map(\.destination)) {
+                // Find an entrance that matches the exit's parent lane
+                if let entrance = exits.first(where: { $0.source == exit }) {
+                    entrances.append(.init(source: exit, destination: entrance.source))
+                }
+                else if exit == lane {
+                    entrances.append(.init(source: exit, destination: lane))
+                }
+                else {
+                    // Unreachable.
+                    fatalError()
+                }
             }
-
-            let lanes_ = Set([lane] + exits.flatMap { [$0.childLane] }).sorted()
-
-
+            let lanes_ = Set([lane] + exits.flatMap { [$0.source] }).sorted()
             lanes.freeLane(for: node)
-
             lastExits = exits
 
-            return Row(node: node, currentLane: lane, lanes: lanes_, entrances: entrances, exits: exits, debugLabel: "[\(lane)]: \(currentEdges)")
+            return Row(node: node, currentLane: lane, lanes: lanes_, entrances: entrances.sorted(), exits: exits.sorted(), debugLabel: "[\(lane)]: \(currentEdges)")
         }
         return rows
     }
@@ -94,7 +100,7 @@ public struct Graph <Node> where Node: Hashable {
 
 extension Graph.Edge: CustomDebugStringConvertible {
     public var debugDescription: String {
-        "\(child)->\(parent)"
+        "\(source)->\(destination)"
     }
 }
 
@@ -103,12 +109,21 @@ extension Graph.Edge: Hashable {
 
 extension Graph.Intersection: CustomDebugStringConvertible {
     public var debugDescription: String {
-        "\(childLane)->\(parentLane)"
+        "\(source)->\(destination)"
     }
 }
 
 extension Graph.Row: Identifiable {
     public var id: Node {
         node
+    }
+}
+
+extension Graph.Intersection: Comparable {
+    public static func < (lhs: Graph.Intersection, rhs: Graph.Intersection) -> Bool {
+        if lhs.source == rhs.source {
+            return lhs.destination < rhs.destination
+        }
+        return lhs.source < rhs.source
     }
 }

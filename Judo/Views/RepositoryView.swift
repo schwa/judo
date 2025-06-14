@@ -17,14 +17,8 @@ struct RepositoryView: View {
     @State
     var mode: Mode = .mixed
 
-    @State
-    var actionHost: ActionHost?
-
     @Environment(Repository.self)
     var repository
-
-    @State
-    var status: Status = .waiting
 
     @State
     private var selection: Set<ChangeID> = []
@@ -40,14 +34,11 @@ struct RepositoryView: View {
                 ChangesDetailView(changes: selectedChanges)
             }
         }
-        .environment(\.actionHost, actionHost)
+        .modifier(ActionHostViewModifier())
         .navigationDocument(repository.path.url)
         .navigationSubtitle("\(repository.path.description)")
         .toolbar {
             toolbar
-        }
-        .onAppear {
-            actionHost = ActionHost(status: $status)
         }
         .task {
             try! await repository.refresh()
@@ -67,10 +58,6 @@ struct RepositoryView: View {
             }
             .pickerStyle(.segmented)
         }
-        ToolbarItem(placement: .status) {
-            StatusView(status: $status)
-//                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 6))
-        }
     }
 
     var selectedChanges: [Change] {
@@ -84,5 +71,4 @@ struct RepositoryView: View {
             .compactMap { log.changes[$0] } // Filter changes based on selection
 
     }
-
 }

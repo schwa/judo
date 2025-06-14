@@ -59,6 +59,13 @@ extension JujutsuID: Decodable {
     )
 }
 
+extension JujutsuID: Encodable {
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
+}
+
 extension JujutsuID: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         rawValue = value

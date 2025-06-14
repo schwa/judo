@@ -27,8 +27,8 @@ public extension Graph {
             }
             characters = Array(repeating: Character(" "), count: laneCount * 2 - 1)
             for exit in row.exits {
-                let source = exit.childLane * 2
-                let destination = exit.parentLane * 2
+                let source = exit.source * 2
+                let destination = exit.destination * 2
                 if source == destination {
                     characters[destination] = characters[destination].boxMerge(with: "│")
                 }

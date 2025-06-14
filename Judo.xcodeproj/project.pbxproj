@@ -26,6 +26,13 @@
 			);
 			target = 45FF28822DEA173E00947A9B /* Judo */;
 		};
+		45AFE2BA2DFDCF4C006A22EC /* Exceptions for "Judo" folder in "Judo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 45FF28822DEA173E00947A9B /* Judo */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -39,6 +46,9 @@
 		};
 		45FF28852DEA173E00947A9B /* Judo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				45AFE2BA2DFDCF4C006A22EC /* Exceptions for "Judo" folder in "Judo" target */,
+			);
 			path = Judo;
 			sourceTree = "<group>";
 		};
@@ -310,6 +320,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Judo/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -341,6 +352,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Judo/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (

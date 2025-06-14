@@ -31,7 +31,7 @@ public struct Jujutsu: Sendable {
         ])
 
         try TOMLEncoder().encode(temporaryConfig).write(toFile: tempConfigPath.path, atomically: true, encoding: .utf8)
-        print(">>>", tempConfigPath)
+        logger?.info(">>> \(tempConfigPath.string)")
     }
 
     public func run(subcommand: String, arguments: [String], repository: Repository) async throws -> Data {

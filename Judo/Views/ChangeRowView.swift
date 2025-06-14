@@ -1,12 +1,17 @@
 import SwiftUI
 import JudoSupport
+import UniformTypeIdentifiers
+import System
 
 struct ChangeRowView: View {
     @Environment(Repository.self)
     var repository
 
-    @Environment(\.actionHost)
-    var actionHost
+    @Environment(\.actionRunner)
+    var actionRunner
+
+    @State
+    var isTargeted: Bool = false
 
     var change: Change
 
@@ -19,6 +24,12 @@ struct ChangeRowView: View {
             }
             primaryDataView
         }
+        .border(isTargeted ? Color.blue : Color.clear)
+        .dropDestination(for: Bookmark.self, action: { items, location in
+            return performBookmarkMove(bookmarks: items, change: change)
+        }, isTargeted: { isTargeted in
+            self.isTargeted = isTargeted
+        })
         .contextMenu {
             contextMenu
         }
@@ -50,9 +61,9 @@ struct ChangeRowView: View {
                 .foregroundStyle(.white)
             //            .background(Color.red.mix(with: Color.green, by: 0.5), in: Capsule())
                 .background(Color.orange, in: Capsule())
+                .font(.caption)
         }
         else {
-
             HStack(spacing: 0) {
                 Text("+\(change.totalAdded, format: .number)")
                     .padding(.vertical, 2)
@@ -72,6 +83,7 @@ struct ChangeRowView: View {
             //        .font(.caption2)
             //        .background(.green)
             .clipShape(Capsule())
+            .font(.caption)
         }
     }
 
@@ -104,6 +116,7 @@ struct ChangeRowView: View {
     var authorView: some View {
         if !change.author.name.isEmpty && !(change.author.email ?? "").isEmpty {
             ContactView(name: change.author.name, email: change.author.email)
+                .font(.caption)
         }
     }
 
@@ -113,30 +126,34 @@ struct ChangeRowView: View {
             Text(change.author.timestamp, style: .relative)
                 .foregroundStyle(.judoTimestampColor)
                 .fixedSize()
+                .font(.caption)
         }
     }
 
     @ViewBuilder
     var gitHeadView: some View {
         if change.isGitHead {
-            TagView("git_head()")
+            TagView("git_head()", systemImage: "star.fill")
                 .backgroundStyle(.judoHeadColor)
+                .font(.caption)
         }
     }
 
     @ViewBuilder
     var rootView: some View {
         if change.isRoot {
-            TagView("root()")
+            TagView("root()", systemImage: "arrow.down.to.line")
                 .backgroundStyle(.judoHeadColor)
+                .font(.caption)
         }
     }
 
     @ViewBuilder
     var conflictView: some View {
         if change.isConflict {
-            TagView("conflict()")
+            TagView("conflict()", systemImage: "exclamationmark.triangle.fill")
                 .foregroundStyle(.judoConflictColor)
+                .font(.caption)
         }
     }
 
@@ -156,10 +173,12 @@ struct ChangeRowView: View {
         if change.bookmarks.isEmpty == false {
             HStack {
                 ForEach(change.bookmarks, id: \.self) { bookmark in
-                    TagView(bookmark)
+                    TagView(bookmark, systemImage: "bookmark.fill")
                         .backgroundStyle(.judoBookmarkColor)
+                        .draggable(Bookmark(repositoryPath: repository.path, source: change.changeID, bookmark: bookmark))
                 }
             }
+            .font(.caption)
         }
     }
 
@@ -179,59 +198,63 @@ struct ChangeRowView: View {
 
     @ViewBuilder
     var contextMenu: some View {
-
         CopyButton("Copy Change ID", value: change.changeID)
         CopyButton("Copy Description", value: change.description)
         Divider()
 
-        if let actionHost {
+        if let actionRunner {
             Button("Squash Change") {
-                actionHost.with(action: Action(name: "Squash Change") {
+                actionRunner.with(action: Action(name: "Squash Change") {
                     try await repository.squash(changes: [change.changeID])
                     try await repository.refresh()
                 })
             }
             Button("Abandon Change") {
-                actionHost.with(action: Action(name: "Abandon Change") {
+                actionRunner.with(action: Action(name: "Abandon Change") {
                     try await repository.abandon(changes: [change.changeID])
                     try await repository.refresh()
                 })
             }
             Button("New Change") {
-                actionHost.with(action: Action(name: "New Change") {
+                actionRunner.with(action: Action(name: "New Change") {
                     try await repository.new(changes: [change.changeID])
                     try await repository.refresh()
                 })
             }
         }
     }
-}
 
-struct TagView <Content: View>: View {
-    let content: Content
 
-    @Environment(\.backgroundStyle)
-    var backgroundStyle
+    func performBookmarkMove(bookmarks: [Bookmark], change: Change) -> Bool {
+        let action = PreviewableAction(name: "Hello") {
+            let arguments = ["move"] + bookmarks.map(\.bookmark) + ["--to", change.changeID.description]
+            _ = try await repository.jujutsu.run(subcommand: "bookmark", arguments: arguments, repository: repository)
+            try await repository.refresh()
+        }
+        content: {
+            // TODO: Add an allow backwards option
+            Text("Move bookmark(s) \(bookmarks.map(\.bookmark).joined(separator: ", ")) to change \(change.changeID)")
+                .padding()
+        }
 
-    init(@ViewBuilder _ content: () -> Content) {
-        self.content = content()
-    }
-
-    var body: some View {
-        content
-        .fixedSize()
-        .font(.caption)
-        .foregroundStyle(.white)
-        .backgroundStyle(.clear)
-        .padding(.horizontal, 6)
-        .padding(.vertical, 2)
-        .background(backgroundStyle ?? AnyShapeStyle(.white), in: Capsule())
+        actionRunner?.with(action: action)
+        return false
     }
 }
 
-extension TagView where Content == Text {
-    init(_ text: String) {
-        self.init { Text(text) }
-    }
+
+
+
+extension UTType {
+    static let jujutsuBookmark = UTType(exportedAs: "io.schwa.judo.jj-bookmark")
 }
 
+struct Bookmark: Transferable, Codable {
+    var repositoryPath: FilePath
+    var source: ChangeID
+    var bookmark: String
+
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: .jujutsuBookmark)
+    }
+}

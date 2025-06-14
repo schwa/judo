@@ -36,13 +36,9 @@ struct MixedModeChangeDetailView: View {
                             Task {
                                 do {
                                     let arguments = ["-r", change.changeID.description, "-m", description]
-                                    print("Describing commit with arguments: \(arguments)")
-
                                     _ = try await appModel.jujutsu.run(subcommand: "describe", arguments: arguments, repository: repository)
-
-                                    print("Change described successfully.")
                                 } catch {
-                                    print("Error describing change: \(error)")
+                                    logger?.error("Error describing change: \(error)")
                                 }
                             }
                         }

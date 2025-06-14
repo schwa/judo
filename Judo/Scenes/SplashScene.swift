@@ -22,6 +22,9 @@ struct SplashView: View {
     @Environment(\.openWindow)
     var openWindow
 
+    @Environment(\.openDocument)
+    var openDocument
+
     @Environment(\.dismissWindow)
     var dismissWindow
 
@@ -60,27 +63,42 @@ struct SplashView: View {
                 Link("Github", destination: URL(string: "https://github.com/schwa/judo")!)
             }
             .frame(width: 240)
-            List(appModel.recentRepositories.reversed(), id: \.self, selection: $selectedRepository) { path in
-                HStack {
-                    Image(nsImage: path.icon)
-                    VStack(alignment: .leading) {
-                        Text("\(path.displayName)")
-                        Text(verbatim: path.path).foregroundStyle(.secondary)
-                            .font(.caption)
-                    }
-                }
-                // TODO: This is kinda shit as it imposes a delay and uses semi invisible bg
-                .background(Color.white.opacity(0.01))
-                .onTapGesture(count: 2) {
-                    selectedRepository = path
-                    openRepository(path)
-                }
-                .onTapGesture(count: 1) {
-                    selectedRepository = path
+
+            let paths = (NSDocumentController.shared.recentDocumentURLs.map(\.filePath)
+                         + appModel.recentRepositories.reversed()).uniqued()
+
+            List(selection: $selectedRepository) {
+                ForEach(paths, id: \.self) { path in
+                    row(for: path)
                 }
             }
         }
         .frame(width: 480, height: 320)
+    }
+
+    @ViewBuilder
+    func row(for path: FilePath) -> some View {
+        HStack {
+            Image(nsImage: path.icon)
+            VStack(alignment: .leading) {
+                Text("\(path.displayName)")
+                Text(verbatim: path.path).foregroundStyle(.secondary)
+                    .font(.caption)
+            }
+        }
+        // TODO: This is kinda shit as it imposes a delay and uses semi invisible bg
+        .background(Color.white.opacity(0.01))
+        .onTapGesture(count: 2) {
+            selectedRepository = path
+//            openRepository(path)
+            Task {
+                try! await openDocument(at: path.url)
+            }
+        }
+        .onTapGesture(count: 1) {
+            selectedRepository = path
+        }
+
     }
 
     func openRepository(_ result: Result<[URL], Error>) {
@@ -95,5 +113,18 @@ struct SplashView: View {
     func openRepository(_ path: FilePath) {
         dismissWindow()
         openWindow(value: path)
+    }
+}
+
+extension URL {
+    var filePath: FilePath {
+        FilePath(path)
+    }
+}
+
+extension Array where Element: Hashable {
+    func uniqued() -> [Element] {
+        var seen = Set<Element>()
+        return self.filter { seen.insert($0).inserted }
     }
 }
