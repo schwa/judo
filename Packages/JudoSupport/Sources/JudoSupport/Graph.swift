@@ -31,12 +31,6 @@ public struct Graph <Node> where Node: Hashable {
         laneCount = rows.isEmpty ? 0 : (rows.map({ $0.lanes.last ?? 0 }).max() ?? 0) + 1
     }
 
-    public init() {
-        self.adjacency = []
-        self.rows = []
-        self.laneCount = 0
-    }
-
     static func rows(for adjacency: [(node: Node, parents: [Node])]) -> [Row] {
         var lanes = LanePool<Node>()
         var currentEdges = OrderedSet<Edge>()
