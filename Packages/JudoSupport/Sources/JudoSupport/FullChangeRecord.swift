@@ -100,7 +100,7 @@ public extension Repository {
             let changes: [FullChangeRecord] = try await fetch(subcommand: "log", arguments: arguments)
             return changes[0]
         } catch {
-            logger?.error(error)
+            logger?.error("\(error)")
             throw error
         }
     }
