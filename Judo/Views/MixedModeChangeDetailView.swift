@@ -86,7 +86,7 @@ struct MixedModeChangeDetailView: View {
     }
 }
 
-struct AsyncValueView<Value, Content>: View where Content: View {
+struct AsyncValueView<Value, Content>: View where Content: View, Value: Sendable {
     @ViewBuilder
     var content: (Value) -> Content
     var task: () async throws -> Value

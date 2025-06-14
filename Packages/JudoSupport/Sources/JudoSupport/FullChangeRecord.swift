@@ -1,6 +1,6 @@
 import Everything
 
-public struct FullChangeRecord: Decodable, JutsuTemplateProviding {
+public struct FullChangeRecord: Decodable, JutsuTemplateProviding, Sendable {
     enum CodingKeys: String, CodingKey {
         case changeID = "change_id"
         case diff
@@ -19,7 +19,7 @@ public struct FullChangeRecord: Decodable, JutsuTemplateProviding {
     )
 }
 
-public struct TreeDiff: Decodable, JutsuTemplateProviding {
+public struct TreeDiff: Decodable, JutsuTemplateProviding, Sendable {
     public var files: [TreeDiffEntry]
 
     //         ++ "\t'bookmarks': [" ++ bookmarks.map(|c| "'" ++ c ++ "'").join(",") ++ "],\\n"
@@ -33,8 +33,8 @@ public struct TreeDiff: Decodable, JutsuTemplateProviding {
     )
 }
 
-public struct TreeDiffEntry: Decodable, JutsuTemplateProviding {
-    public enum Status: String, Decodable {
+public struct TreeDiffEntry: Decodable, JutsuTemplateProviding, Sendable {
+    public enum Status: String, Decodable, Sendable {
         case modified
         case added
         case removed
@@ -59,8 +59,8 @@ public struct TreeDiffEntry: Decodable, JutsuTemplateProviding {
     )
 }
 
-public struct TreeEntry: Decodable, JutsuTemplateProviding {
-    public enum FileType: String, Decodable {
+public struct TreeEntry: Decodable, JutsuTemplateProviding, Sendable {
+    public enum FileType: String, Decodable, Sendable {
         case file
         case symlink
         case tree

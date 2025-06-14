@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "45FF28822DEA173E00947A9B"
-               BuildableName = "Judo.app"
+               BuildableName = "Judo VCS.app"
                BlueprintName = "Judo"
                ReferencedContainer = "container:Judo.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "45FF28822DEA173E00947A9B"
-            BuildableName = "Judo.app"
+            BuildableName = "Judo VCS.app"
             BlueprintName = "Judo"
             ReferencedContainer = "container:Judo.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "45FF28822DEA173E00947A9B"
-            BuildableName = "Judo.app"
+            BuildableName = "Judo VCS.app"
             BlueprintName = "Judo"
             ReferencedContainer = "container:Judo.xcodeproj">
          </BuildableReference>
