@@ -109,7 +109,10 @@ internal extension Array {
     }
 }
 
-func printTable(_ rows: [[String]]) {
+func formatTable(_ rows: [[String]]) -> String {
+
+    var result = ""
+
     // Determine the number of columns (max number of elements in any row)
     let columnCount = rows.map { $0.count }.max() ?? 0
 
@@ -136,32 +139,93 @@ func printTable(_ rows: [[String]]) {
             }
         }
         line += "|"
-        print(line)
+        result.append(line + "\n")
     }
+
+    return result
 }
 
 extension Character {
     func boxMerge(with other: Character) -> Character {
-        guard self != other else {
-            return self
+        // Try to get BoxSegments for each character
+        let segmentsA = BoxSegments(self) ?? []
+        let segmentsB = BoxSegments(other) ?? []
+
+        // Merge the segment sets
+        let combined = segmentsA.union(segmentsB)
+
+        return combined.character
+    }
+}
+
+struct BoxSegments: OptionSet {
+    let rawValue: Int
+
+    static let top = BoxSegments(rawValue: 1 << 0)
+    static let bottom = BoxSegments(rawValue: 1 << 1)
+    static let left = BoxSegments(rawValue: 1 << 2)
+    static let right = BoxSegments(rawValue: 1 << 3)
+
+    init(rawValue: Int) {
+        self.rawValue = rawValue
+    }
+
+    init?(_ character: Character) {
+        switch character {
+        case "┼": self = [.top, .bottom, .left, .right]
+        case "┤": self = [.top, .bottom, .left]
+        case "├": self = [.top, .bottom, .right]
+        case "┴": self = [.top, .left, .right]
+        case "┬": self = [.bottom, .left, .right]
+        case "│": self = [.top, .bottom]
+        case "─": self = [.left, .right]
+        case "╯": self = [.top, .left]
+        case "╰": self = [.top, .right]
+        case "╮": self = [.bottom, .left]
+        case "╭": self = [.bottom, .right]
+        case "╵": self = [.top]
+        case "╷": self = [.bottom]
+        case "╴": self = [.left]
+        case "╶": self = [.right]
+        case " ": self = []
+        default: return nil
         }
-        switch (self, other) {
-        case (" ", _):
-            return other
-        case ("─", "│"), ("|", "─"):
+    }
+
+    var character: Character {
+        switch self {
+        case [.top, .bottom, .left, .right]:
             return "┼"
-        case ("─", "╰"), ("─", "╯"):
-            return "┴"
-        case ("─", "╭"), ("─", "╮"):
-            return "┬"
-        case ("│", "╰"), ("│", "╭"):
-            return "├"
-        case ("│", "╯"), ("│", "╮"):
+        case [.top, .bottom, .left]:
             return "┤"
-        case ("╰", "│"), ("│", "╰"):
+        case [.top, .bottom, .right]:
             return "├"
+        case [.top, .left, .right]:
+            return "┴"
+        case [.bottom, .left, .right]:
+            return "┬"
+        case [.top, .bottom]:
+            return "│"
+        case [.left, .right]:
+            return "─"
+        case [.top, .left]:
+            return "╯"
+        case [.top, .right]:
+            return "╰"
+        case [.bottom, .left]:
+            return "╮"
+        case [.bottom, .right]:
+            return "╭"
+        case [.top]:
+            return "╵"
+        case [.bottom]:
+            return "╷"
+        case [.left]:
+            return "╴"
+        case [.right]:
+            return "╶"
         default:
-            return other
+            return " "
         }
     }
 }

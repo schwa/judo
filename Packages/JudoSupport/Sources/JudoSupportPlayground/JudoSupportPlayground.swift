@@ -75,7 +75,7 @@ struct JudoSupportPlayground {
             ("N5", []),            // End
         ]
         let graph = Graph(adjacency: changes)
-        graph.prettyPrint(debug: true)
+        graph.prettyPrint()
     }
 
 
