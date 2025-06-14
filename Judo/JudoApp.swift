@@ -1,10 +1,10 @@
-import SwiftUI
 import JudoSupport
+import SwiftUI
 
 @main
 struct JudoApp: App {
     @State
-    var appModel: AppModel = AppModel()
+    private var appModel = AppModel()
 
     @Environment(\.openWindow)
     var openWindow
@@ -20,4 +20,3 @@ struct JudoApp: App {
         .environment(appModel)
     }
 }
-

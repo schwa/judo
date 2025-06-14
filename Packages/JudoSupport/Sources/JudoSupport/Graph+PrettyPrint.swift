@@ -1,11 +1,10 @@
 public extension Graph {
-
     func prettyPrint(labels: Bool = true, debug: Bool = false) {
         print(prettyFormat(labels: labels, debug: debug))
     }
 
     func prettyFormat(labels: Bool = true, debug: Bool = false) -> String {
-        let laneCount = (rows.map({ $0.lanes.last ?? 0 }).max() ?? 0) + 1
+        let laneCount = (rows.map { $0.lanes.last ?? 0 }.max() ?? 0) + 1
         let rows = rows.flatMap { row -> [[String]] in
             var row0: [String] = []
             var characters = Array(repeating: Character(" "), count: laneCount * 2 - 1)
@@ -16,8 +15,7 @@ public extension Graph {
 
             if labels {
                 row0 = [String(characters), String(describing: row.node)]
-            }
-            else {
+            } else {
                 row0 = [String(characters)]
             }
             if debug {
@@ -31,15 +29,13 @@ public extension Graph {
                 let destination = exit.destination * 2
                 if source == destination {
                     characters[destination] = characters[destination].boxMerge(with: "│")
-                }
-                else if destination > source {
+                } else if destination > source {
                     characters[source] = characters[source].boxMerge(with: "╰")
                     for n in stride(from: source + 1, through: destination - 1, by: 1) {
                         characters[n] = "─"
                     }
                     characters[destination] = characters[destination].boxMerge(with: "╮")
-                }
-                else {
+                } else {
                     characters[source] = characters[source].boxMerge(with: "╯")
                     for n in stride(from: source - 1, through: destination + 1, by: -1) {
                         characters[n] = "─"
@@ -54,8 +50,6 @@ public extension Graph {
         if debug {
             return formatTable([["Graph", "Node", "Lane", "Lanes", "Exits", "Debug Label"]] + rows)
         }
-        else {
-            return rows.map { $0.joined(separator: " ") }.joined(separator: "\n")
-        }
+        return rows.map { $0.joined(separator: " ") }.joined(separator: "\n")
     }
 }

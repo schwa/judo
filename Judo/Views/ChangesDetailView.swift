@@ -1,18 +1,16 @@
-import SwiftUI
 import JudoSupport
+import SwiftUI
 
 struct ChangesDetailView: View {
-
     @State
-    var currentIndex: Int = 0
+    private var currentIndex: Int = 0
 
     var changes: [Change]
 
     var body: some View {
         if changes.isEmpty {
             ContentUnavailableView("", systemImage: "gear", description: Text(""))
-        }
-        else {
+        } else {
             ChangeDetailView(change: changes[currentIndex])
                 .id(changes[currentIndex].id)
                 .toolbar {
@@ -30,4 +28,3 @@ struct ChangesDetailView: View {
         }
     }
 }
-

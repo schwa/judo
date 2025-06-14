@@ -14,9 +14,7 @@ public struct RepositoryLog: Sendable {
 
 public extension RepositoryLog {
     func makeGraph() -> Graph<ChangeID> {
-
         Graph(adjacency: changes.values.map { ($0.changeID, $0.parents) })
-
     }
 }
 
@@ -31,6 +29,5 @@ extension RepositoryLog {
         return log
     }
 }
-
 
 #endif

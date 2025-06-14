@@ -21,22 +21,19 @@ struct ActionRunner {
                     do {
                         try await action.closure()
                         status = .success(action)
-                    }
-                    catch {
+                    } catch {
                         logger?.error("Action failed: \(action.name), error: \(error)")
                         status = .failure(action, error)
                     }
                 }
             }
             self.preview = preview
-        }
-        else {
+        } else {
             Task {
                 do {
                     try await action.closure()
                     status = .success(action)
-                }
-                catch {
+                } catch {
                     logger?.error("Action failed: \(action.name), error: \(error)")
                     status = .failure(action, error)
                 }
@@ -65,32 +62,32 @@ struct ActionHostViewModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-        .toolbar {
-            ToolbarItem(placement: .status) {
-                StatusView(status: $actionStatus)
-                //                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 6))
-            }
-        }
-        .onAppear {
-            actionRunner = ActionRunner(status: $actionStatus, preview: $preview)
-        }
-        .sheet(item: $preview) { preview in
-            preview.body
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        self.preview = nil
-                    }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("OK") {
-                        self.preview = nil
-                        preview.confirm()
-                    }
+                ToolbarItem(placement: .status) {
+                    StatusView(status: $actionStatus)
+                    //                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 6))
                 }
             }
-        }
-        .environment(\.actionRunner, actionRunner)
+            .onAppear {
+                actionRunner = ActionRunner(status: $actionStatus, preview: $preview)
+            }
+            .sheet(item: $preview) { preview in
+                preview.body
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                self.preview = nil
+                            }
+                        }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("OK") {
+                                self.preview = nil
+                                preview.confirm()
+                            }
+                        }
+                    }
+            }
+            .environment(\.actionRunner, actionRunner)
     }
 }
 

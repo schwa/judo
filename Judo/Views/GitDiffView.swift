@@ -4,17 +4,16 @@ struct GitDiffingView: View {
     let data: Data
 
     @State
-    var raw: Bool = false
+    private var raw: Bool = false
 
     @State
-    var diff: Diff?
+    private var diff: Diff?
 
     var body: some View {
         Group {
-            if raw == false, let diff = diff {
+            if raw == false, let diff {
                 GitDiffView(parsedDiff: diff)
-            }
-            else {
+            } else {
                 let s = String(data: data, encoding: .utf8)!
                 ScrollView {
                     Text(verbatim: s)
@@ -61,9 +60,9 @@ struct GitDiffView: View {
                         .background(Color.blue)
                         .foregroundColor(.white)
                 }
-//                footer: {
-//                    EmptyView()
-//                }
+                //                footer: {
+                //                    EmptyView()
+                //                }
             }
         }
     }

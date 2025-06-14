@@ -1,5 +1,5 @@
-import SwiftUI
 import JudoSupport
+import SwiftUI
 
 struct IDView: View {
     let id: JujutsuID
@@ -15,7 +15,5 @@ struct IDView: View {
 
     var body: some View {
         Text(id.shortAttributedString(variant: variant, style: isRowSelected ? .plain : .shortestHighlighted)).monospaced().textSelection(.enabled).fixedSize()
-
     }
 }
-

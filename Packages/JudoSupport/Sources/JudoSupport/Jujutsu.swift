@@ -1,8 +1,8 @@
 import Everything
 import Foundation
-import TOMLKit
 import Subprocess
 import System
+import TOMLKit
 
 public struct Jujutsu: Sendable {
     public var binaryPath: FilePath
@@ -27,7 +27,7 @@ public struct Jujutsu: Sendable {
             FullChangeRecord.template.key: FullChangeRecord.template.content,
             TreeDiff.template.key: TreeDiff.template.content,
             TreeDiffEntry.template.key: TreeDiffEntry.template.content,
-            TreeEntry.template.key: TreeEntry.template.content,
+            TreeEntry.template.key: TreeEntry.template.content
         ])
 
         try TOMLEncoder().encode(temporaryConfig).write(toFile: tempConfigPath.path, atomically: true, encoding: .utf8)
@@ -43,12 +43,10 @@ public struct Jujutsu: Sendable {
                 throw JudoError.generic("TODO")
             }
             return result.standardOutput
-        }
-        catch {
+        } catch {
             print(binaryPath, subcommand, arguments.joined(separator: " "))
             ////            logger?.log("Error running jujutsu: \(error)")
             throw error
         }
     }
 }
-

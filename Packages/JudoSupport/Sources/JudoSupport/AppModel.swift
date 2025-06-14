@@ -1,7 +1,7 @@
-import Observation
+import Collections
 import Everything
 import Foundation
-import Collections
+import Observation
 import System
 
 @Observable
@@ -17,7 +17,7 @@ public class AppModel {
     // TODO: standardize paths.
     public var recentRepositories: Collections.OrderedSet<FilePath> {
         didSet {
-            UserDefaults.standard.set(recentRepositories.map { $0.path }, forKey: "judo.recentRepositories")
+            UserDefaults.standard.set(recentRepositories.map(\.path), forKey: "judo.recentRepositories")
         }
     }
 
@@ -26,12 +26,12 @@ public class AppModel {
     public init() {
         UserDefaults.standard.register(defaults: [
             "judo.binaryPath": "/opt/homebrew/bin/jj",
-            "judo.recentRepositories": [],
+            "judo.recentRepositories": []
         ])
         let binaryPath = FilePath(UserDefaults.standard.string(forKey: "judo.binaryPath")!)
         self.binaryPath = binaryPath
         recentRepositories = OrderedSet(UserDefaults.standard.array(forKey: "judo.recentRepositories")!.map { path in
-            return FilePath(path as! String)
+            FilePath(path as! String)
         })
         jujutsu = Jujutsu(binaryPath: binaryPath)
     }

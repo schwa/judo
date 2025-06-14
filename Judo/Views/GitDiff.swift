@@ -1,6 +1,6 @@
 import Foundation
-import SwiftUI
 import RegexBuilder
+import SwiftUI
 
 enum LineChangeType {
     case addition
@@ -33,9 +33,7 @@ struct Diff {
 }
 
 struct GitDiffParser {
-
     static func parse(diffText: String) -> Diff {
-
         let hunkHeaderRegex = Regex {
             "@@ -"
             Capture {
@@ -60,7 +58,6 @@ struct GitDiffParser {
             " @@"
         }
 
-        
         var files: [FileDiff] = []
         var lines = diffText.components(separatedBy: .newlines)
 
@@ -76,14 +73,11 @@ struct GitDiffParser {
                 }
                 currentFile = FileDiff(oldPath: "", newPath: "", hunks: [])
                 currentHunk = nil
-            }
-            else if line.starts(with: "--- ") {
+            } else if line.starts(with: "--- ") {
                 currentFile?.oldPath = String(line.dropFirst(4)).trimmingCharacters(in: .whitespaces)
-            }
-            else if line.starts(with: "+++ ") {
+            } else if line.starts(with: "+++ ") {
                 currentFile?.newPath = String(line.dropFirst(4)).trimmingCharacters(in: .whitespaces)
-            }
-            else if line.starts(with: "@@") {
+            } else if line.starts(with: "@@") {
                 // Finish prior hunk
                 if let hunk = currentHunk {
                     currentFile?.hunks.append(hunk)
@@ -107,8 +101,7 @@ struct GitDiffParser {
                     newCount: newCount,
                     changes: []
                 )
-            }
-            else if line.starts(with: "+") || line.starts(with: "-") || line.starts(with: " ") {
+            } else if line.starts(with: "+") || line.starts(with: "-") || line.starts(with: " ") {
                 guard var hunk = currentHunk else { continue }
 
                 let type: LineChangeType
@@ -124,8 +117,7 @@ struct GitDiffParser {
 
                 hunk.changes.append(LineChange(type: type, content: content))
                 currentHunk = hunk
-            }
-            else {
+            } else {
                 logger?.debug("Unrecognized line in diff: \(line)")
                 // Skip unrelated lines
             }
@@ -143,8 +135,8 @@ struct GitDiffParser {
     }
 }
 
-//import Playgrounds
-//#Playground {
+// import Playgrounds
+// #Playground {
 //    let sampleDiffText = """
 //    diff --git a/foo.txt b/foo.txt
 //    --- a/foo.txt
@@ -161,7 +153,7 @@ struct GitDiffParser {
 //    --- /dev/null
 //    +++ b/file_1.txt
 //    @@ -0,0 +1,1 @@
-//    +File 1 Content        
+//    +File 1 Content
 //    """
 //    _ = GitDiffParser.parse(diffText: sample2)
 //
@@ -174,7 +166,7 @@ struct GitDiffParser {
 //        +import os
 //         import Collections
 //         import SwiftUI
-//         
+//
 //        +let logger: Logger? = Logger()
 //        +
 //         extension Dictionary {
@@ -184,4 +176,4 @@ struct GitDiffParser {
 //    _ = GitDiffParser.parse(diffText: sample3)
 //
 //
-//}
+// }

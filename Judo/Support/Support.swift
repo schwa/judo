@@ -1,5 +1,5 @@
-import os
 import Collections
+import os
 import SwiftUI
 
 let logger: Logger? = Logger()
@@ -50,9 +50,7 @@ extension AttributedString {
     }
 }
 
-
 extension EnvironmentValues {
     @Entry
     var isRowSelected: Bool = false
 }
-

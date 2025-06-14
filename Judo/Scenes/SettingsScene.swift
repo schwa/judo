@@ -1,8 +1,8 @@
-import SwiftUI
 import Everything
 import JudoSupport
-import System
 import Subprocess
+import SwiftUI
+import System
 
 struct SettingsScene: Scene {
     var body: some Scene {
@@ -23,7 +23,7 @@ struct SettingsView: View {
     var debugUI: Bool = false
 
     @State
-    var binaryPath: String = ""
+    private var binaryPath: String = ""
 
     var body: some View {
         @Bindable
@@ -41,7 +41,6 @@ struct SettingsView: View {
             Spacer()
 
             Section(header: Text("Debug")) {
-
                 Toggle("Debug UI", isOn: $debugUI)
 
                 Button("Generate Demo Repo") {
@@ -57,4 +56,3 @@ struct SettingsView: View {
         .padding()
     }
 }
-

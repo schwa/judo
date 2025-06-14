@@ -1,10 +1,9 @@
-import SwiftUI
 import Everything
 import JudoSupport
+import SwiftUI
 import System
 
 struct RepositoryScene: Scene {
-
     @Environment(AppModel.self)
     var appModel: AppModel
 

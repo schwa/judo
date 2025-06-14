@@ -34,11 +34,9 @@ public struct Change {
         ++ "\t'bookmarks': [" ++ bookmarks.map(|c| "'" ++ c ++ "'").join(",") ++ "],\\n"
         ++ "},\\n"
         """
-        .replacingOccurrences(of: "'", with: "\\\"")
+                                            .replacingOccurrences(of: "'", with: "\\\"")
     )
 }
-
-
 
 extension Change: Sendable {
 }

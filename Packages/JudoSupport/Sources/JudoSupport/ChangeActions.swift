@@ -1,14 +1,13 @@
-import Foundation
 import Collections
 import Everything
+import Foundation
 
 public extension Repository {
-
     var jujutsu: Jujutsu {
         appModel.jujutsu
     }
 
-    func new(changes: [ChangeID] = []) async throws {
+    func new(changes _: [ChangeID] = []) async throws {
         let data = try await jujutsu.run(subcommand: "new", arguments: [], repository: self)
         // TODO; Not basing it on changes
         logger?.info(String(data: data, encoding: .utf8) ?? "No output")
@@ -48,7 +47,7 @@ public extension Repository {
 
     func rebase(from: [ChangeID], to: ChangeID) async throws {
         let arguments = ["--revisions"] + from.map(\.description)
-         + ["--insert-after", to.description]
+            + ["--insert-after", to.description]
         logger?.info(arguments)
         let data = try await jujutsu.run(subcommand: "rebase", arguments: arguments, repository: self)
         logger?.info(">", String(data: data, encoding: .utf8) ?? "No output")

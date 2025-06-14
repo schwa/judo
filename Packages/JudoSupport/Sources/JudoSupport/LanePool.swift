@@ -8,13 +8,11 @@ internal struct LanePool<Key: Hashable> {
 
     internal private(set) var allLanesByKey: [Key: Int] = [:]
 
-
     internal init() {
-
     }
 
     internal var isEmpty: Bool {
-        return lanesByKey.isEmpty
+        lanesByKey.isEmpty
     }
 
     internal func isValid() -> Bool {
@@ -49,15 +47,15 @@ internal struct LanePool<Key: Hashable> {
     }
 
     internal func lane(for key: Key) -> Int? {
-        return lanesByKey[key]
+        lanesByKey[key]
     }
 
     internal func count(for lane: Int) -> Int {
-        return keysByLane[lane]?.count ?? 0
+        keysByLane[lane]?.count ?? 0
     }
 
     internal var lanes: [Int] {
-        return keysByLane.keys.sorted()
+        keysByLane.keys.sorted()
     }
 
     @discardableResult
@@ -66,23 +64,19 @@ internal struct LanePool<Key: Hashable> {
         if let existingLane = lanesByKey[key] {
             return existingLane
         }
-        // If there are free lanes, use one of them
-        else if freeLanes.isEmpty == false {
+        if freeLanes.isEmpty == false {
             let lane = freeLanes.removeLast()
             lanesByKey[key] = lane
             allLanesByKey[key] = lane
             keysByLane[lane, default: []].insert(key)
             return lane
         }
-        // Otherwise, create a new lane
-        else {
-            let lane = nextLane
-            nextLane += 1
-            lanesByKey[key] = lane
-            allLanesByKey[key] = lane
-            keysByLane[lane, default: []].insert(key)
-            return lane
-        }
+        let lane = nextLane
+        nextLane += 1
+        lanesByKey[key] = lane
+        allLanesByKey[key] = lane
+        keysByLane[lane, default: []].insert(key)
+        return lane
     }
 
     internal mutating func add(_ key: Key, to lane: Int) {
@@ -99,14 +93,11 @@ internal struct LanePool<Key: Hashable> {
             return
         }
 
-
-
         // Associate the key with the lane
         lanesByKey[key] = lane
         allLanesByKey[key] = lane
         keysByLane[lane, default: []].insert(key)
     }
-
 
     internal mutating func freeLane(for key: Key) {
         guard let lane = lanesByKey.removeValue(forKey: key) else {
@@ -122,14 +113,9 @@ internal struct LanePool<Key: Hashable> {
 }
 
 extension LanePool: CustomDebugStringConvertible {
-
     var debugDescription: String {
-
         let keysByLane = keysByLane.map { "\($0.key): \($0.value)" }.joined(separator: ", ")
 
         return "LanePool(\(keysByLane))"
-
     }
 }
-
-

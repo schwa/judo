@@ -15,4 +15,3 @@ public struct Template: Sendable {
         name + (parameters.isEmpty ? "" : "(\(parameters.joined(separator: ",")))")
     }
 }
-

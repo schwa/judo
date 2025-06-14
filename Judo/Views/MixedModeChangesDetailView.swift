@@ -1,6 +1,6 @@
 import Collections
-import SwiftUI
 import JudoSupport
+import SwiftUI
 
 struct MixedModeChangesDetailView: View {
     @Environment(Repository.self)

@@ -1,8 +1,8 @@
 import Collections
 import Everything
+import JudoSupport
 import SwiftTerm
 import SwiftUI
-import JudoSupport
 
 struct RepositoryView: View {
     init() {
@@ -15,7 +15,7 @@ struct RepositoryView: View {
     }
 
     @State
-    var mode: Mode = .mixed
+    private var mode: Mode = .mixed
 
     @Environment(Repository.self)
     var repository
@@ -28,8 +28,10 @@ struct RepositoryView: View {
             switch mode {
             case .timeline:
                 ChangesGraphView(selection: $selection)
+
             case .mixed:
                 MixedModeRepositoryView(selection: $selection)
+
             case .change:
                 ChangesDetailView(changes: selectedChanges)
             }

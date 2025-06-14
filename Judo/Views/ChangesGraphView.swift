@@ -1,8 +1,7 @@
-import SwiftUI
 import JudoSupport
+import SwiftUI
 
 struct ChangesGraphView: View {
-
     @Binding
     var selection: Set<ChangeID>
 
@@ -15,4 +14,3 @@ struct ChangesGraphView: View {
         }
     }
 }
-

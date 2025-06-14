@@ -1,7 +1,7 @@
-import SwiftUI
-import UniformTypeIdentifiers
-import System
 import JudoSupport
+import SwiftUI
+import System
+import UniformTypeIdentifiers
 
 struct JudoDocumentScene: Scene {
     var body: some Scene {
@@ -17,20 +17,19 @@ final class JudoDocument: ReferenceFileDocument {
 
     static let readableContentTypes: [UTType] = [.directory]
 
-    init(configuration: ReadConfiguration) throws {
+    init(configuration _: ReadConfiguration) throws {
     }
-    
-    func snapshot(contentType: UTType) throws -> () {
+
+    func snapshot(contentType _: UTType) throws {
         throw JudoError.generic("Cannot save scene.")
     }
-    
-    func fileWrapper(snapshot: (), configuration: WriteConfiguration) throws -> FileWrapper {
+
+    func fileWrapper(snapshot _: (), configuration _: WriteConfiguration) throws -> FileWrapper {
         throw JudoError.generic("Cannot save scene.")
     }
 }
 
 struct JudoDocumentView: View {
-
     @Environment(AppModel.self)
     private var appModel
 
@@ -45,4 +44,3 @@ struct JudoDocumentView: View {
             }
     }
 }
-

@@ -1,7 +1,6 @@
 import Collections
 
 public struct Graph <Node> where Node: Hashable {
-
     public struct Row {
         public var node: Node
         public var currentLane: Int
@@ -28,7 +27,7 @@ public struct Graph <Node> where Node: Hashable {
     public init(adjacency: [(node: Node, parents: [Node])]) {
         self.adjacency = adjacency
         self.rows = Self.rows(for: adjacency)
-        laneCount = rows.isEmpty ? 0 : (rows.map({ $0.lanes.last ?? 0 }).max() ?? 0) + 1
+        laneCount = rows.isEmpty ? 0 : (rows.map { $0.lanes.last ?? 0 }.max() ?? 0) + 1
     }
 
     static func rows(for adjacency: [(node: Node, parents: [Node])]) -> [Row] {
@@ -37,7 +36,7 @@ public struct Graph <Node> where Node: Hashable {
 
         var lastExits: [Intersection] = []
 
-        let rows = adjacency.map { (node, parents) -> Row in
+        return adjacency.map { node, parents -> Row in
             for edge in currentEdges where edge.destination == node {
                 if lanes.lane(for: edge.source) != nil {
                     lanes.freeLane(for: edge.source)
@@ -49,8 +48,7 @@ public struct Graph <Node> where Node: Hashable {
             if let (firstParent, remainingParents) = parents.uncons() {
                 if lanes.lane(for: firstParent) == nil {
                     lanes.add(firstParent, to: lane)
-                }
-                else {
+                } else {
                     lanes.allocateLane(for: firstParent)
                 }
                 remainingParents.forEach { parent in
@@ -63,7 +61,7 @@ public struct Graph <Node> where Node: Hashable {
                 Edge(source: node, destination: $0)
             }
             currentEdges.formUnion(edges)
-            currentEdges.removeAll(where: { $0.destination == node })
+            currentEdges.removeAll { $0.destination == node }
 
             // Form exits...
             let exits = currentEdges.map { edge in
@@ -79,11 +77,9 @@ public struct Graph <Node> where Node: Hashable {
                 // Find an entrance that matches the exit's parent lane
                 if let entrance = exits.first(where: { $0.source == exit }) {
                     entrances.append(.init(source: exit, destination: entrance.source))
-                }
-                else if exit == lane {
+                } else if exit == lane {
                     entrances.append(.init(source: exit, destination: lane))
-                }
-                else {
+                } else {
                     // Unreachable.
                     fatalError()
                 }
@@ -94,7 +90,6 @@ public struct Graph <Node> where Node: Hashable {
 
             return Row(node: node, currentLane: lane, lanes: lanes_, entrances: entrances.sorted(), exits: exits.sorted(), debugLabel: "[\(lane)]: \(currentEdges)")
         }
-        return rows
     }
 }
 

@@ -26,7 +26,7 @@ struct StatusView: View {
                     .foregroundColor(.green)
                     .padding(6)
                     .help("Success: \(action.name)")
-            
+
             case .failure(let action, _):
                 Button {
                     isPopoverPresented.toggle()
@@ -57,13 +57,13 @@ struct StatusView: View {
         if case let .failure(_, error) = status {
             Form {
                 switch error {
-//                case let error as SimpleAsyncProcess.Error:
-//                    LabeledContent("ExitCode", value: error.exitCode, format: .number)
-//                    LabeledContent("stderr") {
-//                        Text(error.stderr)
-//                            .monospaced()
-//                    }
-//
+                //                case let error as SimpleAsyncProcess.Error:
+                //                    LabeledContent("ExitCode", value: error.exitCode, format: .number)
+                //                    LabeledContent("stderr") {
+                //                        Text(error.stderr)
+                //                            .monospaced()
+                //                    }
+                //
                 default:
                     Text("\(error.localizedDescription)")
                 }
@@ -83,11 +83,11 @@ struct DummyError: LocalizedError {
 }
 
 #Preview("StatusView – Success") {
-    StatusView(status: .constant(.success(Action(name: "Build", closure: {}))))
+    StatusView(status: .constant(.success(Action(name: "Build") {})))
         .padding()
 }
 
 #Preview("StatusView – Failure") {
-    StatusView(status: .constant(.failure(Action(name: "Run", closure: {}), DummyError())))
+    StatusView(status: .constant(.failure(Action(name: "Run") {}, DummyError())))
         .padding()
 }

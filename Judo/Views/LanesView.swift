@@ -1,26 +1,24 @@
-import SwiftUI
 import JudoSupport
+import SwiftUI
 
 struct LanesView: View {
     var laneCount: Int
     var horizontalPadding: CGFloat = 4
     var laneWidth: CGFloat = 12
-//    var intersections: Intersections
+    //    var intersections: Intersections
     var row: Graph<ChangeID>.Row
 
     var body: some View {
         Canvas { context, size in
-
             let shhhColor = Color.secondary.opacity(0.15)
 
             func laneToX(_ lane: Int) -> CGFloat {
-                return (CGFloat(lane) + 0.5) * laneWidth + horizontalPadding
+                (CGFloat(lane) + 0.5) * laneWidth + horizontalPadding
             }
 
             let minY = 0.0
             let midY = size.height / 2
             let maxY = size.height
-
 
             for lane in 0..<laneCount {
                 let x = laneToX(lane)
@@ -40,8 +38,6 @@ struct LanesView: View {
             }
 
             context.fill(Path(ellipseIn: CGRect(x: laneToX(row.currentLane) - 5, y: midY - 5, width: 10, height: 10)), with: .color(.judoTimelineNodeColor))
-
-
         }
         .background(Color.secondary.opacity(0.1))
         .frame(width: CGFloat(laneCount) * laneWidth + horizontalPadding * 2)

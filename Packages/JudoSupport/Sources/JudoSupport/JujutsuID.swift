@@ -1,5 +1,5 @@
-import SwiftUI
 import CoreTransferable
+import SwiftUI
 
 public typealias ChangeID = JujutsuID
 public typealias CommitID = JujutsuID
@@ -18,7 +18,7 @@ public struct JujutsuID {
     public init(rawValue: String, shortest: String?) {
         self.rawValue = rawValue
         // Assert shortest is part of rawValue if it exists
-        if let shortest = shortest {
+        if let shortest {
             precondition(rawValue.hasPrefix(shortest), "Shortest prefix must be a prefix of the raw value")
         }
         self.shortestPrefixCount = shortest?.count
@@ -85,43 +85,43 @@ public extension JujutsuID {
     }
 
     func shortAttributedString(variant: Variant, style: Style = .shortestHighlighted) -> AttributedString {
-
         switch (variant, style, shortestPrefixCount) {
         case (.changeID, .shortestHighlighted, .some):
             return AttributedString(shortest()).modifying {
                 $0.foregroundColor = Color.judoShortChangeIDColor
             }
             + AttributedString(rawValue.trimmingPrefix(shortest()).prefix(8 - shortest().count))
+
         case (.commitID, .shortestHighlighted, .some):
             return AttributedString(shortest()).modifying {
                 $0.foregroundColor = Color.judoShortCommitIDColor
             }
             + AttributedString(rawValue.trimmingPrefix(shortest()).prefix(8 - shortest().count))
+
         default:
             return AttributedString(short())
-
         }
     }
 }
 
 extension JujutsuID: CustomStringConvertible {
     public var description: String {
-        return short(4)
+        short(4)
     }
 }
 
 extension JujutsuID: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return rawValue
+        rawValue
     }
 }
 
 public extension JujutsuID {
     func short(_ count: Int = 8) -> String {
-        return String(rawValue.prefix(count))
+        String(rawValue.prefix(count))
     }
 
-    func shortest() -> String{
+    func shortest() -> String {
         if let shortestPrefixCount {
             return String(rawValue.prefix(shortestPrefixCount))
         }
@@ -142,6 +142,5 @@ private extension AttributedString {
 extension JujutsuID: Transferable {
     public static var transferRepresentation: some TransferRepresentation {
         ProxyRepresentation(exporting: \.rawValue)
-
     }
 }

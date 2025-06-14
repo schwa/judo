@@ -1,6 +1,6 @@
+import JudoSupport
 import SwiftUI
 import System
-import JudoSupport
 
 struct TemplateDemoScene: Scene {
     @Environment(\.openWindow)
@@ -20,9 +20,7 @@ struct TemplateDemoScene: Scene {
     }
 }
 
-
 struct TemplateDemoView: View {
-
     @Environment(AppModel.self)
     private var appModel
 
@@ -66,8 +64,7 @@ struct TemplateDemoView: View {
                 arguments.append(contentsOf: ["--template", template])
             }
 
-
-//            let process = SimpleAsyncProcess(executableURL: appModel.binaryPath.url, arguments: arguments, currentDirectoryURL: URL(fileURLWithPath: path))
+            //            let process = SimpleAsyncProcess(executableURL: appModel.binaryPath.url, arguments: arguments, currentDirectoryURL: URL(fileURLWithPath: path))
             do {
                 let result = try await JudoSupport.run(.path(appModel.binaryPath), useShell: true, arguments: arguments, workingDirectory: FilePath(path))
                 output = result.standardOutput!

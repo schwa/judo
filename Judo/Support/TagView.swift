@@ -12,12 +12,12 @@ struct TagView <Content: View>: View {
 
     var body: some View {
         content
-        .fixedSize()
-        .foregroundStyle(.white)
-        .backgroundStyle(.clear)
-        .padding(.horizontal, 6)
-        .padding(.vertical, 2)
-        .background(backgroundStyle ?? AnyShapeStyle(.white), in: Capsule())
+            .fixedSize()
+            .foregroundStyle(.white)
+            .backgroundStyle(.clear)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(backgroundStyle ?? AnyShapeStyle(.white), in: Capsule())
     }
 }
 

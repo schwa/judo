@@ -1,7 +1,7 @@
-import SwiftUI
 import JudoSupport
-import UniformTypeIdentifiers
+import SwiftUI
 import System
+import UniformTypeIdentifiers
 
 struct ChangeRowView: View {
     @Environment(Repository.self)
@@ -11,7 +11,7 @@ struct ChangeRowView: View {
     var actionRunner
 
     @State
-    var isTargeted: Bool = false
+    private var isTargeted: Bool = false
 
     var change: Change
 
@@ -25,8 +25,8 @@ struct ChangeRowView: View {
             primaryDataView
         }
         .border(isTargeted ? Color.blue : Color.clear)
-        .dropDestination(for: Bookmark.self, action: { items, location in
-            return performBookmarkMove(bookmarks: items, change: change)
+        .dropDestination(for: Bookmark.self, action: { items, _ in
+            performBookmarkMove(bookmarks: items, change: change)
         }, isTargeted: { isTargeted in
             self.isTargeted = isTargeted
         })
@@ -51,19 +51,16 @@ struct ChangeRowView: View {
 
     @ViewBuilder
     var diffStatView: some View {
-
-
         if change.totalAdded == 0 && change.totalRemoved == 0 && change.isEmpty {
             Text("empty")
                 .padding(.vertical, 2)
                 .padding(.leading, 4)
                 .padding(.trailing, 2)
                 .foregroundStyle(.white)
-            //            .background(Color.red.mix(with: Color.green, by: 0.5), in: Capsule())
+                //            .background(Color.red.mix(with: Color.green, by: 0.5), in: Capsule())
                 .background(Color.orange, in: Capsule())
                 .font(.caption)
-        }
-        else {
+        } else {
             HStack(spacing: 0) {
                 Text("+\(change.totalAdded, format: .number)")
                     .padding(.vertical, 2)
@@ -99,7 +96,6 @@ struct ChangeRowView: View {
                 parentCountView
             }
         }
-
     }
 
     @ViewBuilder
@@ -224,7 +220,6 @@ struct ChangeRowView: View {
         }
     }
 
-
     func performBookmarkMove(bookmarks: [Bookmark], change: Change) -> Bool {
         let action = PreviewableAction(name: "Hello") {
             let arguments = ["move"] + bookmarks.map(\.bookmark) + ["--to", change.changeID.description]
@@ -241,9 +236,6 @@ struct ChangeRowView: View {
         return false
     }
 }
-
-
-
 
 extension UTType {
     static let jujutsuBookmark = UTType(exportedAs: "io.schwa.judo.jj-bookmark")

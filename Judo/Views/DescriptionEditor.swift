@@ -1,18 +1,17 @@
-import SwiftUI
 import JudoSupport
+import SwiftUI
 
 struct DescriptionEditor: View {
-
     let targetChange: Change?
     let sourceChanges: [Change]
     let isSquash: Bool
     let callback: (String) -> Void
 
     @State
-    var description: String
+    private var description: String
 
     @State
-    var textSelection: TextSelection? = nil
+    private var textSelection: TextSelection?
 
     @Environment(\.dismiss)
     var dismiss
@@ -33,15 +32,15 @@ struct DescriptionEditor: View {
                 MiniChangeView(change: targetChange, includeDescription: false)
             }
             TextEditor(text: $description, selection: $textSelection)
-            .frame(maxHeight: .infinity)
-            .textEditorStyle(.plain)
-//            .aspectRatio(1.618033988749895, contentMode: .fill)
-            .layoutPriority(1000)
+                .frame(maxHeight: .infinity)
+                .textEditorStyle(.plain)
+                //            .aspectRatio(1.618033988749895, contentMode: .fill)
+                .layoutPriority(1_000)
 
             if isSquash {
                 Section("(\(sourceChanges.count)) Squashed Changes") {
                     Button("Use All", systemImage: "doc.on.doc") {
-                        let allDescriptions = sourceChanges.map { $0.description }.joined(separator: "\n")
+                        let allDescriptions = sourceChanges.map(\.description).joined(separator: "\n")
                         description.append(contentsOf: allDescriptions)
                     }
                     .buttonStyle(.borderless)
@@ -73,7 +72,6 @@ struct DescriptionEditor: View {
                     dismiss()
                     callback(description)
                 }
-
             }
         }
     }
@@ -97,7 +95,6 @@ struct MiniChangeView: View {
             }
         }
     }
-
 }
 
 struct MiniSignatureView: View {
@@ -105,7 +102,6 @@ struct MiniSignatureView: View {
 
     var body: some View {
         (Text(signature.name) + Text(" (") + Text(signature.timestamp, style: .relative) + Text(")"))
-        .textSelection(.enabled)
+            .textSelection(.enabled)
     }
-
 }

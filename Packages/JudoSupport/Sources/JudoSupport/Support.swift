@@ -1,7 +1,7 @@
-import Foundation
-import System
 import AppKit
+import Foundation
 import Subprocess
+import System
 
 public extension FilePath {
     var displayName: String {
@@ -15,17 +15,16 @@ public extension FilePath {
 
     var icon: NSImage {
         let fileURL = URL(fileURLWithPath: self.path)
-        let icon = NSWorkspace.shared.icon(forFile: fileURL.path)
-        return icon
+        return NSWorkspace.shared.icon(forFile: fileURL.path)
     }
 
     static func + (lhs: FilePath, rhs: String) -> FilePath {
-        return lhs.appending(rhs)
+        lhs.appending(rhs)
     }
 
     // TODO: Deprecate.
     var path: String {
-        return withCString { cString in
+        withCString { cString in
             String(cString: cString)
         }
     }
@@ -35,7 +34,7 @@ public extension FilePath {
     }
 
     var url: URL {
-        return URL(fileURLWithPath: self.path)
+        URL(fileURLWithPath: self.path)
     }
 
     static var currentDirectory: FilePath {
@@ -55,7 +54,6 @@ public enum JudoError: Swift.Error {
     case generic(String)
 }
 
-
 public func run<
     Input: InputProtocol,
     Output: OutputProtocol,
@@ -73,12 +71,11 @@ public func run<
 ) async throws -> CollectedResult<Output, Error> {
     var executable = executable
     var arguments = arguments
-    if useShell  {
+    if useShell {
         let shell: String
         if let pw = getpwuid(getuid()), let shellCString = pw.pointee.pw_shell {
             shell = String(cString: shellCString)
-        }
-        else {
+        } else {
             shell = "/bin/sh"
         }
         arguments = ["-l", "-c", try executable.resolveExecutablePath(in: environment).string] + arguments
@@ -110,11 +107,10 @@ internal extension Array {
 }
 
 func formatTable(_ rows: [[String]]) -> String {
-
     var result = ""
 
     // Determine the number of columns (max number of elements in any row)
-    let columnCount = rows.map { $0.count }.max() ?? 0
+    let columnCount = rows.map(\.count).max() ?? 0
 
     // Determine the maximum width of each column
     var columnWidths = Array(repeating: 0, count: columnCount)
@@ -161,10 +157,10 @@ extension Character {
 struct BoxSegments: OptionSet {
     let rawValue: Int
 
-    static let top = BoxSegments(rawValue: 1 << 0)
-    static let bottom = BoxSegments(rawValue: 1 << 1)
-    static let left = BoxSegments(rawValue: 1 << 2)
-    static let right = BoxSegments(rawValue: 1 << 3)
+    static let top = Self(rawValue: 1 << 0)
+    static let bottom = Self(rawValue: 1 << 1)
+    static let left = Self(rawValue: 1 << 2)
+    static let right = Self(rawValue: 1 << 3)
 
     init(rawValue: Int) {
         self.rawValue = rawValue
@@ -196,34 +192,49 @@ struct BoxSegments: OptionSet {
         switch self {
         case [.top, .bottom, .left, .right]:
             return "┼"
+
         case [.top, .bottom, .left]:
             return "┤"
+
         case [.top, .bottom, .right]:
             return "├"
+
         case [.top, .left, .right]:
             return "┴"
+
         case [.bottom, .left, .right]:
             return "┬"
+
         case [.top, .bottom]:
             return "│"
+
         case [.left, .right]:
             return "─"
+
         case [.top, .left]:
             return "╯"
+
         case [.top, .right]:
             return "╰"
+
         case [.bottom, .left]:
             return "╮"
+
         case [.bottom, .right]:
             return "╭"
+
         case [.top]:
             return "╵"
+
         case [.bottom]:
             return "╷"
+
         case [.left]:
             return "╴"
+
         case [.right]:
             return "╶"
+
         default:
             return " "
         }

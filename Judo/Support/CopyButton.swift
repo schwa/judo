@@ -33,7 +33,6 @@ struct CopyButton <Label, Value>: View where Label: View, Value: Transferable & 
                 pasteboard.setString(jsonString, forType: .string)
             }
         }
-
     }
 }
 

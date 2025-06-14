@@ -1,6 +1,6 @@
 import Collections
-import SwiftUI
 import JudoSupport
+import SwiftUI
 
 struct MixedModeChangeDetailView: View {
     @Environment(AppModel.self)
@@ -79,7 +79,6 @@ struct MixedModeChangeDetailView: View {
                 try await repository.fullChange(change: change.changeID)
             }
             .id(change.changeID)
-
         }
         .onChange(of: change.description) {
             description = change.description
@@ -87,22 +86,23 @@ struct MixedModeChangeDetailView: View {
     }
 }
 
-struct AsyncValueView<Value, Content> : View where Content: View{
-
+struct AsyncValueView<Value, Content>: View where Content: View {
     @ViewBuilder
     var content: (Value) -> Content
     var task: () async throws -> Value
 
     @State
-    var result: Result<Value, Error>? = nil
+    private var result: Result<Value, Error>?
 
     var body: some View {
         Group {
             switch result {
             case .none:
                 ProgressView()
+
             case .some(.success(let value)):
                 content(value)
+
             case .some(.failure(let error)):
                 ContentUnavailableView {
                     Text("Error: \(error.localizedDescription)")
@@ -113,8 +113,7 @@ struct AsyncValueView<Value, Content> : View where Content: View{
             do {
                 let value = try await task()
                 result = .success(value)
-            }
-            catch {
+            } catch {
                 result = .failure(error)
             }
         }

@@ -1,6 +1,6 @@
-import SwiftUI
 import Everything
 import JudoSupport
+import SwiftUI
 import System
 
 struct SplashScene: Scene {
@@ -15,7 +15,6 @@ struct SplashScene: Scene {
 }
 
 struct SplashView: View {
-
     @Environment(AppModel.self)
     var appModel
 
@@ -29,10 +28,10 @@ struct SplashView: View {
     var dismissWindow
 
     @State
-    var selectedRepository: FilePath?
+    private var selectedRepository: FilePath?
 
     @State
-    var isOpeningRepositoryPresented: Bool = false
+    private var isOpeningRepositoryPresented: Bool = false
 
     var body: some View {
         HStack {
@@ -59,13 +58,12 @@ struct SplashView: View {
                 .menuStyle(.borderlessButton)
                 .fixedSize()
 
-
                 Link("Github", destination: URL(string: "https://github.com/schwa/judo")!)
             }
             .frame(width: 240)
 
             let paths = (NSDocumentController.shared.recentDocumentURLs.map(\.filePath)
-                         + appModel.recentRepositories.reversed()).uniqued()
+                            + appModel.recentRepositories.reversed()).uniqued()
 
             List(selection: $selectedRepository) {
                 ForEach(paths, id: \.self) { path in
@@ -90,7 +88,7 @@ struct SplashView: View {
         .background(Color.white.opacity(0.01))
         .onTapGesture(count: 2) {
             selectedRepository = path
-//            openRepository(path)
+            //            openRepository(path)
             Task {
                 try! await openDocument(at: path.url)
             }
@@ -98,7 +96,6 @@ struct SplashView: View {
         .onTapGesture(count: 1) {
             selectedRepository = path
         }
-
     }
 
     func openRepository(_ result: Result<[URL], Error>) {

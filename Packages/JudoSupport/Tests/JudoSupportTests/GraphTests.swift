@@ -1,6 +1,6 @@
-import Testing
 import Collections
 @testable import JudoSupport
+import Testing
 
 extension Tag {
     @Tag
@@ -9,7 +9,6 @@ extension Tag {
 
 @Suite
 struct GraphTests {
-
     @Test
     func testEmptyGraph() {
         let changes: [(String, [String])] = []
@@ -22,21 +21,21 @@ struct GraphTests {
     @Test
     func testSingleNode() {
         let changes: [(String, [String])] = [
-            ("N0", []),
+            ("N0", [])
         ]
         let graph = Graph(adjacency: changes)
 
         #expect(graph.rows.count == 1)
         #expect(graph.laneCount == 1)
 
-        #expect(graph.rows[0] == Graph.Row(node: "N0", currentLane: 0, lanes: [0], entrances: [],exits: []))
+        #expect(graph.rows[0] == Graph.Row(node: "N0", currentLane: 0, lanes: [0], entrances: [], exits: []))
     }
 
     @Test
     func testTwoDisconnectedNodes() {
         let changes: [(String, [String])] = [
             ("N0", []),
-            ("N1", []),
+            ("N1", [])
         ]
         let graph = Graph(adjacency: changes)
 
@@ -46,12 +45,11 @@ struct GraphTests {
         #expect(graph.rows[0] == Graph.Row(node: "N0", currentLane: 0, lanes: [0], entrances: [], exits: []))
         #expect(graph.rows[1] == Graph.Row(node: "N1", currentLane: 0, lanes: [0], entrances: [], exits: []))
 
-
         #expect(graph.prettyFormat() == """
             ○ N0
-             
+
             ○ N1
-             
+
             """
         )
     }
@@ -61,7 +59,7 @@ struct GraphTests {
         let changes = [
             ("N0", ["N1"]),
             ("N1", ["N2"]),
-            ("N2", []),
+            ("N2", [])
         ]
         let graph = Graph(adjacency: changes)
 
@@ -88,7 +86,7 @@ struct GraphTests {
         let changes = [
             ("N0", ["N2"]),
             ("N1", ["N2"]),
-            ("N2", []),
+            ("N2", [])
         ]
         let graph = Graph(adjacency: changes)
 
@@ -103,7 +101,7 @@ struct GraphTests {
 
         #expect(graph.prettyFormat().trimmingCharacters(in: .whitespacesAndNewlines) == """
             ○   N0
-            │  
+            │
             │ ○ N1
             ├─╯
             ○   N2
@@ -116,7 +114,7 @@ struct GraphTests {
         let changes = [
             ("N0", ["N1", "N2"]),
             ("N1", []),
-            ("N2", []),
+            ("N2", [])
         ]
         let graph = Graph(adjacency: changes)
 
@@ -144,7 +142,7 @@ struct GraphTests {
             ("N0", ["N1", "N2"]),  // N0 branches to N1 and N2
             ("N1", ["N3"]),        // N1 flows to N3
             ("N2", ["N3"]),        // N2 flows to N3 (merge)
-            ("N3", []),            // N3 is terminal
+            ("N3", [])            // N3 is terminal
         ]
         let graph = Graph(adjacency: changes)
 
@@ -175,7 +173,7 @@ struct GraphTests {
             ("N0", ["N1", "N2", "N3"]),
             ("N1", []),
             ("N2", []),
-            ("N3", []),
+            ("N3", [])
         ]
         let graph = Graph(adjacency: changes)
 
@@ -207,7 +205,7 @@ struct GraphTests {
             ("N0", ["N1"]),  // First component: N0 -> N1
             ("N1", []),
             ("N2", ["N3"]),  // Second component: N2 -> N3
-            ("N3", []),
+            ("N3", [])
         ]
         let graph = Graph(adjacency: changes)
 
@@ -224,13 +222,12 @@ struct GraphTests {
             ○ N0
             │
             ○ N1
-             
+
             ○ N2
             │
             ○ N3
             """
         )
-
     }
 
     @Test
@@ -241,7 +238,7 @@ struct GraphTests {
             ("N2", ["N4"]),        // N2 continues to N4
             ("N3", ["N4"]),        // N3 also goes to N4 (rejoin)
             ("N4", ["N5"]),        // Continue after rejoin
-            ("N5", []),            // End
+            ("N5", [])            // End
         ]
         let graph = Graph(adjacency: changes)
         #expect(graph.rows.count == 6)
@@ -257,7 +254,7 @@ struct GraphTests {
 
         #expect(graph.prettyFormat().trimmingCharacters(in: .whitespacesAndNewlines) == """
             ○   N0
-            │  
+            │
             ○   N1
             ├─╮
             ○ │ N2
@@ -265,7 +262,7 @@ struct GraphTests {
             │ ○ N3
             ├─╯
             ○   N4
-            │  
+            │
             ○   N5
             """
         )
@@ -294,10 +291,10 @@ extension Graph.Intersection: ExpressibleByArrayLiteral {
 
 extension Graph.Row: Equatable where Node: Equatable {
     public static func == (lhs: Graph.Row, rhs: Graph.Row) -> Bool {
-        return lhs.node == rhs.node
+        lhs.node == rhs.node
             && lhs.currentLane == rhs.currentLane
             && lhs.lanes == rhs.lanes
-//            && lhs.entrances == rhs.entrances // TODO: Entrance generation is broken.
+            //            && lhs.entrances == rhs.entrances // TODO: Entrance generation is broken.
             && lhs.exits == rhs.exits
     }
 }

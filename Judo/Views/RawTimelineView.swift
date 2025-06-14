@@ -1,7 +1,7 @@
 import Everything
-import SwiftUI
-import SwiftTerm
 import JudoSupport
+import SwiftTerm
+import SwiftUI
 import System
 
 struct RawTimelineView: View {
@@ -29,4 +29,3 @@ struct RawTimelineView: View {
         .background(Color.black)
     }
 }
-

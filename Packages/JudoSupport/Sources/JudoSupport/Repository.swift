@@ -2,8 +2,8 @@ import Collections
 import Everything
 import Foundation
 import Observation
-import TOMLKit
 import System
+import TOMLKit
 
 @Observable
 @MainActor
@@ -16,7 +16,7 @@ public class Repository {
     public var currentLog: RepositoryLog
 
     public var canUndo: Bool {
-        return true
+        true
     }
 
     public init(appModel: AppModel, path: FilePath) {
@@ -36,12 +36,12 @@ public class Repository {
         }
         let changes: [Change] = try await fetch(subcommand: "log", arguments: arguments)
 
-        // TODO: 
-//        let bookmarks: [CommitRef] = try await fetch(subcommand: "bookmark", arguments: ["list"])
+        // TODO:
+        //        let bookmarks: [CommitRef] = try await fetch(subcommand: "bookmark", arguments: ["list"])
         self.currentLog = RepositoryLog(
             revset: revset,
             changes: OrderedDictionary(uniqueKeys: changes.map(\.id), values: changes),
-            bookmarks: [:] //OrderedDictionary(uniqueKeys: bookmarks.map(\.name), values: bookmarks)
+            bookmarks: [:] // OrderedDictionary(uniqueKeys: bookmarks.map(\.name), values: bookmarks)
         )
     }
 
@@ -59,15 +59,13 @@ public class Repository {
         decoder.dateDecodingStrategy = .iso8601
         do {
             return try decoder.decode([T].self, from: jsonData)
-        }
-        catch {
+        } catch {
             logger?.error("Error decoding \(T.self): \(error)")
             logger?.error("Data: \(String(data: jsonData, encoding: .utf8) ?? "<invalid data>")")
             throw error
         }
     }
 }
-
 
 public protocol JutsuTemplateProviding {
     static var template: Template { get }

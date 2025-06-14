@@ -1,12 +1,9 @@
-import Testing
 @testable import JudoSupport
+import Testing
 
 @Suite
 struct LanePoolTests {
-
     @Test func test1() {
-
-
         var lanes = LanePool<String>()
         #expect(lanes.isEmpty)
         #expect(lanes.isValid())
@@ -30,12 +27,9 @@ struct LanePoolTests {
         lanes.add("C", to: lane2)
         #expect(lanes.isValid())
 
-
         let lane4 = lanes.allocateLane(for: "D")
         #expect(lane4 == 1)
 
         #expect(lanes.lanesByKey == ["B": 0, "C": 0, "D": 1])
-
     }
-
 }

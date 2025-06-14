@@ -1,5 +1,5 @@
-import SwiftUI
 import Everything
+import SwiftUI
 
 struct ContactView: View {
     let name: String
@@ -13,11 +13,11 @@ struct ContactView: View {
                 }
                 Text(name)
                     .foregroundStyle(.judoContactColor)
-//                if let email {
-//                    Text(email)
-//                        .foregroundStyle(.secondary)
-//                        .foregroundStyle(.judoContactColor)
-//                }
+                //                if let email {
+                //                    Text(email)
+                //                        .foregroundStyle(.secondary)
+                //                        .foregroundStyle(.judoContactColor)
+                //                }
             }
 
             Text(email ?? name).fixedSize()
@@ -28,10 +28,5 @@ struct ContactView: View {
                 CopyButton("Email", value: email)
             }
         }
-
-
     }
 }
-
-
-

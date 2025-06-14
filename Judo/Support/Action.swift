@@ -42,8 +42,6 @@ public struct PreviewableAction <Content>: PreviewableActionProtocol where Conte
     }
 }
 
-
-
 // MARK: -
 
 public enum Status {
@@ -53,28 +51,29 @@ public enum Status {
 }
 
 public extension Status {
-
     var actionID: UUID? {
         switch self {
         case .waiting:
             return nil
+
         case .success(let action):
             return action.id
+
         case .failure(let action, _):
             return action.id
         }
-
     }
 
     var action: (any ActionProtocol)? {
         switch self {
         case .waiting:
             return nil
+
         case .success(let action):
             return action
+
         case .failure(let action, _):
             return action
         }
     }
 }
-

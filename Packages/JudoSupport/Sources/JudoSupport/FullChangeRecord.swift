@@ -1,7 +1,6 @@
 import Everything
 
 public struct FullChangeRecord: Decodable, JutsuTemplateProviding {
-
     enum CodingKeys: String, CodingKey {
         case changeID = "change_id"
         case diff
@@ -16,7 +15,7 @@ public struct FullChangeRecord: Decodable, JutsuTemplateProviding {
         ++ "'diff':" ++ JUDO_TREE_DIFF(self.diff())
         ++ "}"
     """
-    .replacingOccurrences(of: "'", with: "\\\"")
+                                            .replacingOccurrences(of: "'", with: "\\\"")
     )
 }
 
@@ -30,7 +29,7 @@ public struct TreeDiff: Decodable, JutsuTemplateProviding {
         ++ "'files': [" ++ p.files().map(|c| JUDO_TREE_DIFF_ENTRY(c)).join(",") ++ "]"
         ++ "}"
     """
-        .replacingOccurrences(of: "'", with: "\\\"")
+                                            .replacingOccurrences(of: "'", with: "\\\"")
     )
 }
 
@@ -56,12 +55,11 @@ public struct TreeDiffEntry: Decodable, JutsuTemplateProviding {
         ++ "'target':" ++ JUDO_TREE_ENTRY(p.target()) ++ ","
         ++ "}"
         """
-        .replacingOccurrences(of: "'", with: "\\\"")
+                                            .replacingOccurrences(of: "'", with: "\\\"")
     )
 }
 
 public struct TreeEntry: Decodable, JutsuTemplateProviding {
-
     public enum FileType: String, Decodable {
         case file
         case symlink
@@ -70,7 +68,6 @@ public struct TreeEntry: Decodable, JutsuTemplateProviding {
         case conflict
         case unknown = ""
     }
-
 
     public var path: String
     public var conflict: Bool
@@ -92,7 +89,7 @@ public struct TreeEntry: Decodable, JutsuTemplateProviding {
         ++ "'executable':" ++ p.executable() ++ ","
         ++ "}"
         """
-        .replacingOccurrences(of: "'", with: "\\\"")
+                                            .replacingOccurrences(of: "'", with: "\\\"")
     )
 }
 
@@ -102,11 +99,9 @@ public extension Repository {
             let arguments = ["--no-graph", "-r", change.description]
             let changes: [FullChangeRecord] = try await fetch(subcommand: "log", arguments: arguments)
             return changes[0]
-        }
-        catch {
+        } catch {
             logger?.error(error)
             throw error
         }
     }
 }
-

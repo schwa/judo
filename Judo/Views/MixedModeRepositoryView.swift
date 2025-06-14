@@ -1,8 +1,8 @@
 import Collections
 import Everything
+import JudoSupport
 import SwiftTerm
 import SwiftUI
-import JudoSupport
 
 struct MixedModeRepositoryView: View {
     @Binding
@@ -21,44 +21,43 @@ struct MixedModeRepositoryView: View {
     private var search: String = ""
 
     @State
-    var isInspectorPresented: Bool = true
+    private var isInspectorPresented: Bool = true
 
     var body: some View {
         @Bindable
         var repository = self.repository
 
         VStack {
-//            RevsetEditorView(revset: $revisionQuery) { text in
-//                revisionQuery = text
-//                Task {
-//                    try! await repository.refresh()
-//                }
-//            }
-//            .padding()
+            //            RevsetEditorView(revset: $revisionQuery) { text in
+            //                revisionQuery = text
+            //                Task {
+            //                    try! await repository.refresh()
+            //                }
+            //            }
+            //            .padding()
             RepositoryLogView(log: repository.currentLog, selection: $selection)
 
-
-//            bookmarksView
-//            Text("\(repository.currentLog.changes.count)")
+            //            bookmarksView
+            //            Text("\(repository.currentLog.changes.count)")
         }
         .toolbar {
             toolbar
         }
         .inspector(isPresented: $isInspectorPresented) {
             inspector
-            .inspectorColumnWidth(min: 200, ideal: 320)
-            .toolbar {
-                Spacer()
-                Button("Toggle Inspector", systemImage: "sidebar.leading") {
-                    isInspectorPresented.toggle()
+                .inspectorColumnWidth(min: 200, ideal: 320)
+                .toolbar {
+                    Spacer()
+                    Button("Toggle Inspector", systemImage: "sidebar.leading") {
+                        isInspectorPresented.toggle()
+                    }
                 }
-            }
         }
         .searchable(text: $search, placement: .toolbarPrincipal)
         .searchScopes($scope, activation: .onSearchPresentation) {
-             Text("Revset").tag(SearchScope.revset)
-             Text("Description").tag(SearchScope.description)
-         }
+            Text("Revset").tag(SearchScope.revset)
+            Text("Description").tag(SearchScope.description)
+        }
         .searchPresentationToolbarBehavior(.avoidHidingContent)
         .onSubmit(of: .search) {
             performSearch()
@@ -66,13 +65,12 @@ struct MixedModeRepositoryView: View {
     }
 
     @State
-    var scope: SearchScope = .revset
+    private var scope: SearchScope = .revset
 
     enum SearchScope: Hashable {
         case description
         case revset
     }
-
 
     var selectedChanges: [Change] {
         let log = repository.currentLog
@@ -91,7 +89,7 @@ struct MixedModeRepositoryView: View {
         HStack {
             ForEach(repository.currentLog.bookmarks.values) { bookmark in
                 TagView(bookmark.name)
-                .backgroundStyle(.judoBookmarkColor)
+                    .backgroundStyle(.judoBookmarkColor)
             }
         }
         .padding(.bottom, 4)
@@ -130,9 +128,9 @@ struct MixedModeRepositoryView: View {
 
         ToolbarItem(placement: .primaryAction) {
             ValueView(value: false) { value in
-                let selectedChanges = self.selectedChanges
+                let selectedChanges = selectedChanges
                 let targetChange = selectedChanges.first
-                let sourceChanges = selectedChanges.dropFirst().map { $0 }
+                let sourceChanges = selectedChanges.dropFirst().map(\.self)
                 Button("Squash") {
                     let descriptions = selectedChanges.compactMap { $0.description.isEmpty ? nil : $0.description }
                     if descriptions.count <= 1 {
@@ -140,8 +138,7 @@ struct MixedModeRepositoryView: View {
                             try await repository.squash(changes: sourceChanges.map(\.id), destination: targetChange!.id, description: descriptions.first ?? "")
                             try await repository.refresh()
                         })
-                    }
-                    else {
+                    } else {
                         value.wrappedValue = true
                     }
                 }
@@ -157,11 +154,11 @@ struct MixedModeRepositoryView: View {
             }
         }
 
-//        ToolbarItem(placement: .primaryAction) {
-//            Button("Describe") {
-//            }
-//            .disabled(true)
-//        }
+        //        ToolbarItem(placement: .primaryAction) {
+        //            Button("Describe") {
+        //            }
+        //            .disabled(true)
+        //        }
     }
 
     @ViewBuilder
@@ -181,11 +178,11 @@ struct MixedModeRepositoryView: View {
             var search = search.trimmingCharacters(in: .whitespacesAndNewlines)
             if search.isEmpty {
                 revset = ""
-            }
-            else {
+            } else {
                 search = search.replacingOccurrences(of: "\"", with: "\\\"")
                 revset = "description(\"\(search)\")"
             }
+
         case .revset:
             revset = search
         }

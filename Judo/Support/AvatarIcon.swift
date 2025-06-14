@@ -1,21 +1,19 @@
-import SwiftUI
 import Everything
-import System
 import JudoSupport
+import SwiftUI
+import System
 
 struct AvatarIcon: View {
     var email: String
 
     static let avatarCache = URLCache(
-        memoryCapacity: 50 * 1024 * 1024,  // 50 MB in RAM
-        diskCapacity: 200 * 1024 * 1024,   // 200 MB on disk
+        memoryCapacity: 50 * 1_024 * 1_024,  // 50 MB in RAM
+        diskCapacity: 200 * 1_024 * 1_024,   // 200 MB on disk
         diskPath: (FilePath.temporaryDirectory + "AvatarCache").path
     )
 
-
-
     @State
-    var image: Image?
+    private var image: Image?
 
     var body: some View {
         ZStack {
