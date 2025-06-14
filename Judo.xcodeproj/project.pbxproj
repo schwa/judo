@@ -16,7 +16,7 @@
 
 /* Begin PBXFileReference section */
 		45ED8A872DFE35DE00908096 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		45FF28832DEA173E00947A9B /* Judo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Judo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		45FF28832DEA173E00947A9B /* Judo VCS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Judo VCS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -92,7 +92,7 @@
 		45FF28842DEA173E00947A9B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				45FF28832DEA173E00947A9B /* Judo.app */,
+				45FF28832DEA173E00947A9B /* Judo VCS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -125,7 +125,7 @@
 				45480B2B2DF34CE20032CB12 /* JudoSupport */,
 			);
 			productName = Judo;
-			productReference = 45FF28832DEA173E00947A9B /* Judo.app */;
+			productReference = 45FF28832DEA173E00947A9B /* Judo VCS.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -334,7 +334,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.schwa.Judo;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Judo VCS";
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -366,7 +366,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.schwa.Judo;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Judo VCS";
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
