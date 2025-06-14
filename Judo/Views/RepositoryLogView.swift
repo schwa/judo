@@ -15,7 +15,7 @@ struct RepositoryLogView: View {
     var actionHost
 
     @State
-    var graph: Graph = Graph<ChangeID>()
+    var graph: Graph = Graph<ChangeID>(adjacency: [])
 
     var body: some View {
         List(selection: $selection) {
