@@ -22,50 +22,17 @@ struct RepositoryLogView: View {
 
     var body: some View {
         List(selection: $selection) {
-            listContent
-        }
-        //        .scrollContentBackground(.hidden)
-        //        .background(Color.black.opacity(0.1).border(Color.red).frame(width: 12 * CGFloat(graph.laneCount + 1)), alignment: .leading)
-        //        .background(Color.white)
-        //        .overlay(alignment: .bottomTrailing) {
-        //            warningView
-        //            .padding()
-        //        }
-    }
-
-    @ViewBuilder
-    var listContent: some View {
-        ForEach(graph.rows) { row in
-            Group {
+            ForEach(graph.rows) { row in
                 if let change = log.changes[row.node] {
-                    HStack {
-                        // Spacer().frame(width: CGFloat(graph.laneCount) * 12)
-                        LanesView(laneCount: graph.laneCount, row: row)
-                        ////                            .overlay(alignment: .leading) {
-                        ////                                node(change: change, lane: row.activeLane)
-                        ////                                .offset(x: Double(row.activeLane.id) * 12)
-                        //                    }
-                        VStack(alignment: .leading) {
-                            ChangeRowView(change: change)
-                            if debugUI {
-                                Text("\(String(describing: row))").monospaced().font(.caption)
-                                    .padding(2)
-                                    .background(
-                                        Color.black.colorEffect(ShaderLibrary.barberpole(.float(10), .float(0), .color(.orange.opacity(0.125)))),
-                                        )
-                            }
-                        }
-                    }
-                    .environment(\.isRowSelected, selection.contains(row.node))
-                    .tag(row.node)
+                    RepositoryLogRow(row: row, change: change, selected: selection.contains(row.node), laneCount: graph.laneCount)
                 }
             }
-        }
-        .onMove { from, to in
-            move(from: from, to: to)
-        }
-        .onChange(of: log.changes) {
-            graph = log.makeGraph()
+            .onMove { from, to in
+                move(from: from, to: to)
+            }
+            .onChange(of: log.changes) {
+                graph = log.makeGraph()
+            }
         }
     }
 
@@ -112,6 +79,8 @@ struct RepositoryLogView: View {
             try await repository.log(revset: log.revset ?? "")
         })
     }
+
+
 }
 
 // #Preview {
@@ -125,3 +94,76 @@ struct RepositoryLogView: View {
 //        .font(.system(size: 300))
 //        .colorEffect(ShaderLibrary.barberpole(.float(10), .float(0), .color(.orange)))
 // }
+
+struct RepositoryLogRow: View {
+
+    let row: Graph<ChangeID>.Row
+    let change: Change
+    let selected: Bool
+    let laneCount: Int
+
+    @Environment(Repository.self)
+    private var repository
+
+    @Environment(\.actionRunner)
+    private var actionRunner
+
+    @State
+    private var isTargeted: Bool = false
+
+    @AppStorage("judo.debug-ui")
+    var debugUI: Bool = false
+
+    var body: some View {
+        Group {
+            HStack {
+                LanesView(laneCount: laneCount, row: row)
+                VStack(alignment: .leading) {
+                    ChangeRowView(change: change)
+                    if debugUI {
+                        Text("\(String(describing: row))").monospaced().font(.caption)
+                        .padding(2)
+                        .background(
+                            Color.black.colorEffect(ShaderLibrary.barberpole(.float(10), .float(0), .color(.orange.opacity(0.125)))),
+                        )
+                    }
+                }
+            }
+            .environment(\.isRowSelected, selected)
+            .tag(row.node)
+        }
+        .border(isTargeted ? Color.blue : Color.clear)
+        .dropDestination(for: Bookmark.self, action: { items, _ in
+            performBookmarkMove(bookmarks: items, change: change)
+        }, isTargeted: { isTargeted in
+            self.isTargeted = isTargeted
+        })
+// macOS 26 only - but can be used for better experience.
+//        .dropDestination(for: Bookmark.self) { items, session in
+//        }
+
+    }
+
+    func performBookmarkMove(bookmarks: [Bookmark], change: Change) -> Bool {
+        let action = PreviewableAction(name: "Hello") {
+            let arguments = ["move"] + bookmarks.map(\.bookmark) + ["--to", change.changeID.description]
+            _ = try await repository.jujutsu.run(subcommand: "bookmark", arguments: arguments, repository: repository)
+            try await repository.refresh()
+        }
+        content: {
+            // TODO: Hook up allow backwards which means PreviewableAction needs to become a "ConfigurableAction" and oh boy.
+            Form {
+                GroupBox("Move Bookmarks?") {
+                    let bookmarks = bookmarks.map(\.bookmark).map { $0.quoted() }
+                    Text("Move bookmark \(bookmarks.joined(separator: ", ")) to change `\(change.changeID.shortAttributedString(variant: .changeID))`?")
+                        .padding()
+                    Toggle("Allow backwards move", isOn: .constant(false))
+                }
+            }
+            .padding()
+        }
+        actionRunner?.with(action: action)
+        return false
+    }
+
+}

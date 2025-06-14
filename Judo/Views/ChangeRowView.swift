@@ -10,9 +10,6 @@ struct ChangeRowView: View {
     @Environment(\.actionRunner)
     var actionRunner
 
-    @State
-    private var isTargeted: Bool = false
-
     var change: Change
 
     var body: some View {
@@ -24,12 +21,7 @@ struct ChangeRowView: View {
             }
             primaryDataView
         }
-        .border(isTargeted ? Color.blue : Color.clear)
-        .dropDestination(for: Bookmark.self, action: { items, _ in
-            performBookmarkMove(bookmarks: items, change: change)
-        }, isTargeted: { isTargeted in
-            self.isTargeted = isTargeted
-        })
+
         .contextMenu {
             contextMenu
         }
@@ -220,33 +212,6 @@ struct ChangeRowView: View {
         }
     }
 
-    func performBookmarkMove(bookmarks: [Bookmark], change: Change) -> Bool {
-        let action = PreviewableAction(name: "Hello") {
-            let arguments = ["move"] + bookmarks.map(\.bookmark) + ["--to", change.changeID.description]
-            _ = try await repository.jujutsu.run(subcommand: "bookmark", arguments: arguments, repository: repository)
-            try await repository.refresh()
-        }
-        content: {
-            // TODO: Add an allow backwards option
-            Text("Move bookmark(s) \(bookmarks.map(\.bookmark).joined(separator: ", ")) to change \(change.changeID)")
-                .padding()
-        }
-
-        actionRunner?.with(action: action)
-        return false
-    }
 }
 
-extension UTType {
-    static let jujutsuBookmark = UTType(exportedAs: "io.schwa.judo.jj-bookmark")
-}
 
-struct Bookmark: Transferable, Codable {
-    var repositoryPath: FilePath
-    var source: ChangeID
-    var bookmark: String
-
-    static var transferRepresentation: some TransferRepresentation {
-        CodableRepresentation(contentType: .jujutsuBookmark)
-    }
-}

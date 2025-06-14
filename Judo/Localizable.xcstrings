@@ -1,0 +1,225 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    " (" : {
+
+    },
+    "-%@" : {
+
+    },
+    "(%lld) Squashed Changes" : {
+
+    },
+    "(no changes selected)" : {
+
+    },
+    "(no description set)" : {
+
+    },
+    ")" : {
+
+    },
+    "%@" : {
+
+    },
+    "%@ → %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ → %2$@"
+          }
+        }
+      }
+    },
+    "%@ failed " : {
+
+    },
+    "%lld" : {
+
+    },
+    "+%@" : {
+
+    },
+    "|" : {
+
+    },
+    "Abandon" : {
+
+    },
+    "Abandon Change" : {
+
+    },
+    "Allow backwards move" : {
+
+    },
+    "Author" : {
+
+    },
+    "Binary Path" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Change" : {
+
+    },
+    "Change %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Change %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Clone a Repository" : {
+
+    },
+    "Copy" : {
+
+    },
+    "Debug" : {
+
+    },
+    "Debug UI" : {
+
+    },
+    "Describe" : {
+
+    },
+    "Description" : {
+
+    },
+    "empty" : {
+
+    },
+    "Error: %@" : {
+
+    },
+    "Generate Demo Repo" : {
+
+    },
+    "Github" : {
+
+    },
+    "Judo" : {
+
+    },
+    "Mixed" : {
+
+    },
+    "Mode" : {
+
+    },
+    "Move bookmark %@ to change `%@`?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Move bookmark %1$@ to change `%2$@`?"
+          }
+        }
+      }
+    },
+    "Move Bookmarks?" : {
+
+    },
+    "New" : {
+
+    },
+    "New Change" : {
+
+    },
+    "Next" : {
+
+    },
+    "No files" : {
+
+    },
+    "OK" : {
+
+    },
+    "Open a Repository" : {
+
+    },
+    "parent" : {
+
+    },
+    "Parent" : {
+
+    },
+    "parents" : {
+
+    },
+    "Path" : {
+
+    },
+    "Previous" : {
+
+    },
+    "Raw" : {
+
+    },
+    "Ready" : {
+
+    },
+    "Recent Repositories" : {
+
+    },
+    "Refresh" : {
+
+    },
+    "revset" : {
+
+    },
+    "Revset" : {
+
+    },
+    "Run" : {
+
+    },
+    "Squash" : {
+
+    },
+    "Squash Change" : {
+
+    },
+    "Success: %@" : {
+
+    },
+    "Template" : {
+
+    },
+    "Template Demo" : {
+
+    },
+    "Timeline" : {
+
+    },
+    "Toggle Inspector" : {
+
+    },
+    "Undo" : {
+
+    },
+    "Use" : {
+
+    },
+    "Use All" : {
+
+    },
+    "Warning: Timeline graph not 100% working yet." : {
+
+    },
+    "Welcome to Judo" : {
+
+    }
+  },
+  "version" : "1.1"
+}

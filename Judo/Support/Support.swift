@@ -54,3 +54,36 @@ extension EnvironmentValues {
     @Entry
     var isRowSelected: Bool = false
 }
+
+extension String {
+    func quoted(smart: Bool = true) -> String {
+        guard !containsTopLevelQuotes() else {
+            return smart ? replacingStraightQuotesWithCurly() : self
+        }
+
+        return smart ? "“\(self)”" : "\"\(self)\""
+    }
+
+    private func containsTopLevelQuotes() -> Bool {
+        return hasPrefix("\"") && hasSuffix("\"") || hasPrefix("“") && hasSuffix("”")
+    }
+
+    private func replacingStraightQuotesWithCurly() -> String {
+        var result = ""
+        var insideQuote = false
+        var i = startIndex
+
+        while i < endIndex {
+            let char = self[i]
+            if char == "\"" {
+                result.append(insideQuote ? "”" : "“")
+                insideQuote.toggle()
+            } else {
+                result.append(char)
+            }
+            i = index(after: i)
+        }
+
+        return result
+    }
+}

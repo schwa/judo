@@ -34,6 +34,7 @@ public struct Jujutsu: Sendable {
         logger?.info(">>> \(tempConfigPath.string)")
     }
 
+    @discardableResult
     public func run(subcommand: String, arguments: [String], repository: Repository) async throws -> Data {
         do {
             let arguments = Arguments([subcommand] + arguments)

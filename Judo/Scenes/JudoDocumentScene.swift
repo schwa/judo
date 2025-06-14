@@ -4,13 +4,26 @@ import System
 import UniformTypeIdentifiers
 
 struct JudoDocumentScene: Scene {
+    @FocusedValue(Repository.self)
+    private var repository
+
     var body: some Scene {
         DocumentGroup(viewing: JudoDocument.self) { configuration in
             let path = FilePath(configuration.fileURL!.path)
             JudoDocumentView(path: path)
         }
+//        .commands {
+//            CommandMenu("Changes") {
+//                Button("Blah", systemImage: "stop.fill") {
+//                    print(repository)
+//                }
+//                .keyboardShortcut("B", modifiers: [])
+//            }
+//        }
     }
 }
+
+// MARK: -
 
 final class JudoDocument: ReferenceFileDocument {
     typealias Snapshot = ()
@@ -28,6 +41,8 @@ final class JudoDocument: ReferenceFileDocument {
         throw JudoError.generic("Cannot save scene.")
     }
 }
+
+// MARK: -
 
 struct JudoDocumentView: View {
     @Environment(AppModel.self)
