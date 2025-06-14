@@ -2,73 +2,37 @@ import SwiftUI
 import JudoSupport
 
 struct LanesView: View {
-    var change: Change
-    var row: GraphRow
-    var lastRow: GraphRow?
     var laneCount: Int
-    var hoziontalPadding: CGFloat = 4
+    var horizontalPadding: CGFloat = 4
     var laneWidth: CGFloat = 12
+//    var intersections: Intersections
+    var row: Graph<ChangeID>.Row
 
     var body: some View {
         Canvas { context, size in
-            func laneIDToX(_ laneID: LaneID) -> CGFloat {
-                return hoziontalPadding + (CGFloat(laneID.id) + 0.5) * laneWidth
+
+            func laneToX(_ lane: Int) -> CGFloat {
+                return CGFloat(lane) * 1.5 * laneWidth + horizontalPadding
             }
 
             let minY = 0.0
             let midY = size.height / 2
             let maxY = size.height
-            let activeLaneX = laneIDToX(row.activeLane)
+//            for entrance in intersections.entrances {
+//                context.stroke(Path.wire(from: CGPoint(x: laneIDToX(entrance.source), y: minY), to: CGPoint(x: laneIDToX(entrance.destination), y: midY)), with: .color(.judoLanesColor), lineWidth: 2)
+//            }
+//            for exit in intersections.exits {
+//                context.stroke(Path.wire(from: CGPoint(x: laneIDToX(exit.source), y: midY), to: CGPoint(x: laneIDToX(exit.destination), y: maxY)), with: .color(.judoLanesColor), lineWidth: 2)
+//            }
 
-            let lanes = (lastRow?.nextLanes ?? [:]).sorted { $0.key.id < $1.key.id }.map { (laneIDToX($0.key), $0.value) }
-            let nextLanes = row.nextLanes.sorted { $0.key.id < $1.key.id }.map { (laneIDToX($0.key), $0.value) }
-            // Top half
-            for (sourceX, currentChange) in lanes {
-                let destinationX: CGFloat
-                if currentChange == row.changeID {
-                    destinationX = laneIDToX(row.activeLane)
-                }
-                else {
-                    destinationX = sourceX
-                }
-                context.stroke(Path.wire(from: CGPoint(x: sourceX, y: minY), to: CGPoint(x: destinationX, y: midY)), with: .color(.judoLanesColor), lineWidth: 2)
-            }
-            // Bottom half
-            for (destinationX, nextChange) in nextLanes {
-                let sourceX: CGFloat
-                if nextChange == row.changeID {
-                    sourceX = laneIDToX(row.activeLane)
-                }
-                else {
-                    sourceX = destinationX
-                }
-                context.stroke(Path.wire(from: CGPoint(x: sourceX, y: midY), to: CGPoint(x: destinationX, y: maxY)), with: .color(.judoLanesColor), lineWidth: 2)
+            for lane in 0..<laneCount {
+                let x = laneToX(lane)
+                context.stroke(Path.wire(from: CGPoint(x: x, y: minY), to: CGPoint(x: x, y: maxY)), with: .color(.secondary), lineWidth: 1)
             }
 
-            if let icon = context.resolveSymbol(id: "icon") {
-                context.draw(icon, at: CGPoint(x: activeLaneX, y: midY), anchor: .center)
-            }
+
         }
-        symbols: {
-            Group {
-                if change.isHead == true {
-                    Text("@")
-                        .foregroundStyle(.judoHeadColor)
-                }
-                else if change.isImmutable {
-                    Image(systemName: "diamond.fill")
-                        .foregroundStyle(.judoLanesColor)
-                } else {
-                    Image(systemName: "circle")
-                        .foregroundStyle(.judoLanesColor)
-                }
-            }
-            .padding(2)
-            .background(Color.white, in: Circle())
-            .tag("icon")
-        }
-        .frame(width: CGFloat(laneCount) * laneWidth + hoziontalPadding * 2)
+        .background(Color.secondary.opacity(0.2))
+        .frame(width: CGFloat(laneCount) * laneWidth + horizontalPadding * 2)
     }
-
 }
-

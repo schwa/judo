@@ -33,31 +33,34 @@ struct Diff {
 }
 
 struct GitDiffParser {
-    static let hunkHeaderRegex = Regex {
-        "@@ -"
-        Capture {
-            OneOrMore(.digit)
-        }
-        Optionally {
-            ","
-            Capture {
-                OneOrMore(.digit)
-            }
-        }
-        " +"
-        Capture {
-            OneOrMore(.digit)
-        }
-        Optionally {
-            ","
-            Capture {
-                OneOrMore(.digit)
-            }
-        }
-        " @@"
-    }
 
     static func parse(diffText: String) -> Diff {
+
+        let hunkHeaderRegex = Regex {
+            "@@ -"
+            Capture {
+                OneOrMore(.digit)
+            }
+            Optionally {
+                ","
+                Capture {
+                    OneOrMore(.digit)
+                }
+            }
+            " +"
+            Capture {
+                OneOrMore(.digit)
+            }
+            Optionally {
+                ","
+                Capture {
+                    OneOrMore(.digit)
+                }
+            }
+            " @@"
+        }
+
+        
         var files: [FileDiff] = []
         var lines = diffText.components(separatedBy: .newlines)
 

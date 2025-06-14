@@ -1,0 +1,12 @@
+- This is a swift project that uses Xcode to build a macOS application.
+- The project is available at the root level of this repository.
+- Much of the logic of the application is implemented in the "JudoSupport" Swift Package inside the Packages directory.
+- When iterating on the code, ignore swift lint warnings - unless told to fix them.
+- Always run unit tests (by running `swift test` within the JudoSupport package).
+- You can build the application by running `xcodebuild` in the root directory of the repository.
+- You can run the command line tool by running `swift run` in the JudoSupport package directory.
+- If a test breaks or a run crashes or fails please offer to run the test or command again without waiting for a prompt from me.
+- When writing Swift unit tests, use the new Testing framework along with #expect etc.
+- When working on code be explicit about the access level of properties and methods. Also when adding new properties or methods, make sure they're ordered properly. I prefer types to have their components orderd as follows: public properties, private properties, public methods, private methods. If you add a new property or method, please order it correctly.
+- Use extensions when adding new functionality to existing types *unless* the functionality is closely related to the existing type's primary purpose.
+- I am not afraid of long lines of code, so please don't break them up unless it makes total sense to do so.

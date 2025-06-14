@@ -35,5 +35,8 @@ let package = Package(
             name: "JudoSupportTests",
             dependencies: ["JudoSupport"]
         ),
+        .executableTarget(name: "JudoSupportPlayground",
+            dependencies: ["JudoSupport"]
+        ),
     ]
 )

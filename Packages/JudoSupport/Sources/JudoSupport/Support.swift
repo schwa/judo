@@ -98,3 +98,70 @@ public func run<
         error: error
     )
 }
+
+internal extension Array {
+    /// Decompose the array into its first element and the remaining elements.
+    /// Returns nil if the array is empty.
+    func uncons() -> (head: Element, tail: Array)? {
+        guard let head = self.first else { return nil }
+        let tail = Array(self.dropFirst())
+        return (head, tail)
+    }
+}
+
+func printTable(_ rows: [[String]]) {
+    // Determine the number of columns (max number of elements in any row)
+    let columnCount = rows.map { $0.count }.max() ?? 0
+
+    // Determine the maximum width of each column
+    var columnWidths = Array(repeating: 0, count: columnCount)
+    for row in rows {
+        for (index, cell) in row.enumerated() {
+            columnWidths[index] = max(columnWidths[index], cell.count)
+        }
+    }
+
+    // Print each row
+    for row in rows {
+        var line = ""
+        for i in 0..<columnCount {
+            line += "| "
+            if i < row.count {
+                let cell = row[i]
+                let paddedCell = cell.padding(toLength: columnWidths[i], withPad: " ", startingAt: 0)
+                line += paddedCell + " "
+            } else {
+                let emptyCell = String(repeating: " ", count: columnWidths[i])
+                line += emptyCell + " "
+            }
+        }
+        line += "|"
+        print(line)
+    }
+}
+
+extension Character {
+    func boxMerge(with other: Character) -> Character {
+        guard self != other else {
+            return self
+        }
+        switch (self, other) {
+        case (" ", _):
+            return other
+        case ("─", "│"), ("|", "─"):
+            return "┼"
+        case ("─", "╰"), ("─", "╯"):
+            return "┴"
+        case ("─", "╭"), ("─", "╮"):
+            return "┬"
+        case ("│", "╰"), ("│", "╭"):
+            return "├"
+        case ("│", "╯"), ("│", "╮"):
+            return "┤"
+        case ("╰", "│"), ("│", "╰"):
+            return "├"
+        default:
+            return other
+        }
+    }
+}

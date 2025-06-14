@@ -57,7 +57,7 @@ struct ChangeRowView: View {
                 .fixedSize()
         }
         .foregroundStyle(.white)
-        .font(.caption2)
+//        .font(.caption2)
 //        .background(.green)
         .clipShape(Capsule())
     }

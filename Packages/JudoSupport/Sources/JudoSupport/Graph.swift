@@ -1,78 +1,102 @@
-public extension RepositoryLog {
-    func makeGraphRows() -> [GraphRow] {
-        JudoSupport.makeGraphRows(changes: changes.values.map { ($0.changeID, $0.parents) })
-    }
-}
+import Collections
 
-func makeGraphRows(changes: [(change_id: ChangeID, parents: [ChangeID])]) -> [GraphRow] {
-    var nextLaneID = 0
-    func makeLaneID() -> LaneID {
-        defer {
-            nextLaneID += 1
-        }
-        return LaneID(id: nextLaneID)
+public struct Graph <Node> where Node: Hashable {
+
+    public struct Row {
+        public var node: Node
+        public var currentLane: Int
+        public var lanes: [Int]
+        public var exits: [Exit] // Will be populated after initial row generation
+        public var debugLabel: String?
     }
-    var rows: [GraphRow] = []
-    for (index, change) in changes.enumerated() {
-        let isAtEnd = index == changes.count - 1
-        let lastRow = rows.last
-        if let lastRow {
-            var nextLanes = lastRow.nextLanes
-            let activeLane = nextLanes
-                .sorted { $0.key.id < $1.key.id }
-                .first(where: { $0.value == change.change_id })?.key ?? makeLaneID()
-            if let first = change.parents.first {
-                nextLanes[activeLane] = first
-                for parent in change.parents.dropFirst() {
-                    nextLanes[makeLaneID()] = parent
+
+    public struct Edge {
+        public var child: Node
+        public var parent: Node
+    }
+
+    public struct Exit {
+        public var childLane: Int
+        public var parentLane: Int
+    }
+
+    public private(set) var adjacency: [(node: Node, parents: [Node])]
+    public private(set) var rows: [Row]
+    public private(set) var laneCount: Int
+
+    public init(adjacency: [(node: Node, parents: [Node])]) {
+        self.adjacency = adjacency
+        self.rows = Self.rows(for: adjacency)
+        laneCount = rows.isEmpty ? 0 : (rows.map({ $0.lanes.last ?? 0 }).max() ?? 0) + 1
+    }
+
+    public init() {
+        self.adjacency = []
+        self.rows = []
+        self.laneCount = 0
+    }
+
+    static func rows(for adjacency: [(node: Node, parents: [Node])]) -> [Row] {
+
+        var lanes = LanePool<Node>()
+        var currentEdges = OrderedSet<Edge>()
+
+        let rows = adjacency.map { (node, parents) -> Row in
+            for edge in currentEdges where edge.parent == node {
+                if lanes.lane(for: edge.child) != nil {
+                    lanes.freeLane(for: edge.child)
                 }
             }
-            if isAtEnd {
-                nextLanes.removeAll()
-            }
-            let row = GraphRow(changeID: change.change_id, activeLane: activeLane, nextLanes: nextLanes)
-            rows.append(row)
-        }
-        else {
-            let activeLane = makeLaneID()
-            var nextLanes: [LaneID: ChangeID] = [:]
-            if let first = change.parents.first {
-                nextLanes[activeLane] = first
-                for parent in change.parents.dropFirst() {
-                    nextLanes[makeLaneID()] = parent
+
+            let lane = lanes.allocateLane(for: node)
+
+            if let (firstParent, remainingParents) = parents.uncons() {
+                if lanes.lane(for: firstParent) == nil {
+                    lanes.add(firstParent, to: lane)
+                }
+                else {
+                    lanes.allocateLane(for: firstParent)
+                }
+                remainingParents.forEach { parent in
+                    lanes.allocateLane(for: parent)
                 }
             }
-            let row = GraphRow(changeID: change.change_id, activeLane: activeLane, nextLanes: nextLanes)
-            rows.append(row)
+
+            // Form edges from current node to its parents
+            let edges = parents.map {
+                Edge(child: node, parent: $0)
+            }
+            currentEdges.formUnion(edges)
+            currentEdges.removeAll(where: { $0.parent == node })
+
+            let exits = currentEdges.map { edge in
+                let childLane = lanes.allLanesByKey[edge.child] ?? -1
+                let parentLane = lanes.allLanesByKey[edge.parent] ?? -1
+                return Exit(childLane: childLane, parentLane: parentLane)
+            }
+            return Row(node: node, currentLane: lane, lanes: lanes.lanes, exits: exits, debugLabel: "\(edges)")
         }
-//        print(">>", rows.last as Any)
-    }
-    return rows
-}
-
-
-public struct LaneID: Hashable {
-    public var id: Int
-}
-
-extension LaneID: CustomStringConvertible {
-    public var description: String {
-        return "L\(id)"
+        return rows
     }
 }
 
-public struct GraphRow {
-    public var changeID: ChangeID
-    public var activeLane: LaneID
-    public var nextLanes: [LaneID: ChangeID]
-}
-
-extension GraphRow: Identifiable {
-    public var id: ChangeID { changeID }
-}
-
-extension GraphRow: CustomDebugStringConvertible {
+extension Graph.Edge: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "GraphRow(changeID: \(changeID.short(4)), activeLane: \(activeLane), nextLanes: \(nextLanes))"
+        "\(child)->\(parent)"
+    }
+}
+
+extension Graph.Edge: Hashable {
+}
+
+extension Graph.Exit: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        "\(childLane)->\(parentLane)"
+    }
+}
+
+extension Graph.Row: Identifiable {
+    public var id: Node {
+        node
     }
 }

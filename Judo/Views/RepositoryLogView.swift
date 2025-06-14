@@ -15,42 +15,48 @@ struct RepositoryLogView: View {
     var actionHost
 
     @State
-    var rows: [GraphRow] = []
+    var graph: Graph = Graph<ChangeID>()
 
     var body: some View {
         List(selection: $selection) {
             listContent
         }
-//        .scrollContentBackground(.hidden)
-//        .background(Color.white)
-//        .overlay(alignment: .bottomTrailing) {
-//            warningView
-//            .padding()
-//        }
+        //        .scrollContentBackground(.hidden)
+        //        .background(Color.white)
+        //        .overlay(alignment: .bottomTrailing) {
+        //            warningView
+        //            .padding()
+        //        }
     }
 
     @ViewBuilder
     var listContent: some View {
-        let laneCount = rows.reduce(0) { max($0, $1.nextLanes.count) }
-        ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
+        ForEach(graph.rows) { row in
             Group {
-                if let change = log.changes[row.changeID] {
-                    let isLastRow = index > 0 ? rows[index - 1] : nil
+                if let change = log.changes[row.node] {
                     HStack {
-                        LanesView(change: change, row: row, lastRow: isLastRow, laneCount: laneCount)
-                        ChangeRowView(change: change)
+                        LanesView(laneCount: graph.laneCount, row: row)
+////                            .overlay(alignment: .leading) {
+////                                node(change: change, lane: row.activeLane)
+////                                .offset(x: Double(row.activeLane.id) * 12)
+//                    }
+                        VStack(alignment: .leading) {
+                            ChangeRowView(change: change)
+                            Text("\(String(describing: row))").monospaced().font(.caption)
+                        }
                     }
-                    .environment(\.isRowSelected, selection.contains(row.changeID))
-                    .tag(row.id)
+                    .environment(\.isRowSelected, selection.contains(row.node))
+                    .tag(row.node)
                 }
             }
-//            .border(Color.red)
         }
         .onMove { from, to in
             move(from: from, to: to)
         }
         .onChange(of: log.changes) {
-            rows = log.makeGraphRows()
+            print(log.changes.values.map { ($0.changeID, $0.parents) })
+            graph = log.makeGraph()
+            graph.prettyPrint()
         }
     }
 
@@ -63,6 +69,29 @@ struct RepositoryLogView: View {
             .background(.yellow, in: Capsule())
 
     }
+
+//    @ViewBuilder
+//    func node(change: Change, lane: Int) -> some View {
+//        Group {
+//            if change.isHead == true {
+//                Text("@")
+//                    .foregroundStyle(.judoHeadColor)
+//            }
+//            else if change.isImmutable {
+//                Image(systemName: "diamond.fill")
+//                    .foregroundStyle(.judoLanesColor)
+//            } else {
+//                Image(systemName: "circle")
+//                    .foregroundStyle(.judoLanesColor)
+//            }
+//        }
+//        .padding(2)
+//        .background(Color.white, in: Circle())
+//        .frame(width: 12, height: 12)
+//        .border(Color.red)
+//    }
+
+
 
     func move(from: IndexSet, to: Int) {
         guard let actionHost else {

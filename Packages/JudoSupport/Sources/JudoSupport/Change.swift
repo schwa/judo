@@ -30,7 +30,7 @@ public struct Change {
         ++ "\t'head': " ++ self.contained_in("@") ++ ",\\n"
         ++ "\t'diff_stat_total_added': " ++ diff.stat().total_added() ++ ",\\n"
         ++ "\t'diff_stat_total_removed': " ++ diff.stat().total_removed() ++ ",\\n"
-        ++ "\t'parents': [" ++ parents.map(|c| "'" ++ c.change_id() ++ "'").join(",") ++ "],\\n"
+        ++ "\t'parents': [" ++ parents.map(|c| JUDO_ID(c.change_id())).join(",") ++ "],\\n"
         ++ "\t'bookmarks': [" ++ bookmarks.map(|c| "'" ++ c ++ "'").join(",") ++ "],\\n"
         ++ "},\\n"
         """

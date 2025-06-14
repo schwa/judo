@@ -18,7 +18,7 @@ struct MixedModeRepositoryView: View {
     private var actionHost
 
     @State
-    private var revisionQuery: String = ""
+    private var search: String = ""
 
     @State
     var isInspectorPresented: Bool = true
@@ -38,8 +38,8 @@ struct MixedModeRepositoryView: View {
             RepositoryLogView(log: repository.currentLog, selection: $selection)
 
 
-            bookmarksView
-            Text("\(repository.currentLog.changes.count)")
+//            bookmarksView
+//            Text("\(repository.currentLog.changes.count)")
         }
         .toolbar {
             toolbar
@@ -54,18 +54,15 @@ struct MixedModeRepositoryView: View {
                 }
             }
         }
-//        .searchable(text: $revisionQuery, placement: .toolbarPrincipal)
-        .searchable(text: $revisionQuery, placement: .toolbar)
-        .searchSuggestions{
-            Text("hello?")
-                .searchCompletion("hello?")
-        }
+        .searchable(text: $search, placement: .toolbarPrincipal)
         .searchScopes($scope, activation: .onSearchPresentation) {
              Text("Revset").tag(SearchScope.revset)
              Text("Description").tag(SearchScope.description)
          }
         .searchPresentationToolbarBehavior(.avoidHidingContent)
-
+        .onSubmit(of: .search) {
+            performSearch()
+        }
     }
 
     @State
@@ -173,6 +170,28 @@ struct MixedModeRepositoryView: View {
             MixedModeChangesDetailView(selectedChanges: selectedChanges)
         } else {
             ContentUnavailableView { Text("(no changes selected)") }
+        }
+    }
+
+    func performSearch() {
+        let revset: String
+        switch scope {
+        case .description:
+            // Search by description
+            var search = search.trimmingCharacters(in: .whitespacesAndNewlines)
+            if search.isEmpty {
+                revset = ""
+            }
+            else {
+                search = search.replacingOccurrences(of: "\"", with: "\\\"")
+                revset = "description(\"\(search)\")"
+            }
+        case .revset:
+            revset = search
+        }
+        Task {
+            logger?.log("Search submitted: \(revset)")
+            try? await repository.log(revset: revset)
         }
     }
 }

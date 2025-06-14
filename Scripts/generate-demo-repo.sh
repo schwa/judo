@@ -30,7 +30,10 @@ done
 
 # Merge branches
 jj new --quiet "description(\"A_${COMMIT_COUNT}\")" "description(\"B_${COMMIT_COUNT}\")"
-jj describe --quiet -m "Merged A_5 and B_5"
+jj describe --quiet -m "Merged A_${COMMIT_COUNT} and B_${COMMIT_COUNT}"
+
+jj new --quiet "description(\"Merged\")" -m "Fork F1"
+jj new --quiet "description(\"Merged\")" -m "Fork F2"
 
 # Display the log
 jj log --no-pager -T "change_id.short(4)"
