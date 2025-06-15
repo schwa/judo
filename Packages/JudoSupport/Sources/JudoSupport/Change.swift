@@ -33,9 +33,7 @@ public struct Change {
         ++ "\t'parents': [" ++ parents.map(|c| JUDO_ID(c.change_id())).join(",") ++ "],\\n"
         ++ "\t'bookmarks': [" ++ bookmarks.map(|c| "'" ++ c ++ "'").join(",") ++ "],\\n"
         ++ "},\\n"
-        """
-                                            .replacingOccurrences(of: "'", with: "\\\"")
-    )
+        """)
 }
 
 extension Change: Sendable {

@@ -74,6 +74,7 @@ struct MixedModeChangeDetailView: View {
                         Text(describing: f.target.executable)
                     }
                 }
+                .debugBackground()
             }
             task: {
                 try await repository.fullChange(change: change.changeID)

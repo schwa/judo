@@ -14,9 +14,7 @@ public struct FullChangeRecord: Decodable, JutsuTemplateProviding, Sendable {
         ++ "'change_id':" ++ JUDO_ID(change_id) ++ ","
         ++ "'diff':" ++ JUDO_TREE_DIFF(self.diff())
         ++ "}"
-    """
-                                            .replacingOccurrences(of: "'", with: "\\\"")
-    )
+    """)
 }
 
 public struct TreeDiff: Decodable, JutsuTemplateProviding, Sendable {
@@ -28,9 +26,7 @@ public struct TreeDiff: Decodable, JutsuTemplateProviding, Sendable {
         "{"
         ++ "'files': [" ++ p.files().map(|c| JUDO_TREE_DIFF_ENTRY(c)).join(",") ++ "]"
         ++ "}"
-    """
-                                            .replacingOccurrences(of: "'", with: "\\\"")
-    )
+    """)
 }
 
 public struct TreeDiffEntry: Decodable, JutsuTemplateProviding, Sendable {
@@ -54,9 +50,7 @@ public struct TreeDiffEntry: Decodable, JutsuTemplateProviding, Sendable {
         ++ "'source':" ++ JUDO_TREE_ENTRY(p.source()) ++ ","
         ++ "'target':" ++ JUDO_TREE_ENTRY(p.target()) ++ ","
         ++ "}"
-        """
-                                            .replacingOccurrences(of: "'", with: "\\\"")
-    )
+        """)
 }
 
 public struct TreeEntry: Decodable, JutsuTemplateProviding, Sendable {
@@ -88,9 +82,7 @@ public struct TreeEntry: Decodable, JutsuTemplateProviding, Sendable {
         ++ "'file_type':" ++ p.file_type().escape_json() ++ ","
         ++ "'executable':" ++ p.executable() ++ ","
         ++ "}"
-        """
-                                            .replacingOccurrences(of: "'", with: "\\\"")
-    )
+        """)
 }
 
 public extension Repository {

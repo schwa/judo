@@ -5,23 +5,42 @@ public typealias ChangeID = JujutsuID
 public typealias CommitID = JujutsuID
 
 public struct JujutsuID {
-    public let rawValue: String
+    private let rawValue: String
 
     // TODO: This is ephemeral and can change as repositories are updated.
     public let shortestPrefixCount: Int?
 
     public init?(rawValue: String) {
+        guard !rawValue.isEmpty else {
+            return nil
+        }
         self.rawValue = rawValue
+        self.shortestPrefixCount = nil
+
+    }
+
+    public init(_ string: String) {
+        guard !string.isEmpty else {
+            fatalError("JujutsuID cannot be initialized with an empty string")
+        }
+        self.rawValue = string
         self.shortestPrefixCount = nil
     }
 
     public init(rawValue: String, shortest: String?) {
+        guard !rawValue.isEmpty else {
+            fatalError("JujutsuID cannot be initialized with an empty string")
+        }
         self.rawValue = rawValue
         // Assert shortest is part of rawValue if it exists
         if let shortest {
             precondition(rawValue.hasPrefix(shortest), "Shortest prefix must be a prefix of the raw value")
         }
         self.shortestPrefixCount = shortest?.count
+    }
+
+    public var string: String {
+        rawValue
     }
 }
 
@@ -55,8 +74,7 @@ extension JujutsuID: Decodable {
 
     public static let template = Template(name: "JUDO_ID", parameters: ["p"], content: """
         "'" ++ p.shortest() ++ "|" ++ p ++ "'"
-        """.replacingOccurrences(of: "'", with: "\\\"")
-    )
+        """)
 }
 
 extension JujutsuID: Encodable {
@@ -106,7 +124,7 @@ public extension JujutsuID {
 
 extension JujutsuID: CustomStringConvertible {
     public var description: String {
-        short(4)
+        rawValue
     }
 }
 

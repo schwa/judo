@@ -12,6 +12,5 @@ public struct Signature: Decodable, Equatable, Sendable {
         ++ ", " ++ "'email': '" ++ p.email().local() ++ "@" ++ p.email().domain() ++ "'"
         ++ ", 'timestamp': '" ++ p.timestamp().format("%Y-%m-%dT%H:%M:%S%z") ++ "'"
         ++ "}"
-        """.replacingOccurrences(of: "'", with: "\\\"")
-    )
+        """)
 }

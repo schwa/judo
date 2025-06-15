@@ -27,7 +27,7 @@ public struct Revset {
     }
 
     public var escaped: String {
-        rawValue.replacingOccurrences(of: "\"", with: "\\\"")
+        rawValue.escaped()
     }
 }
 

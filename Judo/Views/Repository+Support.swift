@@ -19,6 +19,7 @@ extension Repository {
     }
 }
 
+// TODO: Experimental
 protocol RevsetConvertible {
     var revset: Revset { get }
 }

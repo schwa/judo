@@ -182,7 +182,7 @@ struct MixedModeRepositoryView: View {
             if search.isEmpty {
                 revset = ""
             } else {
-                search = search.replacingOccurrences(of: "\"", with: "\\\"")
+                search = search.escaped()
                 revset = "description(\"\(search)\")"
             }
 

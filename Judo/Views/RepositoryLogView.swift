@@ -118,11 +118,13 @@ struct RepositoryLogRow: View {
                 VStack(alignment: .leading) {
                     ChangeRowView(change: change)
                     if debugUI {
-                        Text("\(String(describing: row))").monospaced().font(.caption)
+                        VStack(alignment: .leading) {
+                            Text(String(describing: change))
+                            Text(String(describing: row))
+                        }
+                        .monospaced().font(.caption)
                             .padding(2)
-                            .background(
-                                Color.black.colorEffect(ShaderLibrary.barberpole(.float(10), .float(0), .color(.orange.opacity(0.125)))),
-                                )
+                            .debugBackground()
                     }
                 }
             }
@@ -170,4 +172,19 @@ struct RepositoryLogRow: View {
         actionRunner?.with(action: action)
         return false
     }
+}
+
+extension View {
+
+    func debugBackground() -> some View {
+
+        self.background(
+            Color.black.colorEffect(ShaderLibrary.barberpole(.float(10), .float(0), .color(.orange.opacity(0.125)))),
+        )
+
+
+    }
+
+    
+
 }

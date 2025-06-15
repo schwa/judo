@@ -240,3 +240,10 @@ struct BoxSegments: OptionSet {
         }
     }
 }
+
+public extension String {
+    func escaped() -> String {
+        self.replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+    }
+}
