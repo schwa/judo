@@ -116,7 +116,7 @@ struct RepositoryLogRow: View {
             HStack {
                 LanesView(laneCount: laneCount, row: row)
                 VStack(alignment: .leading) {
-                    ChangeRowView(change: change)
+                    ChangeRowView(change: change, isBookmarkDropTarget: isTargeted)
                     if debugUI {
                         VStack(alignment: .leading) {
                             Text(String(describing: change))
@@ -175,16 +175,9 @@ struct RepositoryLogRow: View {
 }
 
 extension View {
-
     func debugBackground() -> some View {
-
         self.background(
             Color.black.colorEffect(ShaderLibrary.barberpole(.float(10), .float(0), .color(.orange.opacity(0.125)))),
         )
-
-
     }
-
-    
-
 }

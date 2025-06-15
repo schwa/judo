@@ -11,6 +11,7 @@ struct ChangeRowView: View {
     var actionRunner
 
     var change: Change
+    var isBookmarkDropTarget: Bool
 
     var body: some View {
         ViewThatFits {
@@ -158,16 +159,16 @@ struct ChangeRowView: View {
 
     @ViewBuilder
     var bookmarksView: some View {
-        if change.bookmarks.isEmpty == false {
-            HStack {
-                ForEach(change.bookmarks, id: \.self) { bookmark in
-                    TagView(bookmark, systemImage: "bookmark.fill")
-                        .backgroundStyle(.judoBookmarkColor)
-                        .draggable(Bookmark(repositoryPath: repository.path, source: change.changeID, bookmark: bookmark))
-                }
+//            if isBookmarkDropTarget {
+//                Capsule().fill(Color.judoBookmarkColor.opacity(0.2))
+//                    .frame(width: 60, height: 20)
+//            }
+            ForEach(change.bookmarks, id: \.self) { bookmark in
+                TagView(bookmark, systemImage: "bookmark.fill")
+                    .backgroundStyle(.judoBookmarkColor)
+                    .draggable(Bookmark(repositoryPath: repository.path, source: change.changeID, bookmark: bookmark))
             }
-            .font(.caption)
-        }
+        .font(.caption)
     }
 
     @ViewBuilder

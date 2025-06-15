@@ -14,5 +14,8 @@ struct Bookmark: Transferable, Codable {
 
     static var transferRepresentation: some TransferRepresentation {
         CodableRepresentation(contentType: .jujutsuBookmark)
+        ProxyRepresentation { bookmark in
+            bookmark.bookmark
+        }
     }
 }

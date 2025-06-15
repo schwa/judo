@@ -26,6 +26,10 @@ public struct Revset {
         self.rawValue = "description(\"\(description)\")"
     }
 
+    public var string: String {
+        rawValue
+    }
+
     public var escaped: String {
         rawValue.escaped()
     }

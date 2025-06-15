@@ -31,13 +31,13 @@ extension Revset: RevsetConvertible {
 }
 
 extension ChangeID: RevsetConvertible {
-    var revset: Revset {
-        Revset(self.description)
+    var revset: Revset {/Users/schwa/Library/Containers/me.damir.dropover-mac/Data/tmp/Text Files/E1FD66B4-285E-479A-B1F6-57188C367E2F/Bookmark_1.txt
+        Revset(self.string)
     }
 }
 
 extension Revset {
     static func ancestors(of other: some RevsetConvertible) -> Revset {
-        Revset("::\(other.revset)")
+        Revset("::\(other.revset.string)")
     }
 }
