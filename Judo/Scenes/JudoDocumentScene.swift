@@ -1,4 +1,5 @@
 import JudoSupport
+import Subprocess
 import SwiftUI
 import System
 import UniformTypeIdentifiers
@@ -12,14 +13,14 @@ struct JudoDocumentScene: Scene {
             let path = FilePath(configuration.fileURL!.path)
             JudoDocumentView(path: path)
         }
-//        .commands {
-//            CommandMenu("Changes") {
-//                Button("Blah", systemImage: "stop.fill") {
-//                    print(repository)
-//                }
-//                .keyboardShortcut("B", modifiers: [])
-//            }
-//        }
+        //        .commands {
+        //            CommandMenu("Changes") {
+        //                Button("Blah", systemImage: "stop.fill") {
+        //                    print(repository)
+        //                }
+        //                .keyboardShortcut("B", modifiers: [])
+        //            }
+        //        }
     }
 }
 
@@ -45,17 +46,102 @@ final class JudoDocument: ReferenceFileDocument {
 // MARK: -
 
 struct JudoDocumentView: View {
-    @Environment(AppModel.self)
+    @SwiftUI.Environment(AppModel.self)
     private var appModel
 
     var path: FilePath
 
+    @State
+    private var repository: Repository?
+
+    @State
+    private var pathContainsGitRepository: Bool = false
+
+    @State
+    private var pathContainsJujutsuRepository: Bool = false
+
     var body: some View {
-        let repository = Repository(appModel: appModel, path: path)
-        RepositoryView()
-            .environment(repository)
-            .onChange(of: path, initial: true) {
-                appModel.recentRepositories.append(path)
+        Group {
+            if !pathContainsGitRepository {
+                ContentUnavailableView {
+                    Text("Label")
+                }
+                description: {
+                    Text("Description")
+                }
+                actions: {
+                    Button("Create Repository") {
+                        Task {
+                            do {
+                                try await RepositoryView.createGitRepository(at: path)
+                                try await RepositoryView.createJujutsuRepository(at: path)
+                            } catch {
+                                logger?.error("Error: \(error)")
+                            }
+                        }
+                    }
+                }
+            } else if !pathContainsJujutsuRepository {
+                ContentUnavailableView {
+                    Text("Label")
+                }
+                description: {
+                    Text("Description")
+                }
+                actions: {
+                    Button("Create Repository") {
+                        Task {
+                            do {
+                                try await RepositoryView.createGitRepository(at: path)
+                                try await RepositoryView.createJujutsuRepository(at: path)
+                            } catch {
+                                logger?.error("Error: \(error)")
+                            }
+                        }
+                    }
+                }
+            } else {
+                RepositoryView()
+                    .environment(repository)
+                    .onChange(of: path, initial: true) {
+                        appModel.recentRepositories.append(path)
+                    }
             }
+        }
+        .onChange(of: path, initial: true) {
+            pathContainsGitRepository = RepositoryView.gitRepositoryExists(at: path)
+            pathContainsJujutsuRepository = RepositoryView.jujutsuRepositoryExists(at: path)
+
+            if pathContainsGitRepository && pathContainsJujutsuRepository {
+                repository = Repository(appModel: appModel, path: path)
+            }
+        }
+    }
+}
+
+extension RepositoryView {
+    static func gitRepositoryExists(at path: FilePath) -> Bool {
+        path.isDirectory && (path + ".git").isDirectory
+    }
+
+    static func jujutsuRepositoryExists(at path: FilePath) -> Bool {
+        gitRepositoryExists(at: path) && path.isDirectory && (path + ".jj").isDirectory
+    }
+
+    static func createGitRepository(at path: FilePath) async throws {
+        _ = try await run(.name("git"), useShell: true, arguments: ["init"], workingDirectory: path)
+    }
+
+    static func createJujutsuRepository(at path: FilePath) async throws {
+        // TODO: Use appModel.jujutsu here.
+        _ = try await run(.name("jj"), useShell: true, arguments: ["git", "init", "colocate"], workingDirectory: path)
+    }
+}
+
+extension FilePath {
+    var isDirectory: Bool {
+        var isDir: ObjCBool = false
+        let exists = FileManager.default.fileExists(atPath: string, isDirectory: &isDir)
+        return exists && isDir.boolValue
     }
 }

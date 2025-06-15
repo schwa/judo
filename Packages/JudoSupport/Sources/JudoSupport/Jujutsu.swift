@@ -34,6 +34,7 @@ public struct Jujutsu: Sendable {
         logger?.info(">>> \(tempConfigPath.string)")
     }
 
+    // TODO: Make generic by output type
     @discardableResult
     public func run(subcommand: String, arguments: [String], repository: Repository) async throws -> Data {
         do {
@@ -45,8 +46,8 @@ public struct Jujutsu: Sendable {
             }
             return result.standardOutput
         } catch {
-            print(binaryPath, subcommand, arguments.joined(separator: " "))
-            ////            logger?.log("Error running jujutsu: \(error)")
+            logger?.log("\(binaryPath), \(subcommand), \(arguments.joined(separator: " "))")
+            logger?.log("Error running jujutsu: \(error)")
             throw error
         }
     }

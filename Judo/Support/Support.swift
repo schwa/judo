@@ -65,7 +65,7 @@ extension String {
     }
 
     private func containsTopLevelQuotes() -> Bool {
-        return hasPrefix("\"") && hasSuffix("\"") || hasPrefix("“") && hasSuffix("”")
+        hasPrefix("\"") && hasSuffix("\"") || hasPrefix("“") && hasSuffix("”")
     }
 
     private func replacingStraightQuotesWithCurly() -> String {
@@ -85,5 +85,13 @@ extension String {
         }
 
         return result
+    }
+}
+
+extension Data {
+    func wrapped(prefix: String, suffix: String) -> Data {
+        let prefixData = prefix.data(using: .utf8) ?? Data()
+        let suffixData = suffix.data(using: .utf8) ?? Data()
+        return prefixData + self + suffixData
     }
 }

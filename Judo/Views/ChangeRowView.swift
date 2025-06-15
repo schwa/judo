@@ -211,7 +211,4 @@ struct ChangeRowView: View {
             }
         }
     }
-
 }
-
-

@@ -55,7 +55,7 @@ struct MixedModeRepositoryView: View {
         }
 
         // TODO: macOS 26
-//        .searchable(text: $search, placement: .toolbarPrincipal)
+        //        .searchable(text: $search, placement: .toolbarPrincipal)
         .searchable(text: $search, placement: .automatic)
         .searchScopes($scope, activation: .onSearchPresentation) {
             Text("Revset").tag(SearchScope.revset)

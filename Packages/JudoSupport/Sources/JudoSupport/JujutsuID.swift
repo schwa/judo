@@ -5,7 +5,7 @@ public typealias ChangeID = JujutsuID
 public typealias CommitID = JujutsuID
 
 public struct JujutsuID {
-    internal let rawValue: String
+    public let rawValue: String
 
     // TODO: This is ephemeral and can change as repositories are updated.
     public let shortestPrefixCount: Int?

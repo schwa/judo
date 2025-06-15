@@ -79,8 +79,6 @@ struct RepositoryLogView: View {
             try await repository.log(revset: log.revset ?? "")
         })
     }
-
-
 }
 
 // #Preview {
@@ -96,7 +94,6 @@ struct RepositoryLogView: View {
 // }
 
 struct RepositoryLogRow: View {
-
     let row: Graph<ChangeID>.Row
     let change: Change
     let selected: Bool
@@ -122,10 +119,10 @@ struct RepositoryLogRow: View {
                     ChangeRowView(change: change)
                     if debugUI {
                         Text("\(String(describing: row))").monospaced().font(.caption)
-                        .padding(2)
-                        .background(
-                            Color.black.colorEffect(ShaderLibrary.barberpole(.float(10), .float(0), .color(.orange.opacity(0.125)))),
-                        )
+                            .padding(2)
+                            .background(
+                                Color.black.colorEffect(ShaderLibrary.barberpole(.float(10), .float(0), .color(.orange.opacity(0.125)))),
+                                )
                     }
                 }
             }
@@ -138,12 +135,13 @@ struct RepositoryLogRow: View {
         }, isTargeted: { isTargeted in
             self.isTargeted = isTargeted
         })
-// macOS 26 only - but can be used for better experience.
-//        .dropDestination(for: Bookmark.self) { items, session in
-//        }
+        // macOS 26 only - but can be used for better experience.
+        //        .dropDestination(for: Bookmark.self) { items, session in
+        //        }
 
     }
 
+    // TODO: Move
     func performBookmarkMove(bookmarks: [Bookmark], change: Change) -> Bool {
         let action = PreviewableAction(name: "Hello") {
             let arguments = ["move"] + bookmarks.map(\.bookmark) + ["--to", change.changeID.description]
@@ -155,9 +153,16 @@ struct RepositoryLogRow: View {
             Form {
                 GroupBox("Move Bookmarks?") {
                     let bookmarks = bookmarks.map(\.bookmark).map { $0.quoted() }
+
                     Text("Move bookmark \(bookmarks.joined(separator: ", ")) to change `\(change.changeID.shortAttributedString(variant: .changeID))`?")
                         .padding()
                     Toggle("Allow backwards move", isOn: .constant(false))
+                }
+                .onAppear {
+                    Task {
+                        let result = try await repository.are(changes: [change.changeID], allAncestorsOf: bookmarks.map(\.source))
+                        print("backwards?", result)
+                    }
                 }
             }
             .padding()
@@ -165,5 +170,4 @@ struct RepositoryLogRow: View {
         actionRunner?.with(action: action)
         return false
     }
-
 }

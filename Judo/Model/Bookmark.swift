@@ -1,7 +1,7 @@
-import UniformTypeIdentifiers
 import CoreTransferable
 import JudoSupport
 import System
+import UniformTypeIdentifiers
 
 extension UTType {
     static let jujutsuBookmark = UTType(exportedAs: "io.schwa.judo.jj-bookmark")

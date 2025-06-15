@@ -13,7 +13,7 @@ struct JudoApp: App {
         Group {
             SplashScene()
             JudoDocumentScene()
-//            RepositoryScene() // TODO: Remove.
+            //            RepositoryScene() // TODO: Remove.
             TemplateDemoScene()
             SettingsScene()
         }

@@ -36,7 +36,7 @@ struct RepositoryView: View {
                 ChangesDetailView(changes: selectedChanges)
             }
         }
-        
+
         .modifier(ActionHostViewModifier())
         .navigationDocument(repository.path.url)
         .navigationSubtitle("\(repository.path.description)")
@@ -48,7 +48,6 @@ struct RepositoryView: View {
         }
         .focusable()
         .focusedValue(repository)
-
     }
 
     @ToolbarContentBuilder
