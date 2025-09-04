@@ -36,7 +36,7 @@ public class Repository {
         }
         let changes: [Change] = try await fetch(subcommand: "log", arguments: arguments)
 
-        // TODO:
+        // TODO: #18
         //        let bookmarks: [CommitRef] = try await fetch(subcommand: "bookmark", arguments: ["list"])
         self.currentLog = RepositoryLog(
             revset: revset,

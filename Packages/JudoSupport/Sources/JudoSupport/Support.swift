@@ -22,7 +22,7 @@ public extension FilePath {
         lhs.appending(rhs)
     }
 
-    // TODO: Deprecate.
+    // TODO: #17 Deprecate.
     var path: String {
         withCString { cString in
             String(cString: cString)

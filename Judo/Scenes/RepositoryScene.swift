@@ -8,7 +8,7 @@ struct RepositoryScene: Scene {
     var appModel: AppModel
 
     var body: some Scene {
-        // TODO: We should use Documents here - but trickier to do when our docs are directories.
+        // TODO: #21 We should use Documents here - but trickier to do when our docs are directories.
         WindowGroup("Judo", for: FilePath.self) { path in
             if let path = path.wrappedValue {
                 let repository = Repository(appModel: appModel, path: path)

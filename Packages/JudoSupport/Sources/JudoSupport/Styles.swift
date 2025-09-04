@@ -3,7 +3,7 @@ import SwiftUI
 public extension Color {
     static let magenta = Color(nsColor: .magenta)
 
-    // TODO: Rename - remove `Color` suffix
+    // TODO: #15 Rename - remove `Color` suffix
     static let judoBookmarkColor = Color.purple
     static let judoHeadColor = Color.green
     static let judoConflictColor = Color.red
@@ -23,7 +23,7 @@ public extension Color {
 public extension ShapeStyle where Self == Color {
     static var magenta: Self { .magenta }
 
-    // TODO: Rename - remove `Color` suffix
+    // TODO: #15 Rename - remove `Color` suffix
     static var judoBookmarkColor: Self { .judoBookmarkColor }
     static var judoHeadColor: Self { .judoHeadColor}
     static var judoConflictColor: Self { .judoConflictColor}

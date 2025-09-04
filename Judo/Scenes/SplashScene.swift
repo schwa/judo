@@ -84,7 +84,7 @@ struct SplashView: View {
                     .font(.caption)
             }
         }
-        // TODO: This is kinda shit as it imposes a delay and uses semi invisible bg
+        // TODO: #22 This is kinda shit as it imposes a delay and uses semi invisible bg
         .background(Color.white.opacity(0.01))
         .onTapGesture(count: 2) {
             selectedRepository = path

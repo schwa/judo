@@ -1,7 +1,7 @@
 import Collections
 
 public struct RepositoryLog: Sendable {
-    public var revset: String? // TODO: Make non optional
+    public var revset: String? // TODO: #14 Make non optional
     public var changes: OrderedDictionary<ChangeID, Change>
     public var bookmarks: OrderedDictionary<String, CommitRef>
 

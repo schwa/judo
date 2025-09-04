@@ -143,7 +143,7 @@ struct RepositoryLogRow: View {
 
     }
 
-    // TODO: Move
+    // TODO: #23 Move
     func performBookmarkMove(bookmarks: [Bookmark], change: Change) -> Bool {
         let action = PreviewableAction(name: "Hello") {
             let arguments = ["move"] + bookmarks.map(\.bookmark) + ["--to", change.changeID.description]
@@ -151,7 +151,7 @@ struct RepositoryLogRow: View {
             try await repository.refresh()
         }
         content: {
-            // TODO: Hook up allow backwards which means PreviewableAction needs to become a "ConfigurableAction" and oh boy.
+            // TODO: #24 Hook up allow backwards which means PreviewableAction needs to become a "ConfigurableAction" and oh boy.
             Form {
                 GroupBox("Move Bookmarks?") {
                     let bookmarks = bookmarks.map(\.bookmark).map { $0.quoted() }

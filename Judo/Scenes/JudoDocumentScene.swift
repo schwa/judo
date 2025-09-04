@@ -133,7 +133,7 @@ extension RepositoryView {
     }
 
     static func createJujutsuRepository(at path: FilePath) async throws {
-        // TODO: Use appModel.jujutsu here.
+        // TODO: #20 Use appModel.jujutsu here.
         _ = try await run(.name("jj"), useShell: true, arguments: ["git", "init", "colocate"], workingDirectory: path)
     }
 }

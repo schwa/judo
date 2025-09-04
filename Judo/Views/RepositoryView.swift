@@ -69,8 +69,8 @@ struct RepositoryView: View {
         let log = repository.currentLog
         return selection
             .sorted { lhs, rhs in
-                let lhs = log.changes.index(forKey: lhs) ?? -1 // TODO: -1?
-                let rhs = log.changes.index(forKey: rhs) ?? -1 // TODO: -1?
+                let lhs = log.changes.index(forKey: lhs) ?? -1 // TODO: #7 -1?
+                let rhs = log.changes.index(forKey: rhs) ?? -1 // TODO: #7 -1?
                 return lhs < rhs
             }
             .compactMap { log.changes[$0] } // Filter changes based on selection

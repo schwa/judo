@@ -5,7 +5,7 @@ public struct Signature: Decodable, Equatable, Sendable {
     public var email: String?
     public var timestamp: Date
 
-    // TODO: This can outout just "@" if email is empty
+    // TODO: #10 This can outout just "@" if email is empty
     public static let template = Template(name: "JUDO_SIGNATURE", parameters: ["p"], content: """
         "{"
         ++ "'name': " ++ p.name().escape_json()

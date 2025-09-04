@@ -22,7 +22,7 @@ public struct Revset {
     }
 
     public init(description: String) {
-        // TODO: Escape
+        // TODO: #9 Escape
         self.rawValue = "description(\"\(description)\")"
     }
 

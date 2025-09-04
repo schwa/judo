@@ -12,12 +12,12 @@ public struct Jujutsu: Sendable {
         self.binaryPath = binaryPath
         tempConfigPath = FilePath.temporaryDirectory + "judo.toml"
 
-        // TODO: try!
+        // TODO: #29 try!
         try! makeTemplates()
     }
 
     public func makeTemplates() throws {
-        // TODO: We shouldn't need to do these every time.
+        // TODO: #12 We shouldn't need to do these every time.
 
         let temporaryConfig = JujutsuConfig(templateAliases: [
             CommitRef.template.key: CommitRef.template.content,
@@ -34,7 +34,7 @@ public struct Jujutsu: Sendable {
         logger?.info(">>> \(tempConfigPath.string)")
     }
 
-    // TODO: Make generic by output type
+    // TODO: #13 Make generic by output type
     @discardableResult
     public func run(subcommand: String, arguments: [String], repository: Repository) async throws -> Data {
         do {
@@ -42,7 +42,7 @@ public struct Jujutsu: Sendable {
             let result = try await Subprocess.run(.path(binaryPath), arguments: arguments, workingDirectory: repository.path, output: .data, error: .string)
             if !result.terminationStatus.isSuccess {
                 logger?.log("Error running jujutsu: \(result.standardError ?? "")")
-                throw JudoError.generic("TODO")
+                throw JudoError.generic("TODO") // TODO: #6
             }
             return result.standardOutput
         } catch {

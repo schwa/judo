@@ -9,7 +9,7 @@ struct MixedModeChangeDetailView: View {
     @Environment(Repository.self)
     var repository
 
-    // TODO: This is not getting reloaded when description changes??
+    // TODO: #8 This is not getting reloaded when description changes??
     var change: Change
 
     @State

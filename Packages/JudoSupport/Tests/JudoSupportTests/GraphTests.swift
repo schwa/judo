@@ -186,7 +186,7 @@ struct GraphTests {
         #expect(graph.rows[2] == Graph.Row(node: "N2", currentLane: 1, lanes: [1, 2], entrances: [[1, 1], [2, 2]], exits: [[2, 2]]))
         #expect(graph.rows[3] == Graph.Row(node: "N3", currentLane: 2, lanes: [2], entrances: [[2, 2]], exits: []))
 
-        // TODO: Note the lack of T.
+        // TODO: #28 Note the lack of T.
         #expect(graph.prettyFormat().trimmingCharacters(in: .whitespacesAndNewlines) == """
             ○     N0
             ├───╮

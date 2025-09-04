@@ -6,7 +6,7 @@ import System
 
 @Observable
 public class AppModel {
-    // TODO: Cheap & cheesy persistence.
+    // TODO: #16 Cheap & cheesy persistence.
     public var binaryPath: FilePath {
         didSet {
             UserDefaults.standard.set(binaryPath.path, forKey: "judo.binaryPath")
@@ -14,7 +14,7 @@ public class AppModel {
         }
     }
 
-    // TODO: standardize paths.
+    // TODO: #16 standardize paths.
     public var recentRepositories: Collections.OrderedSet<FilePath> {
         didSet {
             UserDefaults.standard.set(recentRepositories.map(\.path), forKey: "judo.recentRepositories")

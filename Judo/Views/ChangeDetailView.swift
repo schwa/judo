@@ -11,7 +11,7 @@ struct ChangeDetailView: View {
     @State
     private var editedDescription: String = ""
 
-    // TODO: This is not getting reloaded when description changes??
+    // TODO: #8 This is not getting reloaded when description changes??
     var change: Change
 
     var body: some View {

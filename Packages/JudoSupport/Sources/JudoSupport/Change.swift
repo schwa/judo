@@ -15,7 +15,7 @@ public struct Change {
     public var totalAdded: Int
     public var totalRemoved: Int
 
-    // TODO: Make sure everything is escaped properly (esp. parents and bookmarks
+    // TODO: #11 Make sure everything is escaped properly (esp. parents and bookmarks
     public static let template = Template(name: "JUDO_CHANGE", content: """
         "{\\n"
         ++ "\t'change_id': " ++ JUDO_ID(change_id) ++ ",\\n"
