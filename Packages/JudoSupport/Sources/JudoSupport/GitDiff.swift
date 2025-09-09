@@ -110,15 +110,17 @@ public enum GitDiffParser {
                 guard var hunk = currentHunk else { continue }
 
                 let type: LineChangeType
+                let content: String
                 if line.starts(with: "+") {
                     type = .addition
+                    content = line.removingPrefix("+")
                 } else if line.starts(with: "-") {
                     type = .deletion
+                    content = line.removingPrefix("-")
                 } else {
                     type = .unchanged
+                    content = line.removingPrefix(" ")
                 }
-
-                let content = String(line.dropFirst())
 
                 hunk.changes.append(LineChange(type: type, content: content))
                 currentHunk = hunk
