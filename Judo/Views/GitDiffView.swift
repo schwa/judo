@@ -12,8 +12,7 @@ struct GitDiffingView: View {
     var body: some View {
         Group {
             if raw == false, let diff {
-//                GitDiffView(parsedDiff: diff)
-                Color.red
+                GitDiffView(parsedDiff: diff)
             } else {
                 let s = String(data: data, encoding: .utf8)!
                 ScrollView {
