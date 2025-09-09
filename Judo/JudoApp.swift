@@ -6,7 +6,7 @@ struct JudoApp: App {
     @State
     private var appModel = AppModel()
 
-    @FocusedValue(Repository.self)
+    @FocusedValue(\.repository)
     private var repository
 
     @Environment(\.openDocument)

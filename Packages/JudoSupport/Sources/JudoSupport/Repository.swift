@@ -8,7 +8,7 @@ import TOMLKit
 @Observable
 @MainActor
 public class Repository {
-    public var appModel: AppModel
+    public var appModel: AppModel // TODO: Weak?
     public var path: FilePath
     public var binaryPath: FilePath {
         appModel.binaryPath

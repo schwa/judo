@@ -22,7 +22,7 @@ public extension AppModel {
             try await openDocument?(path.url)
         }
         Task {
-            try await Task.sleep(for: .seconds(1.0))
+            try await Task.sleep(for: .seconds(0.01667))
             print("New? repo: \(currentRepository)")
         }
     }
