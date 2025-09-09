@@ -71,13 +71,16 @@ public struct Jujutsu: Sendable {
     // TODO: #13 Make generic by output type
     @discardableResult
     public func run(subcommand: String, arguments: [String], repository: Repository, useShell: Bool = true) async throws -> Data {
+
+        
+
         let configuration: Subprocess.Configuration
         if !useShell {
             logger?.info("Running jujutsu directly: \(binaryPath.string) \(subcommand) \(arguments.joined(separator: " "))")
-            configuration = Subprocess.Configuration(executable: .path(binaryPath), arguments: Arguments([subcommand] + arguments), workingDirectory: repository.path)
+            configuration = Subprocess.Configuration(executable: .path(binaryPath), arguments: Arguments(["--no-pager", "--color=never"] + [subcommand] + arguments), workingDirectory: repository.path)
         }
         else {
-            let shellCommand = shellify([binaryPath.string] + [subcommand] + arguments)
+            let shellCommand = shellify([binaryPath.string] + ["--no-pager", "--color=never"] + [subcommand] + arguments)
             logger?.info("Running jujutsu via shell: \(userShell) -c \(shellCommand)")
             configuration = Subprocess.Configuration(executable: .path(userShell), arguments: Arguments(["-c", shellCommand]), workingDirectory: repository.path)
         }
