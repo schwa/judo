@@ -6,13 +6,15 @@ import TOMLKit
 
 public struct Repository {
     public var path: FilePath
+    public let runner: JujutsuRunner
 
     public var canUndo: Bool {
         true
     }
 
-    public init(path: FilePath) {
+    public init(path: FilePath, jujutsu: Jujutsu) {
         self.path = path
+        self.runner = JujutsuRunner(jujutsu: jujutsu, repositoryPath: path)
     }
 
     public func log(jujutsu: Jujutsu, revset: String) async throws -> RepositoryLog {
@@ -37,7 +39,7 @@ public struct Repository {
             "--template", T.template.name,
             "--config-file", jujutsu.tempConfigPath.path
         ]
-        let data = try await jujutsu.run(subcommand: subcommand, arguments: arguments, repository: self)
+        let data = try await runner.run(subcommand: subcommand, arguments: arguments)
         let header = "[\n".data(using: .utf8)!
         let footer = "\n]".data(using: .utf8)!
         let jsonData = header + data + footer

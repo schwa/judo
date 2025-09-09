@@ -20,7 +20,7 @@ class RepositoryViewModel {
 
     init(jujutsu: Jujutsu, path: FilePath) {
         self.jujutsu = jujutsu
-        self.repository = Repository(path: path)
+        self.repository = Repository(path: path, jujutsu: jujutsu)
     }
 }
 

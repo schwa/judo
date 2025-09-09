@@ -153,7 +153,7 @@ struct RepositoryLogRow: View {
     func performBookmarkMove(bookmarks: [Bookmark], change: Change) -> Bool {
         let action = PreviewableAction(name: "Hello") {
             let arguments = ["move"] + bookmarks.map(\.bookmark) + ["--to", change.changeID.description]
-            _ = try await appModel.jujutsu.run(subcommand: "bookmark", arguments: arguments, repository: repositoryViewModel.repository)
+            _ = try await repositoryViewModel.repository.runner.run(subcommand: "bookmark", arguments: arguments)
             try await repositoryViewModel.refreshLog()
         }
         content: {

@@ -49,7 +49,7 @@ struct ChangeDetailView: View {
             GitDiffingView(data: data)
         }
         task: {
-            try await appModel.jujutsu.run(subcommand: "diff", arguments: ["-r", change.changeID.description, "--git"], repository: repositoryViewModel.repository)
+            try await repositoryViewModel.repository.runner.run(subcommand: "diff", arguments: ["-r", change.changeID.description, "--git"])
         }
         .id(change.changeID)
     }

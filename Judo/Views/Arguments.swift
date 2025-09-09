@@ -44,10 +44,10 @@ extension Array: ArgumentsConvertible where Element: ArgumentsConvertible {
     }
 }
 
-extension Jujutsu {
-    func run<T>(subcommand: String, arguments: Arguments, repository: Repository) async throws -> [T] where T: Decodable {
+extension Repository {
+    func run<T>(subcommand: String, arguments: Arguments) async throws -> [T] where T: Decodable {
         let arguments = arguments.strings
-        let data = try await run(subcommand: subcommand, arguments: arguments, repository: repository)
+        let data = try await runner.run(subcommand: subcommand, arguments: arguments)
             .wrapped(prefix: "[", suffix: "]")
         let decoder = JSONDecoder()
         decoder.allowsJSON5 = true
