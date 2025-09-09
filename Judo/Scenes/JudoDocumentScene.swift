@@ -66,6 +66,19 @@ struct JudoDocumentScene: Scene {
                 
                 Divider()
                 
+                Button("Open in Terminal") {
+                    guard let repositoryViewModel else {
+                        logger?.error("No repository focused")
+                        return
+                    }
+                    let url = URL(fileURLWithPath: repositoryViewModel.repository.path.string)
+                    if let terminalURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.Terminal") {
+                        NSWorkspace.shared.open([url], withApplicationAt: terminalURL, configuration: NSWorkspace.OpenConfiguration())
+                    }
+                }
+                .keyboardShortcut("t", modifiers: [.command, .option])
+                .disabled(repositoryViewModel == nil)
+                
                 Button("Reveal in Finder") {
                     guard let repositoryViewModel else {
                         logger?.error("No repository focused")
