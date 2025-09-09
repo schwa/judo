@@ -91,6 +91,9 @@
     "Command Line Interface" : {
 
     },
+    "Command-line tool v1.0.0" : {
+
+    },
     "Copy" : {
 
     },
@@ -109,10 +112,25 @@
     "Description" : {
 
     },
+    "Development" : {
+
+    },
+    "Drag the 'judo' command to install it in your PATH" : {
+
+    },
+    "Drag to /usr/local/bin, ~/.local/bin, or any directory in your PATH" : {
+
+    },
     "empty" : {
 
     },
+    "Environment" : {
+
+    },
     "Error: %@" : {
+
+    },
+    "General" : {
 
     },
     "Generate Demo Repo" : {
@@ -121,16 +139,7 @@
     "Github" : {
 
     },
-    "Install" : {
-
-    },
-    "Install CLI" : {
-
-    },
-    "Install Judo CLI" : {
-
-    },
-    "Install the `judo` command to your PATH" : {
+    "judo" : {
 
     },
     "Judo" : {
@@ -188,10 +197,16 @@
     "parents" : {
 
     },
+    "Pasteboard" : {
+
+    },
     "Path" : {
 
     },
     "Previous" : {
+
+    },
+    "Process" : {
 
     },
     "Raw" : {
@@ -224,10 +239,19 @@
     "Run" : {
 
     },
+    "Shell" : {
+
+    },
+    "Source" : {
+
+    },
     "Squash" : {
 
     },
     "Squash Change" : {
+
+    },
+    "String" : {
 
     },
     "Success: %@" : {
@@ -239,16 +263,19 @@
     "Template Demo" : {
 
     },
-    "This will install the 'judo' command to /usr/local/bin. You may be prompted for your password." : {
-
-    },
     "Timeline" : {
 
     },
     "Toggle Inspector" : {
 
     },
+    "Types" : {
+
+    },
     "Undo" : {
+
+    },
+    "URL" : {
 
     },
     "Use" : {

@@ -79,6 +79,7 @@ public func run<
             shell = "/bin/sh"
         }
         arguments = ["-l", "-c", try executable.resolveExecutablePath(in: environment).string] + arguments
+        print(arguments)
         executable = .path(FilePath(shell))
     }
     let configuration = Configuration(

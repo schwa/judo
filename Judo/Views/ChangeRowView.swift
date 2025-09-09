@@ -191,7 +191,9 @@ struct ChangeRowView: View {
     @ViewBuilder
     var contextMenu: some View {
         CopyButton("Copy Change ID", value: change.changeID)
+        CopyButton("Copy Commit ID", value: change.commitID)
         CopyButton("Copy Description", value: change.description)
+            .disabled(change.description.isEmpty)
         Divider()
 
         if let actionRunner {
