@@ -1,6 +1,7 @@
 import SwiftUI
 import Foundation
 import System
+import JudoSupport
 
 extension AppModel {
     @MainActor
@@ -19,22 +20,49 @@ extension AppModel {
         }
         Task {
             let queryItems = components.queryItems ?? []
+            
+            // Handle mode parameter
             var targetMode: RepositoryViewModel.Mode? = nil
-            if queryItems.contains(where: { $0.name == "show" }) {
-                targetMode = .change
+            if let modeValue = queryItems.first(where: { $0.name == "mode" })?.value {
+                switch modeValue {
+                case "log", "timeline":
+                    targetMode = .timeline
+                case "show", "change":
+                    targetMode = .change
+                case "mixed":
+                    targetMode = .mixed
+                default:
+                    print("Unknown mode: \(modeValue)")
+                }
             }
+            
+            // Handle selection parameter
+            let changeID = queryItems.first(where: { $0.name == "selection" })?.value
+            
+            // Apply the changes after a brief delay to ensure the document is loaded
+            // TODO: Using sleep to wait for mode switch is a hack.
+            try await Task.sleep(for: .seconds(0.01667))
+            
             if let targetMode = targetMode {
-                // TODO: Using sleep to wait for mode switch is a hack.
-                try await Task.sleep(for: .seconds(0.01667))
                 currentRepositoryViewModel?.mode = targetMode
                 print("Switched to mode: \(targetMode)")
+            }
+            
+            if let changeID = changeID {
+                // Set the selection to the specified change
+                currentRepositoryViewModel?.selection = [ChangeID(changeID)]
+                print("Selected change: \(changeID)")
             }
         }
     }
 }
 
 /*
- x-open://<path to repo>/?mode=log
- x-open://<path to repo>/?mode=show
- x-open://<path to repo>/?mode=show&change=zzzzz
+ URL scheme examples:
+ x-judo://<path to repo>/?mode=timeline
+ x-judo://<path to repo>/?mode=timeline&selection=zzzzz
+ x-judo://<path to repo>/?mode=mixed
+ x-judo://<path to repo>/?mode=mixed&selection=zzzzz
+ x-judo://<path to repo>/?mode=change
+ x-judo://<path to repo>/?mode=change&selection=zzzzz
 */
