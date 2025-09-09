@@ -36,9 +36,15 @@ public struct Jujutsu: Sendable {
 
     // TODO: #13 Make generic by output type
     @discardableResult
-    public func run(subcommand: String, arguments: [String], repository: Repository) async throws -> Data {
-        let arguments = Arguments([subcommand] + arguments)
-        let configuration = Subprocess.Configuration(executable: .path(binaryPath), arguments: arguments, workingDirectory: repository.path)
+    public func run(subcommand: String, arguments: [String], repository: Repository, useShell: Bool = true) async throws -> Data {
+        let configuration = if !useShell {
+            Subprocess.Configuration(executable: .path(binaryPath), arguments: Arguments([subcommand] + arguments), workingDirectory: repository.path)
+        }
+        else {
+
+            // TODO: HERE
+            Subprocess.Configuration(executable: .path(binaryPath), arguments: Arguments([subcommand] + arguments), workingDirectory: repository.path)
+        }
 
         logger?.info("Running jujutsu: \(subcommand) \(arguments)")
 
