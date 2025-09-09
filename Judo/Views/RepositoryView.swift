@@ -47,7 +47,7 @@ struct RepositoryView: View {
             try! await repository.refresh()
         }
         .focusable()
-        .focusedValue(repository)
+        .focusedValue(\.repository, repository)
     }
 
     @ToolbarContentBuilder
@@ -76,4 +76,9 @@ struct RepositoryView: View {
             .compactMap { log.changes[$0] } // Filter changes based on selection
 
     }
+}
+
+extension FocusedValues {
+    @Entry
+    var repository: Repository?
 }

@@ -6,17 +6,19 @@ struct JudoApp: App {
     @State
     private var appModel = AppModel()
 
-    @Environment(\.openWindow)
-    var openWindow
+    @FocusedValue(Repository.self)
+    private var repository
 
     var body: some Scene {
         Group {
             SplashScene()
             JudoDocumentScene()
-            //            RepositoryScene() // TODO: Remove.
             TemplateDemoScene()
             SettingsScene()
         }
         .environment(appModel)
+        .onChange(of: repository?.path) {
+            print("REPO CHANGED: \(repository?.path)")
+        }
     }
 }

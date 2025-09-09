@@ -27,6 +27,10 @@ struct SplashView: View {
     @Environment(\.dismissWindow)
     var dismissWindow
 
+    @FocusedValue(Repository.self)
+    private var repository
+
+
     @State
     private var selectedRepository: FilePath?
 
@@ -72,6 +76,9 @@ struct SplashView: View {
             }
         }
         .frame(width: 480, height: 320)
+        .onOpenURL { url in
+            handler(for: url)
+        }
     }
 
     @ViewBuilder
@@ -110,6 +117,32 @@ struct SplashView: View {
     func openRepository(_ path: FilePath) {
         dismissWindow()
         openWindow(value: path)
+    }
+
+    func handler(for url: URL) {
+        print(url)
+        guard url.scheme == "x-judo" else {
+            return
+        }
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return
+        }
+        print(components.host)
+        print(components.path)
+        print(components.queryItems)
+
+        print(repository)
+        let path = FilePath(components.path)
+        Task {
+            try! await openDocument(at: path.url)
+        }
+        Task {
+            try! await Task.sleep(for: .seconds(0.1))
+            print(repository)
+        }
+
+
+
     }
 }
 

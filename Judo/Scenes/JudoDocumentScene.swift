@@ -6,21 +6,31 @@ import UniformTypeIdentifiers
 
 struct JudoDocumentScene: Scene {
     @FocusedValue(Repository.self)
-    private var repository
+    private var repository: Repository?
 
     var body: some Scene {
         DocumentGroup(viewing: JudoDocument.self) { configuration in
             let path = FilePath(configuration.fileURL!.path)
             JudoDocumentView(path: path)
+                .onOpenURL { url in
+                    print("Opened URL: \(url)")
+                }
+                .onChange(of: repository?.path) {
+                    print("REPO CHANGED: \(repository?.path)")
+                }
+                .onAppear {
+                    print("JudoDocumentScene appeared")
+                }
+                .focusable()
         }
-        //        .commands {
-        //            CommandMenu("Changes") {
-        //                Button("Blah", systemImage: "stop.fill") {
-        //                    print(repository)
-        //                }
-        //                .keyboardShortcut("B", modifiers: [])
-        //            }
-        //        }
+        .commands {
+            CommandMenu("Repository") {
+                Button("Reveal", systemImage: "stop.fill") {
+                    print(repository)
+                }
+                .keyboardShortcut("R", modifiers: [.command, .shift])
+            }
+        }
     }
 }
 

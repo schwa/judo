@@ -218,6 +218,8 @@
 			baseConfigurationReferenceAnchor = 456D22FC2E02FC0C0069A8A0 /* Configuration */;
 			baseConfigurationReferenceRelativePath = "Judo-Debug.xcconfig";
 			buildSettings = {
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 			};
 			name = Debug;
 		};
@@ -226,6 +228,8 @@
 			baseConfigurationReferenceAnchor = 456D22FC2E02FC0C0069A8A0 /* Configuration */;
 			baseConfigurationReferenceRelativePath = "Judo-Release.xcconfig";
 			buildSettings = {
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 			};
 			name = Release;
 		};
