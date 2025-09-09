@@ -15,7 +15,14 @@ struct JudoDocumentScene: Scene {
             JudoDocumentView(path: path)
         }
         .commands {
-            
+            // Add standard sidebar and inspector commands
+            SidebarCommands()
+            InspectorCommands()
+            ToolbarCommands()
+//            ImportFromDevicesCommand()
+            TextEditingCommands()
+            TextFormattingCommands()
+
             CommandGroup(after: .toolbar) {
                 Divider()
                 
