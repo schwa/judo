@@ -6,6 +6,8 @@ import System
 public actor JujutsuRunner {
     private let jujutsu: Jujutsu
     private let repositoryPath: FilePath
+    
+    // Task chaining to ensure commands run serially
     private var currentTask: Task<Void, Never>?
     
     public init(jujutsu: Jujutsu, repositoryPath: FilePath) {
@@ -13,7 +15,6 @@ public actor JujutsuRunner {
         self.repositoryPath = repositoryPath
     }
     
-    // TODO: Move out of here (and cache)
     private var userShell: FilePath {
         // Method 1: Try POSIX getpwuid to get user's default shell from passwd database
         let uid = getuid()
@@ -47,7 +48,6 @@ public actor JujutsuRunner {
             .joined(separator: " ")
     }
     
-    // TODO: #13 Make generic by output type
     @discardableResult
     public func run(subcommand: String, arguments: [String], useShell: Bool = false) async throws -> Data {
         // Chain this task after the current one
@@ -71,11 +71,6 @@ public actor JujutsuRunner {
     }
     
     private func executeCommand(subcommand: String, arguments: [String], useShell: Bool) async throws -> Data {
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ENTER")
-        defer {
-            print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< EXIT")
-        }
-
         let configuration: Subprocess.Configuration
         if !useShell {
             await MainActor.run {
@@ -94,8 +89,7 @@ public actor JujutsuRunner {
         do {
             let result = try await Subprocess.run(configuration, output: .data, error: .string)
             if !result.terminationStatus.isSuccess {
-                fatalError("\(configuration), \(result)")
-                // throw JujutsuCLIError(configuration: configuration, result: result)
+                throw JujutsuCLIError(configuration: configuration, result: result)
             }
             return result.standardOutput
         } catch {
