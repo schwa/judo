@@ -89,7 +89,7 @@ struct FileChangeView: View {
     }
 }
 
-struct FileChangeHeaderView {
+struct FileChangeHeaderView: View {
 
     var file: FileDiff
 

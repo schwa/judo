@@ -247,6 +247,13 @@ public extension String {
         self.replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "\"", with: "\\\"")
     }
+    
+    func removingPrefix(_ prefix: String) -> String {
+        if hasPrefix(prefix) {
+            return String(dropFirst(prefix.count))
+        }
+        return self
+    }
 }
 
 public extension Data {

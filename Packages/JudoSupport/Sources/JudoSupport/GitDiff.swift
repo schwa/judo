@@ -74,9 +74,17 @@ public enum GitDiffParser {
                 currentFile = FileDiff(oldPath: "", newPath: "", hunks: [])
                 currentHunk = nil
             } else if line.starts(with: "--- ") {
-                currentFile?.oldPath = String(line.dropFirst(4)).trimmingCharacters(in: .whitespaces)
+                let path = line
+                    .removingPrefix("--- ")
+                    .trimmingCharacters(in: .whitespaces)
+                    .removingPrefix("a/")
+                currentFile?.oldPath = path
             } else if line.starts(with: "+++ ") {
-                currentFile?.newPath = String(line.dropFirst(4)).trimmingCharacters(in: .whitespaces)
+                let path = line
+                    .removingPrefix("+++ ")
+                    .trimmingCharacters(in: .whitespaces)
+                    .removingPrefix("b/")
+                currentFile?.newPath = path
             } else if line.starts(with: "@@") {
                 // Finish prior hunk
                 if let hunk = currentHunk {
