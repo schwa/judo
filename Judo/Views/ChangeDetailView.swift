@@ -11,23 +11,20 @@ struct ChangeDetailView: View {
     @State
     private var editedDescription: String = ""
 
+    @State
+    var selectedFile: String? // TODO: FIlePath?
+
     // TODO: #8 This is not getting reloaded when description changes??
     var change: Change
 
     var body: some View {
-        HSplitView {
+        NavigationSplitView {
             sidebar
-                .frame(minWidth: 200)
-                .border(Color.red)
-            detail
-                .frame(minWidth: 200, maxWidth: .infinity, maxHeight: .infinity)
-                .border(Color.red)
+            .frame(minWidth: 320)
         }
-        .border(Color.red)
-
-        //        NavigationSplitView {
-        //        } detail: {
-        //        }
+        detail: {
+            detail
+        }
         .onChange(of: change.description, initial: true) {
             editedDescription = change.description
         }
@@ -37,9 +34,7 @@ struct ChangeDetailView: View {
     var sidebar: some View {
         VSplitView {
             metadata
-                .frame(minHeight: 200)
             entries
-                .frame(minHeight: 200)
         }
     }
 
@@ -59,42 +54,37 @@ struct ChangeDetailView: View {
         Form {
             IDView(change.changeID, variant: .changeID)
             IDView(change.commitID, variant: .commitID)
+            HStack {
+                Image(systemName: "gear")
+                ContactView(name: change.author.name, email: change.author.email)
+                Text("\(change.author.timestamp, style: .relative)")
+            }
             TextEditor(text: $editedDescription)
+                .textFieldStyle(.roundedBorder)
                 .font(.body)
-            HStack {
-                Image(systemName: "gear")
-                ContactView(name: change.author.name, email: change.author.email)
-                Text("\(change.author.timestamp, style: .relative)")
-            }
-            HStack {
-                Image(systemName: "gear")
-                ContactView(name: change.author.name, email: change.author.email)
-                Text("\(change.author.timestamp, style: .relative)")
-            }
+                .frame(maxHeight: 120)
         }
         .padding()
     }
 
     @ViewBuilder
     var entries: some View {
-        VStack {
-            AsyncValueView { value in
-                if value.diff.files.isEmpty {
-                    ContentUnavailableView("No files", systemImage: "gear")
-                } else {
-                    List(value.diff.files, id: \.path) { f in
-                        HStack {
-                            f.status.view
-                            Text(describing: f.path)
-                        }
+        AsyncValueView { value in
+            if value.diff.files.isEmpty {
+                ContentUnavailableView("No files", systemImage: "gear")
+            } else {
+                List(value.diff.files, id: \.path, selection: $selectedFile) { f in
+                    HStack {
+                        f.status.view
+                        Text(describing: f.path)
                     }
                 }
             }
-            task: {
-                try await repositoryViewModel.repository.fullChange(jujutsu: appModel.jujutsu, change: change.changeID)
-            }
-            .id(change.changeID)
         }
+        task: {
+            try await repositoryViewModel.repository.fullChange(jujutsu: appModel.jujutsu, change: change.changeID)
+        }
+        .id(change.changeID)
     }
 }
 

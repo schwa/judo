@@ -49,43 +49,44 @@ struct GitDiffView: View {
 struct FileChangeView: View {
     var file: FileDiff
 
-    init(file: FileDiff) {
-        self.file = file
-        //
-        let indices = file.hunks.indices
-        assert(indices.count == Set(indices).count)
-        print(indices)
-    }
-
     var body: some View {
-        Section {
+        VStack {
+            Text("\(file.oldPath) → \(file.newPath)")
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                .background(Color.blue)
+                .foregroundColor(.white)
             LazyVStack(alignment: .leading, spacing: 0) {
-                ForEach(Array(file.hunks.enumerated()), id: \.offset) { offset, hunk in
-                    Text(hunk.header)
-                        .foregroundColor(.secondary)
-                        .padding(.vertical, 2)
+                ForEach(file.hunks) { hunk in
+//                    Text(hunk.header)
+//                        .foregroundColor(.secondary)
+//                        .padding(.vertical, 2)
 
-                    ForEach(hunk.changes.indices, id: \.self) { changeIndex in
-                        LineChangeView(change: hunk.changes[changeIndex])
+                    let changes = hunk.changes.enumerated().map { offset, change in
+                        ("\(hunk.id)#\(offset)", change)
+                    }
+
+                    ForEach(changes, id: \.0) { _, change in
+                        LineChangeView(hunk: hunk, change: change)
                     }
                     .font(.system(.body, design: .monospaced))
                 }
             }
         }
-        header: {
-            Text("\(file.oldPath) → \(file.newPath)")
-                .background(Color.blue)
-                .foregroundColor(.white)
-        }
-
     }
 }
 
 struct LineChangeView: View {
+    let hunk: Hunk
     let change: LineChange
 
     var body: some View {
         HStack(spacing: 4) {
+            Text("12")
+                .frame(width: 20, alignment: .trailing)
+            Divider()
+            Text("13")
+                .frame(width: 20, alignment: .trailing)
+            Divider()
             Text(prefixSymbol)
                 .frame(width: 20, alignment: .trailing)
                 .foregroundColor(prefixColor)
@@ -118,5 +119,11 @@ struct LineChangeView: View {
         case .deletion: return Color.red.opacity(0.1)
         case .unchanged: return Color.clear
         }
+    }
+}
+
+extension Hunk: @retroactive Identifiable {
+    public var id: String {
+        "\(oldStart),\(oldCount)-\(newStart),\(newCount)"
     }
 }
