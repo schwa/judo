@@ -15,15 +15,24 @@ struct JudoDocumentScene: Scene {
             JudoDocumentView(path: path)
         }
         .commands {
+
+//            CommandMenu("View") {
+//
+//            }
+
+
             CommandMenu("Repository") {
                 Button("Reveal in Finder") {
-                    if let repositoryViewModel {
-                        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: repositoryViewModel.repository.path.string)
+                    guard let repositoryViewModel else {
+                        logger?.error("No repository focused")
+                        return
                     }
+                    NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: repositoryViewModel.repository.path.string)
                 }
                 .keyboardShortcut("R", modifiers: [.command, .shift])
                 .disabled(repositoryViewModel == nil)
             }
+
         }
     }
 }
