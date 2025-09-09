@@ -10,6 +10,9 @@ struct RepositoryView: View {
 
     @Environment(RepositoryViewModel.self)
     var viewModel
+    
+    @Environment(\.actionRunner)
+    var actionRunner
 
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -41,6 +44,7 @@ struct RepositoryView: View {
         .focusedSceneValue(\.repositoryViewModel, viewModel)
         .onAppear {
             print("RepositoryView appeared with repository: \(viewModel.repository.path)")
+            viewModel.actionRunner = actionRunner
         }
     }
 

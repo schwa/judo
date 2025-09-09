@@ -8,7 +8,8 @@ public actor JujutsuRunner {
     private let jujutsu: Jujutsu
     private let repositoryPath: FilePath
     private let logger: Logger?
-    
+    private let verbose = false
+
     // Task chaining to ensure commands run serially
     private var currentTask: Task<Void, Never>?
     
@@ -59,7 +60,9 @@ public actor JujutsuRunner {
         
         if invalidatesCache && cacheEnabled {
             clearCache()
-            logger?.info("🧹 Cache cleared for write operation: \(subcommand)")
+            if verbose {
+                logger?.info("🧹 Cache cleared for write operation: \(subcommand)")
+            }
         }
         let result = try await execute(command)
         return result
@@ -78,14 +81,20 @@ public actor JujutsuRunner {
             if let cached = cache[command] {
                 let age = Date().timeIntervalSince(cached.timestamp)
                 if age < cacheExpiration {
-                    logger?.info("📦 Cache hit: \(command.description) (age: \(String(format: "%.2f", age))s)")
+                    if verbose {
+                        logger?.info("📦 Cache hit: \(command.description) (age: \(String(format: "%.2f", age))s)")
+                    }
                     return cached.data
                 } else {
-                    logger?.info("⏰ Cache expired: \(command.description) (age: \(String(format: "%.2f", age))s, max: \(self.cacheExpiration)s)")
+                    if verbose {
+                        logger?.info("⏰ Cache expired: \(command.description) (age: \(String(format: "%.2f", age))s, max: \(self.cacheExpiration)s)")
+                    }
                     cache.removeValue(forKey: command)
                 }
             } else {
-                logger?.debug("Cache miss: \(command.description)")
+                if verbose {
+                    logger?.debug("Cache miss: \(command.description)")
+                }
             }
         }
         
@@ -118,14 +127,18 @@ public actor JujutsuRunner {
         guard cacheEnabled else { return }
         
         cache[command] = CachedResult(data: data, timestamp: Date())
-        logger?.info("💾 Cached: \(command.description) (\(data.count) bytes)")
+        if verbose {
+            logger?.info("💾 Cached: \(command.description) (\(data.count) bytes)")
+        }
     }
     
     public func clearCache() {
         let count = cache.count
         cache.removeAll()
         if count > 0 {
-            logger?.debug("Cleared \(count) cached commands")
+            if verbose {
+                logger?.debug("Cleared \(count) cached commands")
+            }
         }
     }
     
@@ -140,13 +153,17 @@ public actor JujutsuRunner {
         }
         
         if !expired.isEmpty {
-            logger?.debug("Removed \(expired.count) expired cache entries")
+            if verbose {
+                logger?.debug("Removed \(expired.count) expired cache entries")
+            }
         }
     }
     
     private func executeCommand(_ command: Command) async throws -> Data {
-        logger?.info("🚀 Executing: \(command.description)")
-        
+        if verbose {
+            logger?.info("🚀 Executing: \(command.description)")
+        }
+
         let configuration = command.configuration
         
         do {

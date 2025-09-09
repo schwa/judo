@@ -8,9 +8,6 @@ import UniformTypeIdentifiers
 struct JudoDocumentScene: Scene {
     @FocusedValue(\.repositoryViewModel)
     private var repositoryViewModel: RepositoryViewModel?
-    
-    @FocusedValue(\.actionRunner)
-    private var actionRunner: ActionRunner?
 
     var body: some Scene {
         DocumentGroup(viewing: JudoDocument.self) { configuration in
@@ -91,6 +88,58 @@ struct JudoDocumentScene: Scene {
                 }
                 .keyboardShortcut("R", modifiers: [.command, .shift])
                 .disabled(repositoryViewModel == nil)
+            }
+            
+            CommandMenu("Change") {
+                Button("New Change") {
+                    guard let repositoryViewModel, let actionRunner = repositoryViewModel.actionRunner else {
+                        logger?.error("No repository or action runner available")
+                        return
+                    }
+                    actionRunner.with(action: Action(name: "New Change") {
+                        _ = try await repositoryViewModel.repository.runner.run(subcommand: "new", arguments: [], invalidatesCache: true)
+                        try await repositoryViewModel.refreshLog()
+                    })
+                }
+                .keyboardShortcut("n", modifiers: [.command])
+                .disabled(repositoryViewModel?.actionRunner == nil)
+                
+                Button("Squash") {
+                    guard let repositoryViewModel, let actionRunner = repositoryViewModel.actionRunner else {
+                        logger?.error("No repository or action runner available")
+                        return
+                    }
+                    let selectedChanges = repositoryViewModel.selection
+                    if !selectedChanges.isEmpty {
+                        actionRunner.with(action: Action(name: "Squash") {
+                            // Squash into parent of first selected change
+                            if let firstChange = selectedChanges.first {
+                                _ = try await repositoryViewModel.repository.runner.run(subcommand: "squash", arguments: ["--from", firstChange.description], invalidatesCache: true)
+                                try await repositoryViewModel.refreshLog()
+                            }
+                        })
+                    }
+                }
+                .keyboardShortcut("s", modifiers: [.command, .shift])
+                .disabled(repositoryViewModel?.actionRunner == nil || repositoryViewModel?.selection.isEmpty == true)
+                
+                Button("Abandon") {
+                    guard let repositoryViewModel, let actionRunner = repositoryViewModel.actionRunner else {
+                        logger?.error("No repository or action runner available")
+                        return
+                    }
+                    let selectedChanges = repositoryViewModel.selection
+                    if !selectedChanges.isEmpty {
+                        actionRunner.with(action: Action(name: "Abandon") {
+                            for changeID in selectedChanges {
+                                _ = try await repositoryViewModel.repository.runner.run(subcommand: "abandon", arguments: [changeID.description], invalidatesCache: true)
+                            }
+                            try await repositoryViewModel.refreshLog()
+                        })
+                    }
+                }
+                .keyboardShortcut(.delete, modifiers: [.command])
+                .disabled(repositoryViewModel?.actionRunner == nil || repositoryViewModel?.selection.isEmpty == true)
             }
 
         }

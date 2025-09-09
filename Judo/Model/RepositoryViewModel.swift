@@ -17,6 +17,7 @@ class RepositoryViewModel {
     var currentLog: RepositoryLog = RepositoryLog()
     var mode: Mode = .mixed
     var selection: Set<ChangeID> = []
+    var actionRunner: ActionRunner?
 
     init(jujutsu: Jujutsu, path: FilePath) {
         self.jujutsu = jujutsu
