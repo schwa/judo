@@ -2,7 +2,8 @@ import SwiftUI
 import Foundation
 import System
 
-extension AppModel {
+public extension AppModel {
+    @MainActor
     func handle(_ url: URL) {
         print(url)
         guard url.scheme == "x-judo" else {
@@ -11,19 +12,18 @@ extension AppModel {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return
         }
-        //        print(components.host)
-        //        print(components.path)
-        //        print(components.queryItems)
 
-        //        print(repository)
         let path = FilePath(components.path)
-        let openDocument = self.openDocument
-        Task {
-            try! await openDocument?(path.url)
+
+        print("Current repo: \(currentRepository)")
+        // Perform document opening on the MainActor to keep UI/document work serialized
+        // and avoid passing a non-Sendable closure across concurrency boundaries.
+        Task { @MainActor in
+            try await openDocument?(path.url)
         }
-//        Task {
-//            try! await Task.sleep(for: .seconds(1.0))
-//            print("AFTER", currentRepository)
-//        }
+        Task {
+            try await Task.sleep(for: .seconds(1.0))
+            print("New? repo: \(currentRepository)")
+        }
     }
 }

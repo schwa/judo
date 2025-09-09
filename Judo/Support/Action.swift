@@ -18,7 +18,7 @@ protocol PreviewableActionProtocol: ActionProtocol {
     var body: Body { get }
 }
 
-public struct Action: ActionProtocol {
+public struct Action: @MainActor ActionProtocol {
     public let id = UUID()
     public let name: String
     public let closure: () async throws -> Void
@@ -29,7 +29,7 @@ public struct Action: ActionProtocol {
     }
 }
 
-public struct PreviewableAction <Content>: PreviewableActionProtocol where Content: View {
+public struct PreviewableAction <Content>: @MainActor PreviewableActionProtocol where Content: View {
     public let id = UUID()
     public let name: String
     public let closure: () async throws -> Void

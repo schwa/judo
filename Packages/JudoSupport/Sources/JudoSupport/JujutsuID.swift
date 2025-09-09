@@ -39,7 +39,7 @@ public struct JujutsuID {
         self.shortestPrefixCount = shortest?.count
     }
 
-    public var string: String {
+    public nonisolated var string: String {
         rawValue
     }
 }
@@ -158,7 +158,11 @@ private extension AttributedString {
 }
 
 extension JujutsuID: Transferable {
-    public static var transferRepresentation: some TransferRepresentation {
-        ProxyRepresentation(exporting: \.rawValue)
+    public nonisolated static var transferRepresentation: some TransferRepresentation {
+        // Use an explicit @Sendable closure to satisfy CoreTransferable's requirements.
+//        ProxyRepresentation(exporting: { @Sendable (id: JujutsuID) -> String in
+//            id.string
+//        })
+        ProxyRepresentation(exporting: \.string)
     }
 }

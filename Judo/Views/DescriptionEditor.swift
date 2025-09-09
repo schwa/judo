@@ -101,7 +101,7 @@ struct MiniSignatureView: View {
     var signature: Signature
 
     var body: some View {
-        (Text(signature.name) + Text(" (") + Text(signature.timestamp, style: .relative) + Text(")"))
+        Text("\(signature.name) (\(signature.timestamp, style: .relative))")
             .textSelection(.enabled)
     }
 }

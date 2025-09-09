@@ -21,6 +21,7 @@ struct JudoApp: App {
         }
         .environment(appModel)
         .onChange(of: repository?.path) {
+            print("Focused repository changed to \(repository)")
             appModel.currentRepository = repository
         }
         .onChange(of: appModel.id, initial: true) {

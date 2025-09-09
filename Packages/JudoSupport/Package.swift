@@ -1,4 +1,4 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 6.2
 
 import PackageDescription
 
@@ -29,14 +29,23 @@ let package = Package(
                 .product(name: "TOMLKit", package: "TOMLKit"),
                 .product(name: "Subprocess", package: "swift-subprocess"),
                 .product(name: "SystemPackage", package: "swift-system"),
+            ],
+            swiftSettings: [
+                .defaultIsolation(MainActor.self)
             ]
         ),
         .testTarget(
             name: "JudoSupportTests",
-            dependencies: ["JudoSupport"]
+            dependencies: ["JudoSupport"],
+            swiftSettings: [
+                .defaultIsolation(MainActor.self)
+            ]
         ),
         .executableTarget(name: "JudoSupportPlayground",
-            dependencies: ["JudoSupport"]
+            dependencies: ["JudoSupport"],
+            swiftSettings: [
+                .defaultIsolation(MainActor.self)
+            ]
         ),
     ]
 )

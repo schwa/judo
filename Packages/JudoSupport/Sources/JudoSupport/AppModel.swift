@@ -28,7 +28,13 @@ public class AppModel: Identifiable {
     }
 
     public var jujutsu: Jujutsu
-    public var currentRepository: Repository?
+    public var currentRepository: Repository? {
+        didSet {
+            print("CURRENT REPO CHANGED: \(currentRepository)" )
+        }
+    }
+
+    @MainActor
     public var openDocument: ((URL) async throws -> Void)?
 
     public init() {
