@@ -8,6 +8,9 @@ import UniformTypeIdentifiers
 struct JudoDocumentScene: Scene {
     @FocusedValue(\.repositoryViewModel)
     private var repositoryViewModel: RepositoryViewModel?
+    
+    @FocusedValue(\.actionRunner)
+    private var actionRunner: ActionRunner?
 
     var body: some Scene {
         DocumentGroup(viewing: JudoDocument.self) { configuration in
