@@ -33,9 +33,9 @@ struct RepositoryLogView: View {
             .onMove { from, to in
                 move(from: from, to: to)
             }
-            .onChange(of: log.changes) {
-                graph = log.makeGraph()
-            }
+        }
+        .onChange(of: log.changes, initial: true) {
+            graph = log.makeGraph()
         }
     }
 
