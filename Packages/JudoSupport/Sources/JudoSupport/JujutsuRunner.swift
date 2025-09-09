@@ -1,18 +1,21 @@
 import Everything
 import Foundation
+import os
 import Subprocess
 import System
 
 public actor JujutsuRunner {
     private let jujutsu: Jujutsu
     private let repositoryPath: FilePath
+    private let logger: Logger?
     
     // Task chaining to ensure commands run serially
     private var currentTask: Task<Void, Never>?
     
-    public init(jujutsu: Jujutsu, repositoryPath: FilePath) {
+    public init(jujutsu: Jujutsu, repositoryPath: FilePath, logger: Logger? = nil) {
         self.jujutsu = jujutsu
         self.repositoryPath = repositoryPath
+        self.logger = logger
     }
     
     private var userShell: FilePath {
@@ -73,17 +76,13 @@ public actor JujutsuRunner {
     private func executeCommand(subcommand: String, arguments: [String], useShell: Bool) async throws -> Data {
         let configuration: Subprocess.Configuration
         if !useShell {
-            await MainActor.run {
-                logger?.info("Running jujutsu directly: \(self.jujutsu.binaryPath.string) \(subcommand) \(arguments.joined(separator: " "))")
-            }
+            logger?.info("Running jujutsu directly: \(jujutsu.binaryPath.string) \(subcommand) \(arguments.joined(separator: " "))")
             configuration = Subprocess.Configuration(executable: .path(jujutsu.binaryPath), arguments: Arguments(["--no-pager", "--color=never"] + [subcommand] + arguments), workingDirectory: repositoryPath)
         }
         else {
             let shell = userShell
             let shellCommand = shellify([jujutsu.binaryPath.string] + ["--no-pager", "--color=never"] + [subcommand] + arguments)
-            await MainActor.run {
-                logger?.info("Running jujutsu via shell: \(shell) -c \(shellCommand)")
-            }
+            logger?.info("Running jujutsu via shell: \(shell) -c \(shellCommand)")
             configuration = Subprocess.Configuration(executable: .path(shell), arguments: Arguments(["-c", shellCommand]), workingDirectory: repositoryPath)
         }
         do {
@@ -93,9 +92,7 @@ public actor JujutsuRunner {
             }
             return result.standardOutput
         } catch {
-            await MainActor.run {
-                logger?.log("Error running jujutsu: \(error)")
-            }
+            logger?.error("Error running jujutsu: \(error)")
             throw error
         }
     }

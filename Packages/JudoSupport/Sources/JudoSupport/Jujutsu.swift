@@ -1,5 +1,6 @@
 import Everything
 import Foundation
+import os
 import Subprocess
 import System
 import TOMLKit
@@ -7,10 +8,12 @@ import TOMLKit
 public struct Jujutsu: Sendable {
     public var binaryPath: FilePath
     public var tempConfigPath: FilePath
+    private let logger: Logger?
 
-    public init(binaryPath: FilePath) {
+    public init(binaryPath: FilePath, logger: Logger? = nil) {
         self.binaryPath = binaryPath
-        tempConfigPath = FilePath.temporaryDirectory + "judo.toml"
+        self.tempConfigPath = FilePath.temporaryDirectory + "judo.toml"
+        self.logger = logger
 
         // TODO: #29 try!
         try! makeTemplates()

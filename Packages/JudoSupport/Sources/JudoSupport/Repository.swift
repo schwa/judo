@@ -14,7 +14,7 @@ public struct Repository {
 
     public init(path: FilePath, jujutsu: Jujutsu) {
         self.path = path
-        self.runner = JujutsuRunner(jujutsu: jujutsu, repositoryPath: path)
+        self.runner = JujutsuRunner(jujutsu: jujutsu, repositoryPath: path, logger: logger)
     }
 
     public func log(jujutsu: Jujutsu, revset: String) async throws -> RepositoryLog {
