@@ -117,7 +117,7 @@ struct JudoDocumentView: View {
             pathContainsJujutsuRepository = RepositoryView.jujutsuRepositoryExists(at: path)
 
             if pathContainsGitRepository && pathContainsJujutsuRepository {
-                repository = Repository(appModel: appModel, path: path)
+                repository = Repository(jujutsu: appModel.jujutsu, path: path)
             }
         }
     }

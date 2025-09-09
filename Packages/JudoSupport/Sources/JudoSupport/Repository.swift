@@ -8,19 +8,16 @@ import TOMLKit
 @Observable
 @MainActor
 public class Repository {
-    public var appModel: AppModel // TODO: Weak?
+    public var jujutsu: Jujutsu
     public var path: FilePath
-    public var binaryPath: FilePath {
-        appModel.binaryPath
-    }
     public var currentLog: RepositoryLog
 
     public var canUndo: Bool {
         true
     }
 
-    public init(appModel: AppModel, path: FilePath) {
-        self.appModel = appModel
+    public init(jujutsu: Jujutsu, path: FilePath) {
+        self.jujutsu = jujutsu
         self.path = path
         self.currentLog = RepositoryLog()
     }
@@ -48,9 +45,9 @@ public class Repository {
     public func fetch<T>(subcommand: String, arguments: [String]) async throws -> [T] where T: Decodable & JutsuTemplateProviding {
         let arguments = arguments + [
             "--template", T.template.name,
-            "--config-file", appModel.jujutsu.tempConfigPath.path
+            "--config-file", jujutsu.tempConfigPath.path
         ]
-        let data = try await appModel.jujutsu.run(subcommand: subcommand, arguments: arguments, repository: self)
+        let data = try await jujutsu.run(subcommand: subcommand, arguments: arguments, repository: self)
         let header = "[\n".data(using: .utf8)!
         let footer = "\n]".data(using: .utf8)!
         let jsonData = header + data + footer

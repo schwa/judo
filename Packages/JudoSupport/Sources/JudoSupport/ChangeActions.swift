@@ -3,10 +3,6 @@ import Everything
 import Foundation
 
 public extension Repository {
-    var jujutsu: Jujutsu {
-        appModel.jujutsu
-    }
-
     func new(changes: [ChangeID] = []) async throws {
         try await jujutsu.run(subcommand: "new", arguments: changes.map(\.description), repository: self)
     }
