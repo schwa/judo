@@ -7,14 +7,10 @@ import SwiftUI
 import JudoSupport
 
 @Observable
-public class AppModel: Identifiable {
-
-    public var id: ObjectIdentifier {
-        ObjectIdentifier(self)
-    }
+class AppModel {
 
     // TODO: #16 Cheap & cheesy persistence.
-    public var binaryPath: FilePath {
+    var binaryPath: FilePath {
         didSet {
             UserDefaults.standard.set(binaryPath.path, forKey: "judo.binaryPath")
             jujutsu.binaryPath = binaryPath
@@ -22,23 +18,23 @@ public class AppModel: Identifiable {
     }
 
     // TODO: #16 standardize paths.
-    public var recentRepositories: Collections.OrderedSet<FilePath> {
+    var recentRepositories: Collections.OrderedSet<FilePath> {
         didSet {
             UserDefaults.standard.set(recentRepositories.map(\.path), forKey: "judo.recentRepositories")
         }
     }
 
-    public var jujutsu: Jujutsu
-    public var currentRepository: Repository? {
+    var jujutsu: Jujutsu
+    var currentRepositoryViewModel: RepositoryViewModel? {
         didSet {
-            print("CURRENT REPO CHANGED: \(currentRepository)" )
+            print("CURRENT REPO VIEW MODEL CHANGED: \(currentRepositoryViewModel)" )
         }
     }
 
     @MainActor
-    public var openDocument: ((URL) async throws -> Void)?
+    var openDocument: ((URL) async throws -> Void)?
 
-    public init() {
+    init() {
         UserDefaults.standard.register(defaults: [
             "judo.binaryPath": "/opt/homebrew/bin/jj",
             "judo.recentRepositories": []
@@ -49,5 +45,11 @@ public class AppModel: Identifiable {
             FilePath(path as! String)
         })
         jujutsu = Jujutsu(binaryPath: binaryPath)
+    }
+}
+
+extension AppModel: Identifiable {
+    var id: ObjectIdentifier {
+        ObjectIdentifier(self)
     }
 }

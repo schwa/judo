@@ -20,9 +20,9 @@ struct JudoApp: App {
             SettingsScene()
         }
         .environment(appModel)
-        .onChange(of: repositoryViewModel?.repository.path) {
+        .onChange(of: repositoryViewModel?.id) {
             print("Focused repository changed to \(repositoryViewModel)")
-            appModel.currentRepository = repositoryViewModel?.repository
+            appModel.currentRepositoryViewModel = repositoryViewModel
         }
         .onChange(of: appModel.id, initial: true) {
             appModel.openDocument = { try await openDocument(at: $0) }

@@ -29,6 +29,12 @@ extension FocusedValues {
     var repositoryViewModel: RepositoryViewModel?
 }
 
+extension RepositoryViewModel: Identifiable {
+    var id: ObjectIdentifier {
+        ObjectIdentifier(self)
+    }
+}
+
 extension RepositoryViewModel {
     func refreshLog() async throws {
         currentLog = try await repository.log(jujutsu: jujutsu, revset: currentLog.revset ?? "")
