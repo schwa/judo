@@ -6,6 +6,7 @@ import System
 public actor JujutsuRunner {
     private let jujutsu: Jujutsu
     private let repositoryPath: FilePath
+    private var currentTask: Task<Void, Never>?
     
     public init(jujutsu: Jujutsu, repositoryPath: FilePath) {
         self.jujutsu = jujutsu
@@ -49,10 +50,30 @@ public actor JujutsuRunner {
     // TODO: #13 Make generic by output type
     @discardableResult
     public func run(subcommand: String, arguments: [String], useShell: Bool = false) async throws -> Data {
-
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        // Chain this task after the current one
+        let previousTask = currentTask
+        
+        let task = Task<Data, Error> {
+            // Wait for previous task to complete
+            await previousTask?.value
+            
+            // Now run our command
+            return try await self.executeCommand(subcommand: subcommand, arguments: arguments, useShell: useShell)
+        }
+        
+        // Store this as the new current task
+        currentTask = Task {
+            _ = try? await task.value
+        }
+        
+        // Return the result
+        return try await task.value
+    }
+    
+    private func executeCommand(subcommand: String, arguments: [String], useShell: Bool) async throws -> Data {
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ENTER")
         defer {
-            print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+            print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< EXIT")
         }
 
         let configuration: Subprocess.Configuration
@@ -74,7 +95,7 @@ public actor JujutsuRunner {
             let result = try await Subprocess.run(configuration, output: .data, error: .string)
             if !result.terminationStatus.isSuccess {
                 fatalError("\(configuration), \(result)")
-                throw JujutsuCLIError(configuration: configuration, result: result)
+                // throw JujutsuCLIError(configuration: configuration, result: result)
             }
             return result.standardOutput
         } catch {
