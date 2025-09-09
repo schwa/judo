@@ -51,11 +51,8 @@ struct RepositoryView: View {
         ToolbarItem(placement: .navigation) {
             Picker("Mode", selection: $viewModel.mode) {
                 Text("Timeline").tag(RepositoryViewModel.Mode.timeline)
-                    .keyboardShortcut("1", modifiers: [.command])
                 Text("Mixed").tag(RepositoryViewModel.Mode.mixed)
-                    .keyboardShortcut("2", modifiers: [.command])
                 Text("Change").tag(RepositoryViewModel.Mode.change)
-                    .keyboardShortcut("3", modifiers: [.command])
             }
             .pickerStyle(.segmented)
         }

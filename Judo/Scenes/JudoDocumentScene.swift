@@ -15,11 +15,30 @@ struct JudoDocumentScene: Scene {
             JudoDocumentView(path: path)
         }
         .commands {
-
-//            CommandMenu("View") {
-//
-//            }
-
+            
+            CommandGroup(after: .toolbar) {
+                Divider()
+                
+                Menu("Repository Mode") {
+                    Button("Timeline") {
+                        repositoryViewModel?.mode = .timeline
+                    }
+                    .keyboardShortcut("1", modifiers: [.command])
+                    .disabled(repositoryViewModel == nil)
+                    
+                    Button("Mixed") {
+                        repositoryViewModel?.mode = .mixed
+                    }
+                    .keyboardShortcut("2", modifiers: [.command])
+                    .disabled(repositoryViewModel == nil)
+                    
+                    Button("Change") {
+                        repositoryViewModel?.mode = .change
+                    }
+                    .keyboardShortcut("3", modifiers: [.command])
+                    .disabled(repositoryViewModel == nil)
+                }
+            }
 
             CommandMenu("Repository") {
                 Button("Reveal in Finder") {
