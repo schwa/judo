@@ -34,6 +34,9 @@ struct SplashView: View {
     private var isOpeningRepositoryPresented: Bool = false
 
     var body: some View {
+        let paths = (NSDocumentController.shared.recentDocumentURLs.map(\.filePath)
+                        + appModel.recentRepositories.reversed()).uniqued()
+        
         HStack {
             VStack {
                 Image(nsImage: NSApp.applicationIconImage)
@@ -62,12 +65,9 @@ struct SplashView: View {
             }
             .frame(width: 240)
 
-            let paths = (NSDocumentController.shared.recentDocumentURLs.map(\.filePath)
-                            + appModel.recentRepositories.reversed()).uniqued()
-
             List(selection: $selectedRepository) {
-                ForEach(paths, id: \.self) { path in
-                    row(for: path)
+                ForEach(Array(paths.enumerated()), id: \.element) { index, path in
+                    row(for: path, index: index)
                 }
             }
         }
@@ -78,13 +78,26 @@ struct SplashView: View {
     }
 
     @ViewBuilder
-    func row(for path: FilePath) -> some View {
+    func row(for path: FilePath, index: Int? = nil) -> some View {
         HStack {
             Image(nsImage: path.icon)
             VStack(alignment: .leading) {
                 Text("\(path.displayName)")
                 Text(verbatim: path.path).foregroundStyle(.secondary)
                     .font(.caption)
+            }
+            Spacer()
+            if let index = index, index < 10 {
+                let digit = index == 9 ? "0" : "\(index + 1)"
+                Button("⌘⇧\(digit)") {
+                    Task {
+                        try! await openDocument(at: path.url)
+                    }
+                }
+                .buttonStyle(.plain)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .keyboardShortcut(KeyEquivalent(Character(digit)), modifiers: [.command, .shift])
             }
         }
         // TODO: #22 This is kinda shit as it imposes a delay and uses semi invisible bg
