@@ -37,9 +37,9 @@ struct MixedModeRepositoryView: View {
             //            bookmarksView
             //            Text("\(repository.currentLog.changes.count)")
         }
-        .toolbar {
-            toolbar
-        }
+//        .toolbar {
+//            toolbar
+//        }
         .inspector(isPresented: $isInspectorPresented) {
             inspector
                 .inspectorColumnWidth(min: 200, ideal: 320)
@@ -98,57 +98,54 @@ struct MixedModeRepositoryView: View {
     @ToolbarContentBuilder
     var toolbar: some ToolbarContent {
         ToolbarItem(placement: .primaryAction) {
-            Button("New") {
-                actionRunner?.with(action: Action(name: "new") {
-                    try await repositoryViewModel.repository.new(jujutsu: appModel.jujutsu, changes: selectedChanges.map(\.changeID))
-                    try await repositoryViewModel.refreshLog()
-                })
-            }
-        }
+            Menu("Actions") {
 
-        ToolbarItem(placement: .primaryAction) {
-            Button("Undo") {
-                actionRunner?.with(action: Action(name: "Undo") {
-                    try await repositoryViewModel.repository.undo(jujutsu: appModel.jujutsu)
-                    try await repositoryViewModel.refreshLog()
-                })
-            }
-            .disabled(!repositoryViewModel.repository.canUndo)
-        }
-
-        ToolbarItem(placement: .primaryAction) {
-            Button("Abandon") {
-                actionRunner?.with(action: Action(name: "Abandon") {
-                    try await repositoryViewModel.repository.abandon(jujutsu: appModel.jujutsu, changes: selectedChanges.map(\.changeID))
-                    try await repositoryViewModel.refreshLog()
-                })
-            }
-            .disabled(selection.isEmpty)
-        }
-
-        ToolbarItem(placement: .primaryAction) {
-            ValueView(value: false) { value in
-                let selectedChanges = selectedChanges
-                let targetChange = selectedChanges.first
-                let sourceChanges = selectedChanges.dropFirst().map(\.self)
-                Button("Squash") {
-                    let descriptions = selectedChanges.compactMap { $0.description.isEmpty ? nil : $0.description }
-                    if descriptions.count <= 1 {
-                        actionRunner?.with(action: Action(name: "Squash") {
-                            try await repositoryViewModel.repository.squash(jujutsu: appModel.jujutsu, changes: sourceChanges.map(\.id), destination: targetChange!.id, description: descriptions.first ?? "")
-                            try await repositoryViewModel.refreshLog()
-                        })
-                    } else {
-                        value.wrappedValue = true
-                    }
+                Button("New") {
+                    actionRunner?.with(action: Action(name: "new") {
+                        try await repositoryViewModel.repository.new(jujutsu: appModel.jujutsu, changes: selectedChanges.map(\.changeID))
+                        try await repositoryViewModel.refreshLog()
+                    })
                 }
-                .disabled(selection.count < 2)
-                .sheet(isPresented: value) {
-                    DescriptionEditor(targetChange: targetChange, sourceChanges: sourceChanges, isSquash: true) { description in
-                        actionRunner?.with(action: Action(name: "Squash") {
-                            try await repositoryViewModel.repository.squash(jujutsu: appModel.jujutsu, changes: sourceChanges.map(\.id), destination: targetChange!.id, description: description)
-                            try await repositoryViewModel.refreshLog()
-                        })
+
+                Button("Undo") {
+                    actionRunner?.with(action: Action(name: "Undo") {
+                        try await repositoryViewModel.repository.undo(jujutsu: appModel.jujutsu)
+                        try await repositoryViewModel.refreshLog()
+                    })
+                }
+                .disabled(!repositoryViewModel.repository.canUndo)
+
+                Button("Abandon") {
+                    actionRunner?.with(action: Action(name: "Abandon") {
+                        try await repositoryViewModel.repository.abandon(jujutsu: appModel.jujutsu, changes: selectedChanges.map(\.changeID))
+                        try await repositoryViewModel.refreshLog()
+                    })
+                }
+                .disabled(selection.isEmpty)
+
+                ValueView(value: false) { value in
+                    let selectedChanges = selectedChanges
+                    let targetChange = selectedChanges.first
+                    let sourceChanges = selectedChanges.dropFirst().map(\.self)
+                    Button("Squash") {
+                        let descriptions = selectedChanges.compactMap { $0.description.isEmpty ? nil : $0.description }
+                        if descriptions.count <= 1 {
+                            actionRunner?.with(action: Action(name: "Squash") {
+                                try await repositoryViewModel.repository.squash(jujutsu: appModel.jujutsu, changes: sourceChanges.map(\.id), destination: targetChange!.id, description: descriptions.first ?? "")
+                                try await repositoryViewModel.refreshLog()
+                            })
+                        } else {
+                            value.wrappedValue = true
+                        }
+                    }
+                    .disabled(selection.count < 2)
+                    .sheet(isPresented: value) {
+                        DescriptionEditor(targetChange: targetChange, sourceChanges: sourceChanges, isSquash: true) { description in
+                            actionRunner?.with(action: Action(name: "Squash") {
+                                try await repositoryViewModel.repository.squash(jujutsu: appModel.jujutsu, changes: sourceChanges.map(\.id), destination: targetChange!.id, description: description)
+                                try await repositoryViewModel.refreshLog()
+                            })
+                        }
                     }
                 }
             }
