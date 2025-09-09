@@ -70,9 +70,12 @@ public struct Jujutsu: Sendable {
 
     // TODO: #13 Make generic by output type
     @discardableResult
-    public func run(subcommand: String, arguments: [String], repository: Repository, useShell: Bool = true) async throws -> Data {
+    public func run(subcommand: String, arguments: [String], repository: Repository, useShell: Bool = false) async throws -> Data {
 
-        
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        defer {
+            print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        }
 
         let configuration: Subprocess.Configuration
         if !useShell {
