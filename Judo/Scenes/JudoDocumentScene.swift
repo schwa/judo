@@ -1,3 +1,4 @@
+import AppKit
 import JudoSupport
 import Subprocess
 import SwiftUI
@@ -5,30 +6,23 @@ import System
 import UniformTypeIdentifiers
 
 struct JudoDocumentScene: Scene {
-    @FocusedValue(Repository.self)
+    @FocusedValue(\.repository)
     private var repository: Repository?
 
     var body: some Scene {
         DocumentGroup(viewing: JudoDocument.self) { configuration in
             let path = FilePath(configuration.fileURL!.path)
             JudoDocumentView(path: path)
-                .onOpenURL { url in
-                    print("Opened URL: \(url)")
-                }
-                .onChange(of: repository?.path) {
-                    print("REPO CHANGED: \(repository?.path)")
-                }
-                .onAppear {
-                    print("JudoDocumentScene appeared")
-                }
-                .focusable()
         }
         .commands {
             CommandMenu("Repository") {
-                Button("Reveal", systemImage: "stop.fill") {
-                    print(repository)
+                Button("Reveal in Finder") {
+                    if let repository {
+                        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: repository.path.string)
+                    }
                 }
                 .keyboardShortcut("R", modifiers: [.command, .shift])
+                .disabled(repository == nil)
             }
         }
     }

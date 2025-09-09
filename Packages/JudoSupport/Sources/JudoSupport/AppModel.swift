@@ -3,9 +3,15 @@ import Everything
 import Foundation
 import Observation
 import System
+import SwiftUI
 
 @Observable
-public class AppModel {
+public class AppModel: Identifiable {
+
+    public var id: ObjectIdentifier {
+        ObjectIdentifier(self)
+    }
+
     // TODO: #16 Cheap & cheesy persistence.
     public var binaryPath: FilePath {
         didSet {
@@ -22,6 +28,8 @@ public class AppModel {
     }
 
     public var jujutsu: Jujutsu
+    public var currentRepository: Repository?
+    public var openDocument: ((URL) async throws -> Void)?
 
     public init() {
         UserDefaults.standard.register(defaults: [

@@ -47,7 +47,10 @@ struct RepositoryView: View {
             try! await repository.refresh()
         }
         .focusable()
-        .focusedValue(\.repository, repository)
+        .focusedSceneValue(\.repository, repository)
+        .onAppear {
+            print("RepositoryView appeared with repository: \(repository.path)")
+        }
     }
 
     @ToolbarContentBuilder

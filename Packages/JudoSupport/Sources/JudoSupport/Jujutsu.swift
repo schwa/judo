@@ -31,7 +31,7 @@ public struct Jujutsu: Sendable {
         ])
 
         try TOMLEncoder().encode(temporaryConfig).write(toFile: tempConfigPath.path, atomically: true, encoding: .utf8)
-        logger?.info(">>> \(tempConfigPath.string)")
+        logger?.info("Using temporary jujutsu config at: \(tempConfigPath.string)")
     }
 
     // TODO: #13 Make generic by output type

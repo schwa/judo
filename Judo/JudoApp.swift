@@ -9,6 +9,9 @@ struct JudoApp: App {
     @FocusedValue(Repository.self)
     private var repository
 
+    @Environment(\.openDocument)
+    var openDocument
+
     var body: some Scene {
         Group {
             SplashScene()
@@ -18,7 +21,10 @@ struct JudoApp: App {
         }
         .environment(appModel)
         .onChange(of: repository?.path) {
-            print("REPO CHANGED: \(repository?.path)")
+            appModel.currentRepository = repository
+        }
+        .onChange(of: appModel.id, initial: true) {
+            appModel.openDocument = { try await openDocument(at: $0) }
         }
     }
 }
