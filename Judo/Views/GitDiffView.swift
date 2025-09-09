@@ -51,10 +51,7 @@ struct FileChangeView: View {
 
     var body: some View {
         VStack {
-            Text("\(file.oldPath) → \(file.newPath)")
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                .background(Color.blue)
-                .foregroundColor(.white)
+            FileChangeHeaderView(file: file)
             LazyVStack(alignment: .leading, spacing: 0) {
                 ForEach(file.hunks) { hunk in
                     Text(hunk.header)
@@ -92,6 +89,24 @@ struct FileChangeView: View {
     }
 }
 
+struct FileChangeHeaderView {
+
+    var file: FileDiff
+
+
+    var body: some View {
+
+
+
+
+        Text("\(file.oldPath) → \(file.newPath)")
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+            .background(Color.blue)
+            .foregroundColor(.white)
+
+    }
+}
+
 struct LineChangeView: View {
     let oldLine: Int
     let newLine: Int
@@ -107,7 +122,7 @@ struct LineChangeView: View {
                     Color.clear
                 }
             }
-            .frame(width: 20, alignment: .trailing)
+            .frame(width: 40, alignment: .trailing)
             Divider()
             Group {
                 if change.type != .deletion {
@@ -117,7 +132,7 @@ struct LineChangeView: View {
                     Color.clear
                 }
             }
-            .frame(width: 20, alignment: .trailing)
+            .frame(width: 40, alignment: .trailing)
             Divider()
             Text(prefixSymbol)
                 .frame(width: 20, alignment: .trailing)
