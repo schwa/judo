@@ -10,6 +10,9 @@ struct RepositoryLogView: View {
 
     @Environment(RepositoryViewModel.self)
     var repositoryViewModel
+    
+    @Environment(AppModel.self)
+    var appModel
 
     @Environment(\.actionRunner)
     var actionRunner
@@ -75,7 +78,7 @@ struct RepositoryLogView: View {
         }
         let to = log.changes.values[to]
         actionRunner.with(action: Action(name: "Rabase") {
-            try await repositoryViewModel.repository.rebase(from: from.map(\.changeID), to: to.changeID)
+            try await repositoryViewModel.repository.rebase(jujutsu: appModel.jujutsu, from: from.map(\.changeID), to: to.changeID)
             try await repositoryViewModel.log(revset: log.revset ?? "")
         })
     }
@@ -101,6 +104,9 @@ struct RepositoryLogRow: View {
 
     @Environment(RepositoryViewModel.self)
     private var repositoryViewModel
+    
+    @Environment(AppModel.self)
+    private var appModel
 
     @Environment(\.actionRunner)
     private var actionRunner
@@ -147,7 +153,7 @@ struct RepositoryLogRow: View {
     func performBookmarkMove(bookmarks: [Bookmark], change: Change) -> Bool {
         let action = PreviewableAction(name: "Hello") {
             let arguments = ["move"] + bookmarks.map(\.bookmark) + ["--to", change.changeID.description]
-            _ = try await repositoryViewModel.repository.jujutsu.run(subcommand: "bookmark", arguments: arguments, repository: repositoryViewModel.repository)
+            _ = try await appModel.jujutsu.run(subcommand: "bookmark", arguments: arguments, repository: repositoryViewModel.repository)
             try await repositoryViewModel.refreshLog()
         }
         content: {
@@ -162,7 +168,7 @@ struct RepositoryLogRow: View {
                 }
                 .onAppear {
                     Task {
-                        let result = try await repositoryViewModel.repository.are(changes: [change.changeID], allAncestorsOf: bookmarks.map(\.source))
+                        let result = try await repositoryViewModel.repository.are(jujutsu: appModel.jujutsu, changes: [change.changeID], allAncestorsOf: bookmarks.map(\.source))
                         print("backwards?", result)
                     }
                 }

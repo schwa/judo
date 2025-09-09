@@ -1,13 +1,13 @@
 import Foundation
 
 public extension Repository {
-    func are(changes: [ChangeID], allAncestorsOf other: [ChangeID]) async throws -> Bool {
+    func are(jujutsu: Jujutsu, changes: [ChangeID], allAncestorsOf other: [ChangeID]) async throws -> Bool {
         let other = other.map { Revset.ancestors(of: $0) }
         let revset = Revset(all: other)
-        return try await are(changes: changes, allMmembersOf: revset)
+        return try await are(jujutsu: jujutsu, changes: changes, allMmembersOf: revset)
     }
 
-    func are(changes: [ChangeID], allMmembersOf revset: Revset) async throws -> Bool {
+    func are(jujutsu: Jujutsu, changes: [ChangeID], allMmembersOf revset: Revset) async throws -> Bool {
         let changes = changes.map(\.description).joined(separator: " | ")
         let data = try await jujutsu.run(subcommand: "log", arguments: ["--no-graph", "--revisions", changes, "--template", "self.contained_in(\"\(revset.escaped)\") ++ \",\""], repository: self)
             .wrapped(prefix: "[", suffix: "]")

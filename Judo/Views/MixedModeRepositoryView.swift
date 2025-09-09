@@ -100,7 +100,7 @@ struct MixedModeRepositoryView: View {
         ToolbarItem(placement: .primaryAction) {
             Button("New") {
                 actionRunner?.with(action: Action(name: "new") {
-                    try await repositoryViewModel.repository.new(changes: selectedChanges.map(\.changeID))
+                    try await repositoryViewModel.repository.new(jujutsu: appModel.jujutsu, changes: selectedChanges.map(\.changeID))
                     try await repositoryViewModel.refreshLog()
                 })
             }
@@ -109,7 +109,7 @@ struct MixedModeRepositoryView: View {
         ToolbarItem(placement: .primaryAction) {
             Button("Undo") {
                 actionRunner?.with(action: Action(name: "Undo") {
-                    try await repositoryViewModel.repository.undo()
+                    try await repositoryViewModel.repository.undo(jujutsu: appModel.jujutsu)
                     try await repositoryViewModel.refreshLog()
                 })
             }
@@ -119,7 +119,7 @@ struct MixedModeRepositoryView: View {
         ToolbarItem(placement: .primaryAction) {
             Button("Abandon") {
                 actionRunner?.with(action: Action(name: "Abandon") {
-                    try await repositoryViewModel.repository.abandon(changes: selectedChanges.map(\.changeID))
+                    try await repositoryViewModel.repository.abandon(jujutsu: appModel.jujutsu, changes: selectedChanges.map(\.changeID))
                     try await repositoryViewModel.refreshLog()
                 })
             }
@@ -135,7 +135,7 @@ struct MixedModeRepositoryView: View {
                     let descriptions = selectedChanges.compactMap { $0.description.isEmpty ? nil : $0.description }
                     if descriptions.count <= 1 {
                         actionRunner?.with(action: Action(name: "Squash") {
-                            try await repositoryViewModel.repository.squash(changes: sourceChanges.map(\.id), destination: targetChange!.id, description: descriptions.first ?? "")
+                            try await repositoryViewModel.repository.squash(jujutsu: appModel.jujutsu, changes: sourceChanges.map(\.id), destination: targetChange!.id, description: descriptions.first ?? "")
                             try await repositoryViewModel.refreshLog()
                         })
                     } else {
@@ -146,7 +146,7 @@ struct MixedModeRepositoryView: View {
                 .sheet(isPresented: value) {
                     DescriptionEditor(targetChange: targetChange, sourceChanges: sourceChanges, isSquash: true) { description in
                         actionRunner?.with(action: Action(name: "Squash") {
-                            try await repositoryViewModel.repository.squash(changes: sourceChanges.map(\.id), destination: targetChange!.id, description: description)
+                            try await repositoryViewModel.repository.squash(jujutsu: appModel.jujutsu, changes: sourceChanges.map(\.id), destination: targetChange!.id, description: description)
                             try await repositoryViewModel.refreshLog()
                         })
                     }

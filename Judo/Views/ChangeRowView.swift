@@ -6,6 +6,9 @@ import UniformTypeIdentifiers
 struct ChangeRowView: View {
     @Environment(RepositoryViewModel.self)
     var repositoryViewModel
+    
+    @Environment(AppModel.self)
+    var appModel
 
     @Environment(\.actionRunner)
     var actionRunner
@@ -194,19 +197,19 @@ struct ChangeRowView: View {
         if let actionRunner {
             Button("Squash Change") {
                 actionRunner.with(action: Action(name: "Squash Change") {
-                    try await repositoryViewModel.repository.squash(changes: [change.changeID])
+                    try await repositoryViewModel.repository.squash(jujutsu: appModel.jujutsu, changes: [change.changeID])
                     try await repositoryViewModel.refreshLog()
                 })
             }
             Button("Abandon Change") {
                 actionRunner.with(action: Action(name: "Abandon Change") {
-                    try await repositoryViewModel.repository.abandon(changes: [change.changeID])
+                    try await repositoryViewModel.repository.abandon(jujutsu: appModel.jujutsu, changes: [change.changeID])
                     try await repositoryViewModel.refreshLog()
                 })
             }
             Button("New Change") {
                 actionRunner.with(action: Action(name: "New Change") {
-                    try await repositoryViewModel.repository.new(changes: [change.changeID])
+                    try await repositoryViewModel.repository.new(jujutsu: appModel.jujutsu, changes: [change.changeID])
                     try await repositoryViewModel.refreshLog()
                 })
             }

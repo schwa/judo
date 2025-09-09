@@ -91,7 +91,7 @@ struct ChangeDetailView: View {
                 }
             }
             task: {
-                try await repositoryViewModel.repository.fullChange(change: change.changeID)
+                try await repositoryViewModel.repository.fullChange(jujutsu: appModel.jujutsu, change: change.changeID)
             }
             .id(change.changeID)
         }

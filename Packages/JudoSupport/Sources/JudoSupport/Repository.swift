@@ -5,24 +5,22 @@ import System
 import TOMLKit
 
 public struct Repository {
-    public var jujutsu: Jujutsu
     public var path: FilePath
 
     public var canUndo: Bool {
         true
     }
 
-    public init(jujutsu: Jujutsu, path: FilePath) {
-        self.jujutsu = jujutsu
+    public init(path: FilePath) {
         self.path = path
     }
 
-    public func log(revset: String) async throws -> RepositoryLog {
+    public func log(jujutsu: Jujutsu, revset: String) async throws -> RepositoryLog {
         var arguments = ["--no-graph"]
         if !revset.isEmpty {
             arguments.append(contentsOf: ["-r", revset])
         }
-        let changes: [Change] = try await fetch(subcommand: "log", arguments: arguments)
+        let changes: [Change] = try await fetch(jujutsu: jujutsu, subcommand: "log", arguments: arguments)
 
         // TODO: #18
         //        let bookmarks: [CommitRef] = try await fetch(subcommand: "bookmark", arguments: ["list"])
@@ -33,7 +31,8 @@ public struct Repository {
         )
     }
 
-    public func fetch<T>(subcommand: String, arguments: [String]) async throws -> [T] where T: Decodable & JutsuTemplateProviding {
+    // TODO: this is misnamed because it's confusable with `jj git fetch`.
+    public func fetch<T>(jujutsu: Jujutsu, subcommand: String, arguments: [String]) async throws -> [T] where T: Decodable & JutsuTemplateProviding {
         let arguments = arguments + [
             "--template", T.template.name,
             "--config-file", jujutsu.tempConfigPath.path

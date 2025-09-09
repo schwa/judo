@@ -23,7 +23,7 @@ struct RawTimelineView: View {
                 args.append(contentsOf: ["-r", revisionQuery])
             }
 
-            view.startProcess(executable: repositoryViewModel.repository.jujutsu.binaryPath.path, args: args, environment: env)
+            view.startProcess(executable: repositoryViewModel.jujutsu.binaryPath.path, args: args, environment: env)
         }
         .padding()
         .background(Color.black)

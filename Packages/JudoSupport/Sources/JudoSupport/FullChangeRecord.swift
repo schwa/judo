@@ -86,10 +86,10 @@ public struct TreeEntry: Decodable, JutsuTemplateProviding, Sendable {
 }
 
 public extension Repository {
-    func fullChange(change: ChangeID) async throws -> FullChangeRecord {
+    func fullChange(jujutsu: Jujutsu, change: ChangeID) async throws -> FullChangeRecord {
         do {
             let arguments = ["--no-graph", "-r", change.description]
-            let changes: [FullChangeRecord] = try await fetch(subcommand: "log", arguments: arguments)
+            let changes: [FullChangeRecord] = try await fetch(jujutsu: jujutsu, subcommand: "log", arguments: arguments)
             return changes[0]
         } catch {
             logger?.error("\(error)")
