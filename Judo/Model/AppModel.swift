@@ -25,11 +25,7 @@ class AppModel {
     }
 
     var jujutsu: Jujutsu
-    var currentRepositoryViewModel: RepositoryViewModel? {
-        didSet {
-            print("CURRENT REPO VIEW MODEL CHANGED: \(currentRepositoryViewModel)" )
-        }
-    }
+    var currentRepositoryViewModel: RepositoryViewModel?
 
     @MainActor
     var openDocument: ((URL) async throws -> Void)?

@@ -21,7 +21,6 @@ struct JudoApp: App {
         }
         .environment(appModel)
         .onChange(of: repositoryViewModel?.id) {
-            print("Focused repository changed to \(repositoryViewModel)")
             appModel.currentRepositoryViewModel = repositoryViewModel
         }
         .onChange(of: appModel.id, initial: true) {

@@ -37,18 +37,26 @@ public struct Jujutsu: Sendable {
     // TODO: #13 Make generic by output type
     @discardableResult
     public func run(subcommand: String, arguments: [String], repository: Repository) async throws -> Data {
+        let arguments = Arguments([subcommand] + arguments)
+        let configuration = Subprocess.Configuration(executable: .path(binaryPath), arguments: arguments, workingDirectory: repository.path)
+
+        logger?.info("Running jujutsu: \(subcommand) \(arguments)")
+
         do {
-            let arguments = Arguments([subcommand] + arguments)
-            let result = try await Subprocess.run(.path(binaryPath), arguments: arguments, workingDirectory: repository.path, output: .data, error: .string)
+            let result = try await Subprocess.run(configuration, output: .data, error: .string)
+
             if !result.terminationStatus.isSuccess {
-                logger?.log("Error running jujutsu: \(result.standardError ?? "")")
-                throw JudoError.generic("TODO") // TODO: #6
+                throw JujutsuCLIError(configuration: configuration, result: result)
             }
             return result.standardOutput
         } catch {
-            logger?.log("\(binaryPath), \(subcommand), \(arguments.joined(separator: " "))")
             logger?.log("Error running jujutsu: \(error)")
             throw error
         }
     }
+}
+
+struct JujutsuCLIError: Error {
+    var configuration: Subprocess.Configuration
+    var result:  CollectedResult<DataOutput, StringOutput<Unicode.UTF8>>
 }

@@ -118,7 +118,7 @@ struct GitDiffParser {
                 hunk.changes.append(LineChange(type: type, content: content))
                 currentHunk = hunk
             } else {
-                logger?.debug("Unrecognized line in diff: \(line)")
+                logger?.debug("Unrecognized line in diff: '\(line)'")
                 // Skip unrelated lines
             }
         }
