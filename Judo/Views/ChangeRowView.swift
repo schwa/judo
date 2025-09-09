@@ -4,8 +4,8 @@ import System
 import UniformTypeIdentifiers
 
 struct ChangeRowView: View {
-    @Environment(Repository.self)
-    var repository
+    @Environment(RepositoryViewModel.self)
+    var repositoryViewModel
 
     @Environment(\.actionRunner)
     var actionRunner
@@ -166,7 +166,7 @@ struct ChangeRowView: View {
             ForEach(change.bookmarks, id: \.self) { bookmark in
                 TagView(bookmark, systemImage: "bookmark.fill")
                     .backgroundStyle(.judoBookmarkColor)
-                    .draggable(Bookmark(repositoryPath: repository.path, source: change.changeID, bookmark: bookmark))
+                    .draggable(Bookmark(repositoryPath: repositoryViewModel.repository.path, source: change.changeID, bookmark: bookmark))
             }
         .font(.caption)
     }
@@ -194,20 +194,20 @@ struct ChangeRowView: View {
         if let actionRunner {
             Button("Squash Change") {
                 actionRunner.with(action: Action(name: "Squash Change") {
-                    try await repository.squash(changes: [change.changeID])
-                    try await repository.refresh()
+                    try await repositoryViewModel.repository.squash(changes: [change.changeID])
+                    try await repositoryViewModel.repository.refresh()
                 })
             }
             Button("Abandon Change") {
                 actionRunner.with(action: Action(name: "Abandon Change") {
-                    try await repository.abandon(changes: [change.changeID])
-                    try await repository.refresh()
+                    try await repositoryViewModel.repository.abandon(changes: [change.changeID])
+                    try await repositoryViewModel.repository.refresh()
                 })
             }
             Button("New Change") {
                 actionRunner.with(action: Action(name: "New Change") {
-                    try await repository.new(changes: [change.changeID])
-                    try await repository.refresh()
+                    try await repositoryViewModel.repository.new(changes: [change.changeID])
+                    try await repositoryViewModel.repository.refresh()
                 })
             }
         }

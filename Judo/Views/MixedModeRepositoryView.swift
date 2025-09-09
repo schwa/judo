@@ -11,8 +11,8 @@ struct MixedModeRepositoryView: View {
     @Environment(AppModel.self)
     private var appModel
 
-    @Environment(Repository.self)
-    private var repository
+    @Environment(RepositoryViewModel.self)
+    private var repositoryViewModel
 
     @Environment(\.actionRunner)
     private var actionRunner
@@ -24,9 +24,6 @@ struct MixedModeRepositoryView: View {
     private var isInspectorPresented: Bool = true
 
     var body: some View {
-        @Bindable
-        var repository = self.repository
-
         VStack {
             //            RevsetEditorView(revset: $revisionQuery) { text in
             //                revisionQuery = text
@@ -35,7 +32,7 @@ struct MixedModeRepositoryView: View {
             //                }
             //            }
             //            .padding()
-            RepositoryLogView(log: repository.currentLog, selection: $selection)
+            RepositoryLogView(log: repositoryViewModel.repository.currentLog, selection: $selection)
 
             //            bookmarksView
             //            Text("\(repository.currentLog.changes.count)")
@@ -76,7 +73,7 @@ struct MixedModeRepositoryView: View {
     }
 
     var selectedChanges: [Change] {
-        let log = repository.currentLog
+        let log = repositoryViewModel.repository.currentLog
         return selection
             .sorted { lhs, rhs in
                 let lhs = log.changes.index(forKey: lhs) ?? -1 // TODO: #7 -1?
@@ -90,7 +87,7 @@ struct MixedModeRepositoryView: View {
     @ViewBuilder
     var bookmarksView: some View {
         HStack {
-            ForEach(repository.currentLog.bookmarks.values) { bookmark in
+            ForEach(repositoryViewModel.repository.currentLog.bookmarks.values) { bookmark in
                 TagView(bookmark.name)
                     .backgroundStyle(.judoBookmarkColor)
             }
@@ -103,8 +100,8 @@ struct MixedModeRepositoryView: View {
         ToolbarItem(placement: .primaryAction) {
             Button("New") {
                 actionRunner?.with(action: Action(name: "new") {
-                    try await repository.new(changes: selectedChanges.map(\.changeID))
-                    try await repository.refresh()
+                    try await repositoryViewModel.repository.new(changes: selectedChanges.map(\.changeID))
+                    try await repositoryViewModel.repository.refresh()
                 })
             }
         }
@@ -112,18 +109,18 @@ struct MixedModeRepositoryView: View {
         ToolbarItem(placement: .primaryAction) {
             Button("Undo") {
                 actionRunner?.with(action: Action(name: "Undo") {
-                    try await repository.undo()
-                    try await repository.refresh()
+                    try await repositoryViewModel.repository.undo()
+                    try await repositoryViewModel.repository.refresh()
                 })
             }
-            .disabled(!repository.canUndo)
+            .disabled(!repositoryViewModel.repository.canUndo)
         }
 
         ToolbarItem(placement: .primaryAction) {
             Button("Abandon") {
                 actionRunner?.with(action: Action(name: "Abandon") {
-                    try await repository.abandon(changes: selectedChanges.map(\.changeID))
-                    try await repository.refresh()
+                    try await repositoryViewModel.repository.abandon(changes: selectedChanges.map(\.changeID))
+                    try await repositoryViewModel.repository.refresh()
                 })
             }
             .disabled(selection.isEmpty)
@@ -138,8 +135,8 @@ struct MixedModeRepositoryView: View {
                     let descriptions = selectedChanges.compactMap { $0.description.isEmpty ? nil : $0.description }
                     if descriptions.count <= 1 {
                         actionRunner?.with(action: Action(name: "Squash") {
-                            try await repository.squash(changes: sourceChanges.map(\.id), destination: targetChange!.id, description: descriptions.first ?? "")
-                            try await repository.refresh()
+                            try await repositoryViewModel.repository.squash(changes: sourceChanges.map(\.id), destination: targetChange!.id, description: descriptions.first ?? "")
+                            try await repositoryViewModel.repository.refresh()
                         })
                     } else {
                         value.wrappedValue = true
@@ -149,8 +146,8 @@ struct MixedModeRepositoryView: View {
                 .sheet(isPresented: value) {
                     DescriptionEditor(targetChange: targetChange, sourceChanges: sourceChanges, isSquash: true) { description in
                         actionRunner?.with(action: Action(name: "Squash") {
-                            try await repository.squash(changes: sourceChanges.map(\.id), destination: targetChange!.id, description: description)
-                            try await repository.refresh()
+                            try await repositoryViewModel.repository.squash(changes: sourceChanges.map(\.id), destination: targetChange!.id, description: description)
+                            try await repositoryViewModel.repository.refresh()
                         })
                     }
                 }
@@ -191,7 +188,7 @@ struct MixedModeRepositoryView: View {
         }
         Task {
             logger?.log("Search submitted: \(revset)")
-            try? await repository.log(revset: revset)
+            try? await repositoryViewModel.repository.log(revset: revset)
         }
     }
 }

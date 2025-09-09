@@ -1,5 +1,6 @@
 import Observation
 import JudoSupport
+import SwiftUI
 
 @Observable
 class RepositoryViewModel {
@@ -8,5 +9,10 @@ class RepositoryViewModel {
     init(repository: Repository) {
         self.repository = repository
     }
+}
+
+extension FocusedValues {
+    @Entry
+    var repositoryViewModel: RepositoryViewModel?
 }
 

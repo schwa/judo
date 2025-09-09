@@ -6,8 +6,8 @@ import System
 import UniformTypeIdentifiers
 
 struct JudoDocumentScene: Scene {
-    @FocusedValue(\.repository)
-    private var repository: Repository?
+    @FocusedValue(\.repositoryViewModel)
+    private var repositoryViewModel: RepositoryViewModel?
 
     var body: some Scene {
         DocumentGroup(viewing: JudoDocument.self) { configuration in
@@ -17,12 +17,12 @@ struct JudoDocumentScene: Scene {
         .commands {
             CommandMenu("Repository") {
                 Button("Reveal in Finder") {
-                    if let repository {
-                        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: repository.path.string)
+                    if let repositoryViewModel {
+                        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: repositoryViewModel.repository.path.string)
                     }
                 }
                 .keyboardShortcut("R", modifiers: [.command, .shift])
-                .disabled(repository == nil)
+                .disabled(repositoryViewModel == nil)
             }
         }
     }
@@ -56,7 +56,7 @@ struct JudoDocumentView: View {
     var path: FilePath
 
     @State
-    private var repository: Repository?
+    private var repositoryViewModel: RepositoryViewModel?
 
     @State
     private var pathContainsGitRepository: Bool = false
@@ -106,7 +106,7 @@ struct JudoDocumentView: View {
                 }
             } else {
                 RepositoryView()
-                    .environment(repository)
+                    .environment(repositoryViewModel)
                     .onChange(of: path, initial: true) {
                         appModel.recentRepositories.append(path)
                     }
@@ -117,7 +117,8 @@ struct JudoDocumentView: View {
             pathContainsJujutsuRepository = RepositoryView.jujutsuRepositoryExists(at: path)
 
             if pathContainsGitRepository && pathContainsJujutsuRepository {
-                repository = Repository(jujutsu: appModel.jujutsu, path: path)
+                let repository = Repository(jujutsu: appModel.jujutsu, path: path)
+                repositoryViewModel = RepositoryViewModel(repository: repository)
             }
         }
     }

@@ -27,10 +27,6 @@ struct SplashView: View {
     @Environment(\.dismissWindow)
     var dismissWindow
 
-    @FocusedValue(Repository.self)
-    private var repository
-
-
     @State
     private var selectedRepository: FilePath?
 

@@ -6,8 +6,8 @@ struct JudoApp: App {
     @State
     private var appModel = AppModel()
 
-    @FocusedValue(\.repository)
-    private var repository
+    @FocusedValue(\.repositoryViewModel)
+    private var repositoryViewModel
 
     @Environment(\.openDocument)
     var openDocument
@@ -20,9 +20,9 @@ struct JudoApp: App {
             SettingsScene()
         }
         .environment(appModel)
-        .onChange(of: repository?.path) {
-            print("Focused repository changed to \(repository)")
-            appModel.currentRepository = repository
+        .onChange(of: repositoryViewModel?.repository.path) {
+            print("Focused repository changed to \(repositoryViewModel)")
+            appModel.currentRepository = repositoryViewModel?.repository
         }
         .onChange(of: appModel.id, initial: true) {
             appModel.openDocument = { try await openDocument(at: $0) }

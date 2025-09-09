@@ -17,8 +17,8 @@ struct RepositoryView: View {
     @State
     private var mode: Mode = .mixed
 
-    @Environment(Repository.self)
-    var repository
+    @Environment(RepositoryViewModel.self)
+    var repositoryViewModel
 
     @State
     private var selection: Set<ChangeID> = []
@@ -38,18 +38,19 @@ struct RepositoryView: View {
         }
 
         .modifier(ActionHostViewModifier())
-        .navigationDocument(repository.path.url)
-        .navigationSubtitle("\(repository.path.description)")
+        .navigationDocument(repositoryViewModel.repository.path.url)
+        .navigationSubtitle("\(repositoryViewModel.repository.path.description)")
         .toolbar {
             toolbar
         }
         .task {
-            try! await repository.refresh()
+            try! await repositoryViewModel.repository.refresh()
         }
         .focusable()
-        .focusedSceneValue(\.repository, repository)
+        .focusedSceneValue(\.repository, repositoryViewModel.repository)
+        .focusedSceneValue(\.repositoryViewModel, repositoryViewModel)
         .onAppear {
-            print("RepositoryView appeared with repository: \(repository.path)")
+            print("RepositoryView appeared with repository: \(repositoryViewModel.repository.path)")
         }
     }
 
@@ -69,7 +70,7 @@ struct RepositoryView: View {
     }
 
     var selectedChanges: [Change] {
-        let log = repository.currentLog
+        let log = repositoryViewModel.repository.currentLog
         return selection
             .sorted { lhs, rhs in
                 let lhs = log.changes.index(forKey: lhs) ?? -1 // TODO: #7 -1?

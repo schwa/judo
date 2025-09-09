@@ -6,8 +6,8 @@ struct MixedModeChangeDetailView: View {
     @Environment(AppModel.self)
     var appModel
 
-    @Environment(Repository.self)
-    var repository
+    @Environment(RepositoryViewModel.self)
+    var repositoryViewModel
 
     // TODO: #8 This is not getting reloaded when description changes??
     var change: Change
@@ -36,7 +36,7 @@ struct MixedModeChangeDetailView: View {
                             Task {
                                 do {
                                     let arguments = ["-r", change.changeID.description, "-m", description]
-                                    _ = try await appModel.jujutsu.run(subcommand: "describe", arguments: arguments, repository: repository)
+                                    _ = try await appModel.jujutsu.run(subcommand: "describe", arguments: arguments, repository: repositoryViewModel.repository)
                                 } catch {
                                     logger?.error("Error describing change: \(error)")
                                 }
@@ -50,7 +50,7 @@ struct MixedModeChangeDetailView: View {
                 ForEach(change.parents, id: \.self) { parent in
                     HStack {
                         IDView(parent, variant: .changeID)
-                        if let parentChange = repository.currentLog.changes[parent] {
+                        if let parentChange = repositoryViewModel.repository.currentLog.changes[parent] {
                             Text(parentChange.description).lineLimit(1)
                         }
                     }
@@ -77,7 +77,7 @@ struct MixedModeChangeDetailView: View {
                 .debugBackground()
             }
             task: {
-                try await repository.fullChange(change: change.changeID)
+                try await repositoryViewModel.repository.fullChange(change: change.changeID)
             }
             .id(change.changeID)
         }

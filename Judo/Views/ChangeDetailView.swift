@@ -5,8 +5,8 @@ struct ChangeDetailView: View {
     @Environment(AppModel.self)
     var appModel
 
-    @Environment(Repository.self)
-    var repository
+    @Environment(RepositoryViewModel.self)
+    var repositoryViewModel
 
     @State
     private var editedDescription: String = ""
@@ -49,7 +49,7 @@ struct ChangeDetailView: View {
             GitDiffingView(data: data)
         }
         task: {
-            try await appModel.jujutsu.run(subcommand: "diff", arguments: ["-r", change.changeID.description, "--git"], repository: repository)
+            try await appModel.jujutsu.run(subcommand: "diff", arguments: ["-r", change.changeID.description, "--git"], repository: repositoryViewModel.repository)
         }
         .id(change.changeID)
     }
@@ -91,7 +91,7 @@ struct ChangeDetailView: View {
                 }
             }
             task: {
-                try await repository.fullChange(change: change.changeID)
+                try await repositoryViewModel.repository.fullChange(change: change.changeID)
             }
             .id(change.changeID)
         }

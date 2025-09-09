@@ -3,8 +3,8 @@ import JudoSupport
 import SwiftUI
 
 struct MixedModeChangesDetailView: View {
-    @Environment(Repository.self)
-    var repository
+    @Environment(RepositoryViewModel.self)
+    var repositoryViewModel
 
     @State
     private var changeIndex: Int = 0

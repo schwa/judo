@@ -5,11 +5,11 @@ struct ChangesGraphView: View {
     @Binding
     var selection: Set<ChangeID>
 
-    @Environment(Repository.self)
-    var repository
+    @Environment(RepositoryViewModel.self)
+    var repositoryViewModel
 
     var body: some View {
-        List(repository.currentLog.changes.values, selection: $selection) { change in
+        List(repositoryViewModel.repository.currentLog.changes.values, selection: $selection) { change in
             IDView(change.changeID, variant: .changeID)
         }
     }

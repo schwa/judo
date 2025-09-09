@@ -8,8 +8,8 @@ struct RepositoryLogView: View {
     @Binding
     var selection: Set<ChangeID>
 
-    @Environment(Repository.self)
-    var repository
+    @Environment(RepositoryViewModel.self)
+    var repositoryViewModel
 
     @Environment(\.actionRunner)
     var actionRunner
@@ -75,8 +75,8 @@ struct RepositoryLogView: View {
         }
         let to = log.changes.values[to]
         actionRunner.with(action: Action(name: "Rabase") {
-            try await repository.rebase(from: from.map(\.changeID), to: to.changeID)
-            try await repository.log(revset: log.revset ?? "")
+            try await repositoryViewModel.repository.rebase(from: from.map(\.changeID), to: to.changeID)
+            try await repositoryViewModel.repository.log(revset: log.revset ?? "")
         })
     }
 }
@@ -99,8 +99,8 @@ struct RepositoryLogRow: View {
     let selected: Bool
     let laneCount: Int
 
-    @Environment(Repository.self)
-    private var repository
+    @Environment(RepositoryViewModel.self)
+    private var repositoryViewModel
 
     @Environment(\.actionRunner)
     private var actionRunner
@@ -147,8 +147,8 @@ struct RepositoryLogRow: View {
     func performBookmarkMove(bookmarks: [Bookmark], change: Change) -> Bool {
         let action = PreviewableAction(name: "Hello") {
             let arguments = ["move"] + bookmarks.map(\.bookmark) + ["--to", change.changeID.description]
-            _ = try await repository.jujutsu.run(subcommand: "bookmark", arguments: arguments, repository: repository)
-            try await repository.refresh()
+            _ = try await repositoryViewModel.repository.jujutsu.run(subcommand: "bookmark", arguments: arguments, repository: repositoryViewModel.repository)
+            try await repositoryViewModel.repository.refresh()
         }
         content: {
             // TODO: #24 Hook up allow backwards which means PreviewableAction needs to become a "ConfigurableAction" and oh boy.
@@ -162,7 +162,7 @@ struct RepositoryLogRow: View {
                 }
                 .onAppear {
                     Task {
-                        let result = try await repository.are(changes: [change.changeID], allAncestorsOf: bookmarks.map(\.source))
+                        let result = try await repositoryViewModel.repository.are(changes: [change.changeID], allAncestorsOf: bookmarks.map(\.source))
                         print("backwards?", result)
                     }
                 }
