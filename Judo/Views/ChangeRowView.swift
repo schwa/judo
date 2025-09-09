@@ -195,19 +195,19 @@ struct ChangeRowView: View {
             Button("Squash Change") {
                 actionRunner.with(action: Action(name: "Squash Change") {
                     try await repositoryViewModel.repository.squash(changes: [change.changeID])
-                    try await repositoryViewModel.repository.refresh()
+                    try await repositoryViewModel.refreshLog()
                 })
             }
             Button("Abandon Change") {
                 actionRunner.with(action: Action(name: "Abandon Change") {
                     try await repositoryViewModel.repository.abandon(changes: [change.changeID])
-                    try await repositoryViewModel.repository.refresh()
+                    try await repositoryViewModel.refreshLog()
                 })
             }
             Button("New Change") {
                 actionRunner.with(action: Action(name: "New Change") {
                     try await repositoryViewModel.repository.new(changes: [change.changeID])
-                    try await repositoryViewModel.repository.refresh()
+                    try await repositoryViewModel.refreshLog()
                 })
             }
         }

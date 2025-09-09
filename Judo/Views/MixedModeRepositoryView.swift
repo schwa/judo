@@ -32,7 +32,7 @@ struct MixedModeRepositoryView: View {
             //                }
             //            }
             //            .padding()
-            RepositoryLogView(log: repositoryViewModel.repository.currentLog, selection: $selection)
+            RepositoryLogView(log: repositoryViewModel.currentLog, selection: $selection)
 
             //            bookmarksView
             //            Text("\(repository.currentLog.changes.count)")
@@ -73,7 +73,7 @@ struct MixedModeRepositoryView: View {
     }
 
     var selectedChanges: [Change] {
-        let log = repositoryViewModel.repository.currentLog
+        let log = repositoryViewModel.currentLog
         return selection
             .sorted { lhs, rhs in
                 let lhs = log.changes.index(forKey: lhs) ?? -1 // TODO: #7 -1?
@@ -87,7 +87,7 @@ struct MixedModeRepositoryView: View {
     @ViewBuilder
     var bookmarksView: some View {
         HStack {
-            ForEach(repositoryViewModel.repository.currentLog.bookmarks.values) { bookmark in
+            ForEach(repositoryViewModel.currentLog.bookmarks.values) { bookmark in
                 TagView(bookmark.name)
                     .backgroundStyle(.judoBookmarkColor)
             }
@@ -101,7 +101,7 @@ struct MixedModeRepositoryView: View {
             Button("New") {
                 actionRunner?.with(action: Action(name: "new") {
                     try await repositoryViewModel.repository.new(changes: selectedChanges.map(\.changeID))
-                    try await repositoryViewModel.repository.refresh()
+                    try await repositoryViewModel.refreshLog()
                 })
             }
         }
@@ -110,7 +110,7 @@ struct MixedModeRepositoryView: View {
             Button("Undo") {
                 actionRunner?.with(action: Action(name: "Undo") {
                     try await repositoryViewModel.repository.undo()
-                    try await repositoryViewModel.repository.refresh()
+                    try await repositoryViewModel.refreshLog()
                 })
             }
             .disabled(!repositoryViewModel.repository.canUndo)
@@ -120,7 +120,7 @@ struct MixedModeRepositoryView: View {
             Button("Abandon") {
                 actionRunner?.with(action: Action(name: "Abandon") {
                     try await repositoryViewModel.repository.abandon(changes: selectedChanges.map(\.changeID))
-                    try await repositoryViewModel.repository.refresh()
+                    try await repositoryViewModel.refreshLog()
                 })
             }
             .disabled(selection.isEmpty)
@@ -136,7 +136,7 @@ struct MixedModeRepositoryView: View {
                     if descriptions.count <= 1 {
                         actionRunner?.with(action: Action(name: "Squash") {
                             try await repositoryViewModel.repository.squash(changes: sourceChanges.map(\.id), destination: targetChange!.id, description: descriptions.first ?? "")
-                            try await repositoryViewModel.repository.refresh()
+                            try await repositoryViewModel.refreshLog()
                         })
                     } else {
                         value.wrappedValue = true
@@ -147,7 +147,7 @@ struct MixedModeRepositoryView: View {
                     DescriptionEditor(targetChange: targetChange, sourceChanges: sourceChanges, isSquash: true) { description in
                         actionRunner?.with(action: Action(name: "Squash") {
                             try await repositoryViewModel.repository.squash(changes: sourceChanges.map(\.id), destination: targetChange!.id, description: description)
-                            try await repositoryViewModel.repository.refresh()
+                            try await repositoryViewModel.refreshLog()
                         })
                     }
                 }
@@ -188,7 +188,7 @@ struct MixedModeRepositoryView: View {
         }
         Task {
             logger?.log("Search submitted: \(revset)")
-            try? await repositoryViewModel.repository.log(revset: revset)
+            try? await repositoryViewModel.log(revset: revset)
         }
     }
 }

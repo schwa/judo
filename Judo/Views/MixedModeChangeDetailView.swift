@@ -50,7 +50,7 @@ struct MixedModeChangeDetailView: View {
                 ForEach(change.parents, id: \.self) { parent in
                     HStack {
                         IDView(parent, variant: .changeID)
-                        if let parentChange = repositoryViewModel.repository.currentLog.changes[parent] {
+                        if let parentChange = repositoryViewModel.currentLog.changes[parent] {
                             Text(parentChange.description).lineLimit(1)
                         }
                     }

@@ -44,7 +44,7 @@ struct RepositoryView: View {
             toolbar
         }
         .task {
-            try! await viewModel.repository.refresh()
+            try! await viewModel.refreshLog()
         }
         .focusable()
         .focusedSceneValue(\.repository, viewModel.repository)
@@ -70,7 +70,7 @@ struct RepositoryView: View {
     }
 
     var selectedChanges: [Change] {
-        let log = viewModel.repository.currentLog
+        let log = viewModel.currentLog
         return selection
             .sorted { lhs, rhs in
                 let lhs = log.changes.index(forKey: lhs) ?? -1 // TODO: #7 -1?

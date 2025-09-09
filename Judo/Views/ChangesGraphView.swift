@@ -9,7 +9,7 @@ struct ChangesGraphView: View {
     var repositoryViewModel
 
     var body: some View {
-        List(repositoryViewModel.repository.currentLog.changes.values, selection: $selection) { change in
+        List(repositoryViewModel.currentLog.changes.values, selection: $selection) { change in
             IDView(change.changeID, variant: .changeID)
         }
     }

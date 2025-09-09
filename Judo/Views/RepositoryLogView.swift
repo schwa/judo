@@ -76,7 +76,7 @@ struct RepositoryLogView: View {
         let to = log.changes.values[to]
         actionRunner.with(action: Action(name: "Rabase") {
             try await repositoryViewModel.repository.rebase(from: from.map(\.changeID), to: to.changeID)
-            try await repositoryViewModel.repository.log(revset: log.revset ?? "")
+            try await repositoryViewModel.log(revset: log.revset ?? "")
         })
     }
 }
@@ -148,7 +148,7 @@ struct RepositoryLogRow: View {
         let action = PreviewableAction(name: "Hello") {
             let arguments = ["move"] + bookmarks.map(\.bookmark) + ["--to", change.changeID.description]
             _ = try await repositoryViewModel.repository.jujutsu.run(subcommand: "bookmark", arguments: arguments, repository: repositoryViewModel.repository)
-            try await repositoryViewModel.repository.refresh()
+            try await repositoryViewModel.refreshLog()
         }
         content: {
             // TODO: #24 Hook up allow backwards which means PreviewableAction needs to become a "ConfigurableAction" and oh boy.

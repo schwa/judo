@@ -1,16 +1,12 @@
 import Collections
 import Everything
 import Foundation
-import Observation
 import System
 import TOMLKit
 
-@Observable
-@MainActor
-public class Repository {
+public struct Repository {
     public var jujutsu: Jujutsu
     public var path: FilePath
-    public var currentLog: RepositoryLog
 
     public var canUndo: Bool {
         true
@@ -19,14 +15,9 @@ public class Repository {
     public init(jujutsu: Jujutsu, path: FilePath) {
         self.jujutsu = jujutsu
         self.path = path
-        self.currentLog = RepositoryLog()
     }
 
-    public func refresh() async throws {
-        try await log(revset: self.currentLog.revset ?? "")
-    }
-
-    public func log(revset: String) async throws {
+    public func log(revset: String) async throws -> RepositoryLog {
         var arguments = ["--no-graph"]
         if !revset.isEmpty {
             arguments.append(contentsOf: ["-r", revset])
@@ -35,7 +26,7 @@ public class Repository {
 
         // TODO: #18
         //        let bookmarks: [CommitRef] = try await fetch(subcommand: "bookmark", arguments: ["list"])
-        self.currentLog = RepositoryLog(
+        return RepositoryLog(
             revset: revset,
             changes: OrderedDictionary(uniqueKeys: changes.map(\.id), values: changes),
             bookmarks: [:] // OrderedDictionary(uniqueKeys: bookmarks.map(\.name), values: bookmarks)
