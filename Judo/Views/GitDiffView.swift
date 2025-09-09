@@ -61,12 +61,29 @@ struct FileChangeView: View {
                         .foregroundColor(.secondary)
                         .padding(.vertical, 2)
 
-                    let changes = hunk.changes.enumerated().map { offset, change in
-                        ("\(hunk.id)#\(offset)", change)
+                    var oldLineNumber = hunk.oldStart
+                    var newLineNumber = hunk.newStart
+                    
+                    let changesWithLineNumbers = hunk.changes.enumerated().map { offset, change in
+                        let id = "\(hunk.id)#\(offset)"
+                        let lineNumbers = (old: oldLineNumber, new: newLineNumber)
+                        
+                        // Update line numbers based on change type
+                        switch change.type {
+                        case .addition:
+                            newLineNumber += 1
+                        case .deletion:
+                            oldLineNumber += 1
+                        case .unchanged:
+                            oldLineNumber += 1
+                            newLineNumber += 1
+                        }
+                        
+                        return (id, lineNumbers, change)
                     }
 
-                    ForEach(changes, id: \.0) { _, change in
-                        LineChangeView(line: 0, change: change)
+                    ForEach(changesWithLineNumbers, id: \.0) { _, lineNumbers, change in
+                        LineChangeView(oldLine: lineNumbers.old, newLine: lineNumbers.new, change: change)
                     }
                     .font(.system(.body, design: .monospaced))
                 }
@@ -76,14 +93,15 @@ struct FileChangeView: View {
 }
 
 struct LineChangeView: View {
-    let line: Int
+    let oldLine: Int
+    let newLine: Int
     let change: LineChange
 
     var body: some View {
         HStack(spacing: 4) {
             Group {
-                if change.type != .deletion {
-                    Text("\(line)")
+                if change.type != .addition {
+                    Text("\(oldLine)")
                 }
                 else {
                     Color.clear
@@ -92,8 +110,8 @@ struct LineChangeView: View {
             .frame(width: 20, alignment: .trailing)
             Divider()
             Group {
-                if change.type != .addition {
-                    Text("\(line)")
+                if change.type != .deletion {
+                    Text("\(newLine)")
                 }
                 else {
                     Color.clear
