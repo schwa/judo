@@ -34,6 +34,23 @@ public struct Change {
         ++ "\t'bookmarks': [" ++ bookmarks.map(|c| "'" ++ c ++ "'").join(",") ++ "],\\n"
         ++ "},\\n"
         """)
+
+    public init(changeID: ChangeID, commitID: CommitID, author: Signature, description: String, isRoot: Bool, isEmpty: Bool, isImmutable: Bool, isGitHead: Bool, isConflict: Bool, isHead: Bool? = nil, parents: [ChangeID], bookmarks: [String], totalAdded: Int, totalRemoved: Int) {
+        self.changeID = changeID
+        self.commitID = commitID
+        self.author = author
+        self.description = description
+        self.isRoot = isRoot
+        self.isEmpty = isEmpty
+        self.isImmutable = isImmutable
+        self.isGitHead = isGitHead
+        self.isConflict = isConflict
+        self.isHead = isHead
+        self.parents = parents
+        self.bookmarks = bookmarks
+        self.totalAdded = totalAdded
+        self.totalRemoved = totalRemoved
+    }
 }
 
 extension Change: Sendable {

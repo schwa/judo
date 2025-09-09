@@ -124,6 +124,9 @@
     "Drag to /usr/local/bin, ~/.local/bin, or any directory in your PATH" : {
 
     },
+    "Edit Description" : {
+
+    },
     "empty" : {
 
     },
@@ -240,6 +243,9 @@
 
     },
     "Run" : {
+
+    },
+    "Save" : {
 
     },
     "Shell" : {

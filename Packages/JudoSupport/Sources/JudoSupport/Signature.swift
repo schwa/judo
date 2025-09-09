@@ -13,4 +13,10 @@ public struct Signature: Decodable, Equatable, Sendable {
         ++ ", 'timestamp': '" ++ p.timestamp().format("%Y-%m-%dT%H:%M:%S%z") ++ "'"
         ++ "}"
         """)
+
+    public init(name: String, email: String? = nil, timestamp: Date) {
+        self.name = name
+        self.email = email
+        self.timestamp = timestamp
+    }
 }
