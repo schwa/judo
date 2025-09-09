@@ -17,8 +17,8 @@ let package = Package(
         .package(url: "https://github.com/schwa/Everything", from: "1.2.0"),
         .package(url: "https://github.com/LebJe/TOMLKit.git", from: "0.5.0"),
         .package(url: "https://github.com/swiftlang/swift-subprocess", branch: "main"),
-        .package(url: "https://github.com/apple/swift-system", from: "1.4.0")
-
+        .package(url: "https://github.com/apple/swift-system", from: "1.4.0"),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0")
     ],
     targets: [
         .target(
@@ -43,6 +43,16 @@ let package = Package(
         ),
         .executableTarget(name: "JudoSupportPlayground",
             dependencies: ["JudoSupport"],
+            swiftSettings: [
+                .defaultIsolation(MainActor.self)
+            ]
+        ),
+        .executableTarget(
+            name: "judo-cli",
+            dependencies: [
+                "JudoSupport",
+                .product(name: "ArgumentParser", package: "swift-argument-parser")
+            ],
             swiftSettings: [
                 .defaultIsolation(MainActor.self)
             ]

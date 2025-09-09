@@ -39,6 +39,50 @@ struct SettingsView: View {
                 }
 
             Spacer()
+            
+            Section(header: Text("Command Line Interface")) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Drag the 'judo' command to install it in your PATH")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    HStack {
+                        Image(systemName: "terminal.fill")
+                            .font(.largeTitle)
+                            .foregroundColor(.accentColor)
+                        
+                        VStack(alignment: .leading) {
+                            Text("judo")
+                                .font(.headline)
+                            Text("Command-line tool v1.0.0")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(8)
+                    .onDrag {
+                        // Create a file provider for the judo.sh script
+                        if let scriptURL = Bundle.main.url(forResource: "judo", withExtension: "sh") {
+                            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("judo")
+                            try? FileManager.default.copyItem(at: scriptURL, to: tempURL)
+                            
+                            // Make it executable
+                            try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: tempURL.path)
+                            
+                            return NSItemProvider(object: tempURL as NSURL)
+                        }
+                        return NSItemProvider()
+                    }
+                    
+                    Text("Drag to /usr/local/bin, ~/.local/bin, or any directory in your PATH")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+            }
 
             Section(header: Text("Debug")) {
                 Toggle("Debug UI", isOn: $debugUI)
@@ -52,7 +96,7 @@ struct SettingsView: View {
                 }
             }
         }
-        .frame(width: 480, height: 320)
+        .frame(width: 480, height: 380)
         .padding()
     }
 }

@@ -88,6 +88,9 @@
     "Clone a Repository" : {
 
     },
+    "Command Line Interface" : {
+
+    },
     "Copy" : {
 
     },
@@ -116,6 +119,18 @@
 
     },
     "Github" : {
+
+    },
+    "Install" : {
+
+    },
+    "Install CLI" : {
+
+    },
+    "Install Judo CLI" : {
+
+    },
+    "Install the `judo` command to your PATH" : {
 
     },
     "Judo" : {
@@ -222,6 +237,9 @@
 
     },
     "Template Demo" : {
+
+    },
+    "This will install the 'judo' command to /usr/local/bin. You may be prompted for your password." : {
 
     },
     "Timeline" : {
