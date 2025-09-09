@@ -16,6 +16,40 @@ public struct Jujutsu: Sendable {
         try! makeTemplates()
     }
 
+    // TODO: Move out of here (and cache)
+    private var userShell: FilePath {
+        // Method 1: Try POSIX getpwuid to get user's default shell from passwd database
+        let uid = getuid()
+        if let pw = getpwuid(uid) {
+            let shellPtr = pw.pointee.pw_shell
+            if let shellPtr = shellPtr, let shell = String(validatingCString: shellPtr), !shell.isEmpty {
+                return FilePath(shell)
+            }
+        }
+        
+        // Method 2: Check SHELL environment variable (current running shell)
+        if let shell = ProcessInfo.processInfo.environment["SHELL"], !shell.isEmpty {
+            return FilePath(shell)
+        }
+        
+        // Method 3: Fallback to POSIX-compliant /bin/sh
+        return FilePath("/bin/sh")
+    }
+    
+    private func shellify(_ arguments: [String]) -> String {
+        arguments
+            .map { arg in
+                // Escape special characters for shell
+                let escaped = arg
+                    .replacingOccurrences(of: "\\", with: "\\\\")
+                    .replacingOccurrences(of: "\"", with: "\\\"")
+                    .replacingOccurrences(of: "$", with: "\\$")
+                    .replacingOccurrences(of: "`", with: "\\`")
+                return "\"\(escaped)\""
+            }
+            .joined(separator: " ")
+    }
+
     public func makeTemplates() throws {
         // TODO: #12 We shouldn't need to do these every time.
 
@@ -37,21 +71,20 @@ public struct Jujutsu: Sendable {
     // TODO: #13 Make generic by output type
     @discardableResult
     public func run(subcommand: String, arguments: [String], repository: Repository, useShell: Bool = true) async throws -> Data {
-        let configuration = if !useShell {
-            Subprocess.Configuration(executable: .path(binaryPath), arguments: Arguments([subcommand] + arguments), workingDirectory: repository.path)
+        let configuration: Subprocess.Configuration
+        if !useShell {
+            logger?.info("Running jujutsu directly: \(binaryPath.string) \(subcommand) \(arguments.joined(separator: " "))")
+            configuration = Subprocess.Configuration(executable: .path(binaryPath), arguments: Arguments([subcommand] + arguments), workingDirectory: repository.path)
         }
         else {
-
-            // TODO: HERE
-            Subprocess.Configuration(executable: .path(binaryPath), arguments: Arguments([subcommand] + arguments), workingDirectory: repository.path)
+            let shellCommand = shellify([binaryPath.string] + [subcommand] + arguments)
+            logger?.info("Running jujutsu via shell: \(userShell) -c \(shellCommand)")
+            configuration = Subprocess.Configuration(executable: .path(userShell), arguments: Arguments(["-c", shellCommand]), workingDirectory: repository.path)
         }
-
-        logger?.info("Running jujutsu: \(subcommand) \(arguments)")
-
         do {
             let result = try await Subprocess.run(configuration, output: .data, error: .string)
-
             if !result.terminationStatus.isSuccess {
+                fatalError("\(configuration), \(result)")
                 throw JujutsuCLIError(configuration: configuration, result: result)
             }
             return result.standardOutput
