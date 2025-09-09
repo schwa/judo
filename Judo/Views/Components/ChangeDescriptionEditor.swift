@@ -1,6 +1,17 @@
 import JudoSupport
 import SwiftUI
 
+
+struct ChangeDescriptionView: View {
+    let change: Change
+
+    var body: some View {
+        Text(change.description.isEmpty ? "No description" : change.description)
+            .foregroundStyle(change.description.isEmpty ? .secondary : .primary)
+    }
+}
+
+
 struct ChangeDescriptionEditor: View {
     @Environment(AppModel.self)
     private var appModel

@@ -27,7 +27,7 @@ public struct JujutsuID {
         self.shortestPrefixCount = nil
     }
 
-    public init(rawValue: String, shortest: String?) {
+    public init(_ rawValue: String, shortest: String?) {
         guard !rawValue.isEmpty else {
             fatalError("JujutsuID cannot be initialized with an empty string")
         }
@@ -69,7 +69,7 @@ extension JujutsuID: Decodable {
         }
         let shortest = match.output.shortest
         let full = match.output.full
-        self.init(rawValue: String(full), shortest: shortest.map(String.init))
+        self.init(String(full), shortest: shortest.map(String.init))
     }
 
     public static let template = Template(name: "JUDO_ID", parameters: ["p"], content: """

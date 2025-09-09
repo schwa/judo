@@ -9,9 +9,6 @@ struct ChangeDetailView: View {
     var repositoryViewModel
 
     @State
-    private var editedDescription: String = ""
-
-    @State
     var selectedFile: String? // TODO: FIlePath?
 
     // TODO: #8 This is not getting reloaded when description changes??
@@ -24,9 +21,6 @@ struct ChangeDetailView: View {
         }
         detail: {
             detail
-        }
-        .onChange(of: change.description, initial: true) {
-            editedDescription = change.description
         }
     }
 
@@ -59,10 +53,7 @@ struct ChangeDetailView: View {
                 ContactView(name: change.author.name, email: change.author.email)
                 Text("\(change.author.timestamp, style: .relative)")
             }
-            TextEditor(text: $editedDescription)
-                .textFieldStyle(.roundedBorder)
-                .font(.body)
-                .frame(maxHeight: 120)
+            ChangeDescriptionEditor(change: change)
         }
         .padding()
     }

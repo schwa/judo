@@ -1,6 +1,7 @@
 import Everything
 import SwiftUI
 
+// TODO: Deprecate
 struct ContactView: View {
     let name: String
     let email: String?
@@ -10,6 +11,7 @@ struct ContactView: View {
             HStack {
                 if let email {
                     AvatarIcon(email: email)
+                        .frame(maxHeight: 18)
                 }
                 Text(name)
                     .foregroundStyle(.judoContactColor)

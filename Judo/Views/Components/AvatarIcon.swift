@@ -13,17 +13,16 @@ struct AvatarIcon: View {
     )
 
     @State
-    private var image: Image?
+    private var image = Image(systemName: "person.crop.circle")
 
     var body: some View {
         ZStack {
-            image?.resizable()
+            image.resizable()
         }
         .aspectRatio(1.0, contentMode: .fit)
-        .frame(maxHeight: 18)
         .onChange(of: email, initial: true) {
             guard !email.isEmpty else {
-                image = nil
+                image = Image(systemName: "person.crop.circle")
                 return
             }
             let url = GravatarFetcher.gravatarURL(for: email)
@@ -56,4 +55,13 @@ struct AvatarIcon: View {
             }
         }
     }
+}
+
+#Preview {
+    AvatarIcon(email: "test1@example.com")
+        .frame(width: 64, height: 64)
+        .border(Color.red)
+    AvatarIcon(email: "random@notarealdomain.com")
+        .frame(width: 64, height: 64)
+        .border(Color.red)
 }

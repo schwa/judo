@@ -77,6 +77,7 @@ struct DescriptionEditor: View {
     }
 }
 
+// TODO: REMOVE
 struct MiniChangeView: View {
     var change: Change
     var includeDescription: Bool = true
@@ -94,14 +95,5 @@ struct MiniChangeView: View {
                 Text(change.description)
             }
         }
-    }
-}
-
-struct MiniSignatureView: View {
-    var signature: Signature
-
-    var body: some View {
-        Text("\(signature.name) (\(signature.timestamp, style: .relative))")
-            .textSelection(.enabled)
     }
 }
