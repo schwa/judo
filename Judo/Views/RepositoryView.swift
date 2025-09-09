@@ -68,7 +68,7 @@ struct RepositoryView: View {
     var toolbar: some ToolbarContent {
         @Bindable var viewModel = viewModel
         
-        ToolbarItem(placement: .navigation) {
+        ToolbarItem(placement: .principal) {
             Picker("Mode", selection: $viewModel.mode) {
                 Text("Timeline").tag(RepositoryViewModel.Mode.timeline)
                 Text("Mixed").tag(RepositoryViewModel.Mode.mixed)

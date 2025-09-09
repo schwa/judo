@@ -68,6 +68,12 @@ public enum GitDiffParser {
             let line = lines.removeFirst()
 
             if line.starts(with: "diff --git") {
+                // Finish current hunk if exists
+                if let hunk = currentHunk {
+                    currentFile?.hunks.append(hunk)
+                    currentHunk = nil
+                }
+                // Finish current file if exists
                 if let file = currentFile {
                     files.append(file)
                 }

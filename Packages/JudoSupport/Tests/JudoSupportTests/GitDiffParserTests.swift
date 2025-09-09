@@ -48,6 +48,33 @@ struct GitDiffParserTests {
         #expect(diff.files[0].newPath == "src/main.swift")
     }
 
+    @Test func testMultiFileDiff() throws {
+        let diffText = """
+        diff --git a/file1.txt b/file1.txt
+        --- a/file1.txt
+        +++ b/file1.txt
+        @@ -1 +1 @@
+        -old1
+        +new1
+        diff --git a/file2.txt b/file2.txt
+        --- a/file2.txt
+        +++ b/file2.txt
+        @@ -1 +1 @@
+        -old2
+        +new2
+        """
+        
+        let diff = GitDiffParser.parse(diffText: diffText)
+        
+        #expect(diff.files.count == 2)
+        #expect(diff.files[0].oldPath == "file1.txt")
+        #expect(diff.files[0].newPath == "file1.txt")
+        #expect(diff.files[0].hunks.count == 1)
+        #expect(diff.files[1].oldPath == "file2.txt")
+        #expect(diff.files[1].newPath == "file2.txt")
+        #expect(diff.files[1].hunks.count == 1)
+    }
+    
     @Test func testRealWorldDiffParsing() throws {
         let diffText = """
         diff --git a/Judo/Views/GitDiffView.swift b/Judo/Views/GitDiffView.swift
@@ -109,19 +136,22 @@ struct GitDiffParserTests {
 
         let diff = GitDiffParser.parse(diffText: diffText)
 
-        #expect(diff.files.count == 1)
-
-        let file = diff.files[0]
-        #expect(file.oldPath == "foo.txt")
-        #expect(file.newPath == "foo.txt")
-        #expect(file.hunks.count == 1)
-
-        let hunk = file.hunks[0]
-        #expect(hunk.changes.count == 4)
-        #expect(hunk.changes[0].type == .unchanged)
-        #expect(hunk.changes[1].type == .deletion)
-        #expect(hunk.changes[2].type == .addition)
-        #expect(hunk.changes[3].type == .unchanged)
+        #expect(diff.files.count == 3)
+        
+        // Check first file
+        #expect(diff.files[0].oldPath == "Judo/Views/GitDiffView.swift")
+        #expect(diff.files[0].newPath == "Judo/Views/GitDiffView.swift")
+        #expect(diff.files[0].hunks.count == 1)
+        
+        // Check second file
+        #expect(diff.files[1].oldPath == "Packages/JudoSupport/Sources/JudoSupport/GitDiff.swift")
+        #expect(diff.files[1].newPath == "Packages/JudoSupport/Sources/JudoSupport/GitDiff.swift")
+        #expect(diff.files[1].hunks.count == 1)
+        
+        // Check third file
+        #expect(diff.files[2].oldPath == "Packages/JudoSupport/Sources/JudoSupport/Support.swift")
+        #expect(diff.files[2].newPath == "Packages/JudoSupport/Sources/JudoSupport/Support.swift")
+        #expect(diff.files[2].hunks.count == 1)
     }
 
 }
