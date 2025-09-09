@@ -39,7 +39,7 @@ public struct Repository {
             "--template", T.template.name,
             "--config-file", jujutsu.tempConfigPath.path
         ]
-        let data = try await runner.run(subcommand: subcommand, arguments: arguments)
+        let data = try await runner.run(subcommand: subcommand, arguments: arguments, invalidatesCache: false)
         let header = "[\n".data(using: .utf8)!
         let footer = "\n]".data(using: .utf8)!
         let jsonData = header + data + footer

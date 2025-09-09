@@ -9,7 +9,7 @@ public extension Repository {
 
     func are(jujutsu: Jujutsu, changes: [ChangeID], allMmembersOf revset: Revset) async throws -> Bool {
         let changes = changes.map(\.description).joined(separator: " | ")
-        let data = try await runner.run(subcommand: "log", arguments: ["--no-graph", "--revisions", changes, "--template", "self.contained_in(\"\(revset.escaped)\") ++ \",\""])
+        let data = try await runner.run(subcommand: "log", arguments: ["--no-graph", "--revisions", changes, "--template", "self.contained_in(\"\(revset.escaped)\") ++ \",\""], invalidatesCache: false)
             .wrapped(prefix: "[", suffix: "]")
         let decoder = JSONDecoder()
         decoder.allowsJSON5 = true

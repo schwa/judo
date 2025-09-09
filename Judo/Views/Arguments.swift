@@ -47,7 +47,7 @@ extension Array: ArgumentsConvertible where Element: ArgumentsConvertible {
 extension Repository {
     func run<T>(subcommand: String, arguments: Arguments) async throws -> [T] where T: Decodable {
         let arguments = arguments.strings
-        let data = try await runner.run(subcommand: subcommand, arguments: arguments)
+        let data = try await runner.run(subcommand: subcommand, arguments: arguments, invalidatesCache: false)
             .wrapped(prefix: "[", suffix: "]")
         let decoder = JSONDecoder()
         decoder.allowsJSON5 = true

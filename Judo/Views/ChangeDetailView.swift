@@ -49,7 +49,7 @@ struct ChangeDetailView: View {
             GitDiffingView(data: data)
         }
         task: {
-            try await repositoryViewModel.repository.runner.run(subcommand: "diff", arguments: ["-r", change.changeID.description, "--git"])
+            try await repositoryViewModel.repository.runner.run(subcommand: "diff", arguments: ["-r", change.changeID.description, "--git"], invalidatesCache: false)
         }
         .id(change.changeID)
     }
