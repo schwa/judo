@@ -10,6 +10,12 @@ public struct Bookmark {
     public var repositoryPath: FilePath
     public var source: ChangeID
     public var bookmark: String
+
+    public init(repositoryPath: FilePath, source: ChangeID, bookmark: String) {
+        self.repositoryPath = repositoryPath
+        self.source = source
+        self.bookmark = bookmark
+    }
 }
 
 extension Bookmark: Sendable {
