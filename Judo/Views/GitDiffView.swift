@@ -57,16 +57,16 @@ struct FileChangeView: View {
                 .foregroundColor(.white)
             LazyVStack(alignment: .leading, spacing: 0) {
                 ForEach(file.hunks) { hunk in
-//                    Text(hunk.header)
-//                        .foregroundColor(.secondary)
-//                        .padding(.vertical, 2)
+                    Text(hunk.header)
+                        .foregroundColor(.secondary)
+                        .padding(.vertical, 2)
 
                     let changes = hunk.changes.enumerated().map { offset, change in
                         ("\(hunk.id)#\(offset)", change)
                     }
 
                     ForEach(changes, id: \.0) { _, change in
-                        LineChangeView(hunk: hunk, change: change)
+                        LineChangeView(line: 0, change: change)
                     }
                     .font(.system(.body, design: .monospaced))
                 }
@@ -76,21 +76,36 @@ struct FileChangeView: View {
 }
 
 struct LineChangeView: View {
-    let hunk: Hunk
+    let line: Int
     let change: LineChange
 
     var body: some View {
         HStack(spacing: 4) {
-            Text("12")
-                .frame(width: 20, alignment: .trailing)
+            Group {
+                if change.type != .deletion {
+                    Text("\(line)")
+                }
+                else {
+                    Color.clear
+                }
+            }
+            .frame(width: 20, alignment: .trailing)
             Divider()
-            Text("13")
-                .frame(width: 20, alignment: .trailing)
+            Group {
+                if change.type != .addition {
+                    Text("\(line)")
+                }
+                else {
+                    Color.clear
+                }
+            }
+            .frame(width: 20, alignment: .trailing)
             Divider()
             Text(prefixSymbol)
                 .frame(width: 20, alignment: .trailing)
                 .foregroundColor(prefixColor)
             Text(change.content)
+                .lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .textSelection(.enabled)
         }
