@@ -247,3 +247,11 @@ public extension String {
             .replacingOccurrences(of: "\"", with: "\\\"")
     }
 }
+
+public extension Data {
+    func wrapped(prefix: String, suffix: String) -> Data {
+        let prefixData = prefix.data(using: .utf8) ?? Data()
+        let suffixData = suffix.data(using: .utf8) ?? Data()
+        return prefixData + self + suffixData
+    }
+}

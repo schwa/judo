@@ -1,7 +1,6 @@
 import Foundation
-import JudoSupport
 
-extension Repository {
+public extension Repository {
     func are(changes: [ChangeID], allAncestorsOf other: [ChangeID]) async throws -> Bool {
         let other = other.map { Revset.ancestors(of: $0) }
         let revset = Revset(all: other)
@@ -20,23 +19,23 @@ extension Repository {
 }
 
 // TODO: #26 Experimental
-protocol RevsetConvertible {
+public protocol RevsetConvertible {
     var revset: Revset { get }
 }
 
 extension Revset: RevsetConvertible {
-    var revset: Revset {
+    public var revset: Revset {
         self
     }
 }
 
 extension ChangeID: RevsetConvertible {
-    var revset: Revset {
+    public var revset: Revset {
         Revset(self.string)
     }
 }
 
-extension Revset {
+public extension Revset {
     static func ancestors(of other: some RevsetConvertible) -> Revset {
         Revset("::\(other.revset.string)")
     }
