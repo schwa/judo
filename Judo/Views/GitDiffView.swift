@@ -1,4 +1,5 @@
 import SwiftUI
+import JudoSupport
 
 struct GitDiffingView: View {
     let data: Data
@@ -39,32 +40,44 @@ struct GitDiffView: View {
         List {
             ForEach(Array(parsedDiff.files.indices), id: \.self) { fileIndex in
                 let file = parsedDiff.files[fileIndex]
-
-                Section {
-                    LazyVStack(alignment: .leading, spacing: 0) {
-                        ForEach(file.hunks.indices, id: \.self) { hunkIndex in
-                            let hunk = file.hunks[hunkIndex]
-                            Text(hunk.header)
-                                .foregroundColor(.secondary)
-                                .padding(.vertical, 2)
-
-                            ForEach(hunk.changes.indices, id: \.self) { changeIndex in
-                                LineChangeView(change: hunk.changes[changeIndex])
-                            }
-                            .font(.system(.body, design: .monospaced))
-                        }
-                    }
-                }
-                header: {
-                    Text("\(file.oldPath) → \(file.newPath)")
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                }
-                //                footer: {
-                //                    EmptyView()
-                //                }
+                FileChangeView(file: file)
             }
         }
+    }
+}
+
+struct FileChangeView: View {
+    var file: FileDiff
+
+    init(file: FileDiff) {
+        self.file = file
+        //
+        let indices = file.hunks.indices
+        assert(indices.count == Set(indices).count)
+        print(indices)
+    }
+
+    var body: some View {
+        Section {
+            LazyVStack(alignment: .leading, spacing: 0) {
+                ForEach(Array(file.hunks.enumerated()), id: \.offset) { offset, hunk in
+                    Text(hunk.header)
+                        .foregroundColor(.secondary)
+                        .padding(.vertical, 2)
+
+                    ForEach(hunk.changes.indices, id: \.self) { changeIndex in
+                        LineChangeView(change: hunk.changes[changeIndex])
+                    }
+                    .font(.system(.body, design: .monospaced))
+                }
+            }
+        }
+        header: {
+            Text("\(file.oldPath) → \(file.newPath)")
+                .background(Color.blue)
+                .foregroundColor(.white)
+        }
+
     }
 }
 

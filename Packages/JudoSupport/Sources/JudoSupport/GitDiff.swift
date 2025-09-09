@@ -2,38 +2,38 @@ import Foundation
 import RegexBuilder
 import SwiftUI
 
-enum LineChangeType {
+public enum LineChangeType {
     case addition
     case deletion
     case unchanged
 }
 
-struct LineChange {
-    var type: LineChangeType
-    var content: String
+public struct LineChange {
+    public var type: LineChangeType
+    public var content: String
 }
 
-struct Hunk {
-    var header: String
-    var oldStart: Int
-    var oldCount: Int
-    var newStart: Int
-    var newCount: Int
-    var changes: [LineChange]
+public struct Hunk {
+    public var header: String
+    public var oldStart: Int
+    public var oldCount: Int
+    public var newStart: Int
+    public var newCount: Int
+    public var changes: [LineChange]
 }
 
-struct FileDiff {
-    var oldPath: String
-    var newPath: String
-    var hunks: [Hunk]
+public struct FileDiff {
+    public var oldPath: String
+    public var newPath: String
+    public var hunks: [Hunk]
 }
 
-struct Diff {
-    var files: [FileDiff]
+public struct Diff {
+    public var files: [FileDiff]
 }
 
-struct GitDiffParser {
-    static func parse(diffText: String) -> Diff {
+public enum GitDiffParser {
+    public static func parse(diffText: String) -> Diff {
         let hunkHeaderRegex = Regex {
             "@@ -"
             Capture {
@@ -82,17 +82,14 @@ struct GitDiffParser {
                 if let hunk = currentHunk {
                     currentFile?.hunks.append(hunk)
                 }
-
                 guard let match = line.firstMatch(of: hunkHeaderRegex) else {
                     // skip malformed hunk
                     continue
                 }
-
                 let oldStart = Int(match.output.1)!
                 let oldCount = match.output.2.map { Int($0)! } ?? 1
                 let newStart = Int(match.output.3)!
                 let newCount = match.output.4.map { Int($0)! } ?? 1
-
                 currentHunk = Hunk(
                     header: line,
                     oldStart: oldStart,
