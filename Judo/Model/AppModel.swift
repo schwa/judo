@@ -4,6 +4,7 @@ import Foundation
 import Observation
 import System
 import SwiftUI
+import JudoSupport
 
 @Observable
 public class AppModel: Identifiable {
