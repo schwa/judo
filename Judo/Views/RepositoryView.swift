@@ -10,9 +10,6 @@ struct RepositoryView: View {
 
     @Environment(RepositoryViewModel.self)
     var viewModel
-    
-    @Environment(\.actionRunner)
-    var actionRunner
 
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -29,12 +26,31 @@ struct RepositoryView: View {
                 ChangesDetailView(changes: selectedChanges)
             }
         }
-
-        .modifier(ActionHostViewModifier())
+        .environment(\.actionRunner, viewModel.actionRunner)
         .navigationDocument(viewModel.repository.path.url)
         .navigationSubtitle("\(viewModel.repository.path.description)")
         .toolbar {
             toolbar
+            
+            ToolbarItem(placement: .status) {
+                StatusView(status: $viewModel.actionStatus)
+            }
+        }
+        .sheet(item: $viewModel.actionPreview) { preview in
+            preview.body
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            viewModel.actionPreview = nil
+                        }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("OK") {
+                            viewModel.actionPreview = nil
+                            preview.confirm()
+                        }
+                    }
+                }
         }
         .task {
             try! await viewModel.refreshLog()
@@ -44,7 +60,7 @@ struct RepositoryView: View {
         .focusedSceneValue(\.repositoryViewModel, viewModel)
         .onAppear {
             print("RepositoryView appeared with repository: \(viewModel.repository.path)")
-            viewModel.actionRunner = actionRunner
+            viewModel.setupActionRunner()
         }
     }
 
