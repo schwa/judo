@@ -48,6 +48,24 @@ struct JudoDocumentScene: Scene {
             }
 
             CommandMenu("Repository") {
+                Button("Refresh") {
+                    guard let repositoryViewModel else {
+                        logger?.error("No repository focused")
+                        return
+                    }
+                    Task {
+                        do {
+                            try await repositoryViewModel.refreshLog()
+                        } catch {
+                            logger?.error("Failed to refresh repository: \(error)")
+                        }
+                    }
+                }
+                .keyboardShortcut("r", modifiers: [.command])
+                .disabled(repositoryViewModel == nil)
+                
+                Divider()
+                
                 Button("Reveal in Finder") {
                     guard let repositoryViewModel else {
                         logger?.error("No repository focused")

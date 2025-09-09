@@ -3,11 +3,6 @@ import JudoSupport
 import SwiftUI
 
 struct RepositoryLogView: View {
-    var log: RepositoryLog
-
-    @Binding
-    var selection: Set<ChangeID>
-
     @Environment(RepositoryViewModel.self)
     var repositoryViewModel
     
@@ -24,18 +19,20 @@ struct RepositoryLogView: View {
     var debugUI: Bool = false
 
     var body: some View {
-        List(selection: $selection) {
+        @Bindable
+        var repositoryViewModel = repositoryViewModel
+        List(selection: $repositoryViewModel.selection) {
             ForEach(graph.rows) { row in
-                if let change = log.changes[row.node] {
-                    RepositoryLogRow(row: row, change: change, selected: selection.contains(row.node), laneCount: graph.laneCount)
+                if let change = repositoryViewModel.currentLog.changes[row.node] {
+                    RepositoryLogRow(row: row, change: change, selected: repositoryViewModel.selection.contains(row.node), laneCount: graph.laneCount)
                 }
             }
             .onMove { from, to in
                 move(from: from, to: to)
             }
         }
-        .onChange(of: log.changes, initial: true) {
-            graph = log.makeGraph()
+        .onChange(of: repositoryViewModel.currentLog.changes, initial: true) {
+            graph = repositoryViewModel.currentLog.makeGraph()
         }
     }
 
@@ -74,12 +71,12 @@ struct RepositoryLogView: View {
             return
         }
         let from = from.map {
-            log.changes.values[$0]
+            repositoryViewModel.currentLog.changes.values[$0]
         }
-        let to = log.changes.values[to]
-        actionRunner.with(action: Action(name: "Rabase") {
+        let to = repositoryViewModel.currentLog.changes.values[to]
+        actionRunner.with(action: Action(name: "Rebase") {
             try await repositoryViewModel.repository.rebase(jujutsu: appModel.jujutsu, from: from.map(\.changeID), to: to.changeID)
-            try await repositoryViewModel.log(revset: log.revset ?? "")
+            try await repositoryViewModel.refreshLog()
         })
     }
 }

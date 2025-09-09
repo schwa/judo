@@ -32,7 +32,7 @@ struct MixedModeRepositoryView: View {
             //                }
             //            }
             //            .padding()
-            RepositoryLogView(log: repositoryViewModel.currentLog, selection: $selection)
+            RepositoryLogView()
 
             //            bookmarksView
             //            Text("\(repository.currentLog.changes.count)")
