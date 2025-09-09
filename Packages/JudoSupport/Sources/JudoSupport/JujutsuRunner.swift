@@ -37,22 +37,22 @@ public actor JujutsuRunner {
         return FilePath("/bin/sh")
     }
     
-    private func shellify(_ arguments: [String]) -> String {
-        arguments
-            .map { arg in
-                // Escape special characters for shell
-                let escaped = arg
-                    .replacingOccurrences(of: "\\", with: "\\\\")
-                    .replacingOccurrences(of: "\"", with: "\\\"")
-                    .replacingOccurrences(of: "$", with: "\\$")
-                    .replacingOccurrences(of: "`", with: "\\`")
-                return "\"\(escaped)\""
-            }
-            .joined(separator: " ")
+    @discardableResult
+    public func run(subcommand: String, arguments: [String], useShell: Bool = false) async throws -> Data {
+        let command = Command(
+            executable: jujutsu.binaryPath,
+            subcommand: subcommand,
+            arguments: arguments,
+            workingDirectory: repositoryPath,
+            useShell: useShell,
+            shell: useShell ? userShell : nil
+        )
+        
+        return try await execute(command)
     }
     
     @discardableResult
-    public func run(subcommand: String, arguments: [String], useShell: Bool = false) async throws -> Data {
+    public func execute(_ command: Command) async throws -> Data {
         // Chain this task after the current one
         let previousTask = currentTask
         
@@ -61,7 +61,7 @@ public actor JujutsuRunner {
             await previousTask?.value
             
             // Now run our command
-            return try await self.executeCommand(subcommand: subcommand, arguments: arguments, useShell: useShell)
+            return try await self.executeCommand(command)
         }
         
         // Store this as the new current task
@@ -73,32 +73,25 @@ public actor JujutsuRunner {
         return try await task.value
     }
     
-    private func executeCommand(subcommand: String, arguments: [String], useShell: Bool) async throws -> Data {
-        let configuration: Subprocess.Configuration
-        if !useShell {
-            logger?.info("Running jujutsu directly: \(jujutsu.binaryPath.string) \(subcommand) \(arguments.joined(separator: " "))")
-            configuration = Subprocess.Configuration(executable: .path(jujutsu.binaryPath), arguments: Arguments(["--no-pager", "--color=never"] + [subcommand] + arguments), workingDirectory: repositoryPath)
-        }
-        else {
-            let shell = userShell
-            let shellCommand = shellify([jujutsu.binaryPath.string] + ["--no-pager", "--color=never"] + [subcommand] + arguments)
-            logger?.info("Running jujutsu via shell: \(shell) -c \(shellCommand)")
-            configuration = Subprocess.Configuration(executable: .path(shell), arguments: Arguments(["-c", shellCommand]), workingDirectory: repositoryPath)
-        }
+    private func executeCommand(_ command: Command) async throws -> Data {
+        logger?.info("Executing: \(command.description)")
+        
+        let configuration = command.configuration
+        
         do {
             let result = try await Subprocess.run(configuration, output: .data, error: .string)
             if !result.terminationStatus.isSuccess {
-                throw JujutsuCLIError(configuration: configuration, result: result)
+                throw JujutsuCLIError(command: command, result: result)
             }
             return result.standardOutput
         } catch {
-            logger?.error("Error running jujutsu: \(error)")
+            logger?.error("Error executing command: \(error)")
             throw error
         }
     }
 }
 
 struct JujutsuCLIError: Error {
-    var configuration: Subprocess.Configuration
-    var result:  CollectedResult<DataOutput, StringOutput<Unicode.UTF8>>
+    var command: Command
+    var result: CollectedResult<DataOutput, StringOutput<Unicode.UTF8>>
 }
