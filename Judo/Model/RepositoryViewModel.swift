@@ -6,9 +6,17 @@ import System
 
 @Observable
 class RepositoryViewModel {
+    enum Mode: Hashable, CaseIterable {
+        case timeline
+        case mixed
+        case change
+    }
+    
     var repository: Repository
     var jujutsu: Jujutsu
     var currentLog: RepositoryLog = RepositoryLog()
+    var mode: Mode = .mixed
+    var selection: Set<ChangeID> = []
 
     init(jujutsu: Jujutsu, path: FilePath) {
         self.jujutsu = jujutsu

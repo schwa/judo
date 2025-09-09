@@ -8,29 +8,19 @@ struct RepositoryView: View {
     init() {
     }
 
-    enum Mode: Hashable, CaseIterable {
-        case timeline
-        case mixed
-        case change
-    }
-
-    @State
-    private var mode: Mode = .mixed
-
     @Environment(RepositoryViewModel.self)
     var viewModel
 
-    @State
-    private var selection: Set<ChangeID> = []
-
     var body: some View {
+        @Bindable var viewModel = viewModel
+        
         Group {
-            switch mode {
+            switch viewModel.mode {
             case .timeline:
-                ChangesGraphView(selection: $selection)
+                ChangesGraphView(selection: $viewModel.selection)
 
             case .mixed:
-                MixedModeRepositoryView(selection: $selection)
+                MixedModeRepositoryView(selection: $viewModel.selection)
 
             case .change:
                 ChangesDetailView(changes: selectedChanges)
@@ -56,13 +46,15 @@ struct RepositoryView: View {
 
     @ToolbarContentBuilder
     var toolbar: some ToolbarContent {
+        @Bindable var viewModel = viewModel
+        
         ToolbarItem(placement: .navigation) {
-            Picker("Mode", selection: $mode) {
-                Text("Timeline").tag(Mode.timeline)
+            Picker("Mode", selection: $viewModel.mode) {
+                Text("Timeline").tag(RepositoryViewModel.Mode.timeline)
                     .keyboardShortcut("1", modifiers: [.command])
-                Text("Mixed").tag(Mode.mixed)
+                Text("Mixed").tag(RepositoryViewModel.Mode.mixed)
                     .keyboardShortcut("2", modifiers: [.command])
-                Text("Change").tag(Mode.change)
+                Text("Change").tag(RepositoryViewModel.Mode.change)
                     .keyboardShortcut("3", modifiers: [.command])
             }
             .pickerStyle(.segmented)
@@ -71,7 +63,7 @@ struct RepositoryView: View {
 
     var selectedChanges: [Change] {
         let log = viewModel.currentLog
-        return selection
+        return viewModel.selection
             .sorted { lhs, rhs in
                 let lhs = log.changes.index(forKey: lhs) ?? -1 // TODO: #7 -1?
                 let rhs = log.changes.index(forKey: rhs) ?? -1 // TODO: #7 -1?
