@@ -45,17 +45,8 @@ struct ChangeDetailView: View {
 
     @ViewBuilder
     var metadata: some View {
-        Form {
-            IDView(change.changeID, variant: .changeID)
-            IDView(change.commitID, variant: .commitID)
-            HStack {
-                Image(systemName: "gear")
-                ContactView(name: change.author.name, email: change.author.email)
-                Text("\(change.author.timestamp, style: .relative)")
-            }
-            ChangeDescriptionEditor(change: change)
-        }
-        .padding()
+        ChangeMetadataFullView(change: change)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     @ViewBuilder
@@ -66,7 +57,7 @@ struct ChangeDetailView: View {
             } else {
                 List(value.diff.files, id: \.path, selection: $selectedFile) { f in
                     HStack {
-                        f.status.view
+                        f.status.view.frame(width: 18, height: 18)
                         Text(describing: f.path)
                     }
                 }
@@ -80,32 +71,45 @@ struct ChangeDetailView: View {
 }
 
 extension TreeDiffEntry.Status {
-    var view: some View {
+
+    var color: Color {
         switch self {
-        case .modified:
-            Image(systemName: "pencil")
-                .foregroundStyle(.white)
-                .background(Color.blue, in: RoundedRectangle(cornerRadius: 2))
-
-        case .added:
-            Image(systemName: "plus")
-                .foregroundStyle(.white)
-                .background(Color.green, in: RoundedRectangle(cornerRadius: 2))
-
-        case .removed:
-            Image(systemName: "minus")
-                .foregroundStyle(.white)
-                .background(Color.red, in: RoundedRectangle(cornerRadius: 2))
-
-        case .copied:
-            Image(systemName: "doc.on.doc")
-                .foregroundStyle(.white)
-                .background(Color.cyan, in: RoundedRectangle(cornerRadius: 2))
-
-        case .renamed:
-            Image(systemName: "arrow.right.arrow.left")
-                .foregroundStyle(.white)
-                .background(Color.purple, in: RoundedRectangle(cornerRadius: 2))
+            case .modified: return .blue
+            case .added: return .green
+            case .removed: return .red
+            case .copied: return .cyan
+            case .renamed: return .purple
         }
     }
+
+    var systemImageName: String {
+        switch self {
+        case .modified: return "pencil"
+        case .added: return "plus"
+        case .removed: return "minus"
+        case .copied: return "doc.on.doc"
+        case .renamed: return "arrow.right.arrow.left"
+        }
+    }
+
+    var view: some View {
+        ZStack {
+            color
+                .aspectRatio(1, contentMode: .fill)
+            Image(systemName: systemImageName)
+                .foregroundStyle(.white)
+        }
+    }
+}
+
+#Preview {
+    VStack {
+        ForEach(TreeDiffEntry.Status.allCases, id: \.self) { status in
+            status.view
+                .frame(width: 50)
+                .padding()
+                .border(Color.black)
+        }
+    }
+    .padding()
 }

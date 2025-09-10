@@ -30,7 +30,7 @@ public struct TreeDiff: Decodable, JutsuTemplateProviding, Sendable {
 }
 
 public struct TreeDiffEntry: Decodable, JutsuTemplateProviding, Sendable {
-    public enum Status: String, Decodable, Sendable {
+    public enum Status: String, Decodable, Sendable, CaseIterable {
         case modified
         case added
         case removed

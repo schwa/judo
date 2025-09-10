@@ -71,8 +71,3 @@ struct SignatureMinimalView: View {
         Spacer()
     }
 }
-
-extension Signature {
-    static let example = Signature(name: "Jane Doe", email: "janedoe@example.com", timestamp: Date())
-}
-

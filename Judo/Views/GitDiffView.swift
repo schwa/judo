@@ -93,12 +93,7 @@ struct FileChangeHeaderView: View {
 
     var file: FileDiff
 
-
     var body: some View {
-
-
-
-
         Text("\(file.oldPath) → \(file.newPath)")
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             .background(Color.blue)
